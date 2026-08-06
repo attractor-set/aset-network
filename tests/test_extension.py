@@ -17,7 +17,11 @@ def test_upstream_binding_is_exact() -> None:
 
 
 def test_model_preserves_seed_boundary() -> None:
-    model = json.loads((ROOT / "extension/canonical/source/network-extension-model.json").read_text(encoding="utf-8"))
+    model = json.loads(
+        (ROOT / "extension/canonical/source/network-extension-model.json").read_text(
+            encoding="utf-8"
+        )
+    )
     texts = " ".join(item["text"] for item in model["invariants"])
     assert "target-local Seed" in texts
     assert "may not weaken" in texts
@@ -32,7 +36,9 @@ def test_all_conformance_cases_match_reference_observables() -> None:
 
 
 def test_canon_package_integrity() -> None:
-    package = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8"))
+    package = json.loads(
+        (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
+    )
     declared = package.pop("package_digest")
     canonical = (json.dumps(package, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
     assert declared == "sha256:" + hashlib.sha256(canonical).hexdigest()
@@ -45,7 +51,12 @@ def test_canon_package_integrity() -> None:
 
 
 def test_import_is_never_accepted_by_observation_alone() -> None:
-    case = json.loads((ROOT / "extension/canonical/conformance/cases/positive/NET-POS-005.json").read_text(encoding="utf-8"))
+    case = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/cases/positive/NET-POS-005.json"
+        ).read_text(encoding="utf-8")
+    )
     state, actual = execute_case(case)
     assert actual["semantic_status"] == "UNKNOWN"
     assert actual["enforcement"] == "BLOCKED"

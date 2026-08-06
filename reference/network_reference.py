@@ -15,11 +15,26 @@ def empty_state() -> None:
     return None
 
 
-def _result(accepted: bool, code: str, changed: bool, status: str = "NOT_APPLICABLE", enforcement: str = "NOT_APPLICABLE") -> dict[str, Any]:
-    return {"accepted": accepted, "code": code, "state_changed": changed, "semantic_status": status, "enforcement": enforcement}
+def _result(
+    accepted: bool,
+    code: str,
+    changed: bool,
+    status: str = "NOT_APPLICABLE",
+    enforcement: str = "NOT_APPLICABLE",
+) -> dict[str, Any]:
+    return {
+        "accepted": accepted,
+        "code": code,
+        "state_changed": changed,
+        "semantic_status": status,
+        "enforcement": enforcement,
+    }
 
 
-def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -> tuple[dict[str, Any] | None, dict[str, Any]]:
+def apply_transition(
+    state: dict[str, Any] | None,
+    transition: dict[str, Any],
+) -> tuple[dict[str, Any] | None, dict[str, Any]]:
     before = copy.deepcopy(state)
     kind = transition["kind"]
     payload = transition["payload"]
@@ -31,7 +46,12 @@ def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -
             "federation_id": payload["federation_id"],
             "federation_epoch": payload.get("federation_epoch", 0),
             "constitution_digest": payload["constitution_digest"],
-            "members": {}, "routes": {}, "exports": {}, "imports": {}, "recognitions": {}, "history": [],
+            "members": {},
+            "routes": {},
+            "exports": {},
+            "imports": {},
+            "recognitions": {},
+            "history": [],
         }
         return _append(state, transition, _result(True, "FEDERATION_CREATED", True))
 
@@ -69,7 +89,10 @@ def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -
             return state, _result(False, "ROUTE_MEMBER_INACTIVE", False)
         if route["source_context_id"] == route["target_context_id"]:
             return state, _result(False, "SELF_ROUTE_FORBIDDEN", False)
-        if route["source_policy_epoch"] != source["policy_epoch"] or route["target_policy_epoch"] != target["policy_epoch"]:
+        if (
+            route["source_policy_epoch"] != source["policy_epoch"]
+            or route["target_policy_epoch"] != target["policy_epoch"]
+        ):
             return state, _result(False, "POLICY_EPOCH_MISMATCH", False)
         if route["status"] != "ACTIVE":
             return state, _result(False, "ROUTE_NOT_ACTIVE", False)
@@ -98,7 +121,17 @@ def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -
         if not exact:
             return state, _result(False, "ROUTE_BINDING_MISMATCH", False)
         state["exports"][eid] = copy.deepcopy(export)
-        return _append(state, transition, _result(True, "ARTIFACT_EXPORTED", True, "NOT_APPLICABLE", "NOT_APPLICABLE"))
+        return _append(
+            state,
+            transition,
+            _result(
+                True,
+                "ARTIFACT_EXPORTED",
+                True,
+                "NOT_APPLICABLE",
+                "NOT_APPLICABLE",
+            ),
+        )
 
     if kind == "OBSERVE_IMPORT":
         observation = payload["import"]
@@ -117,36 +150,69 @@ def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -
             return state, _result(False, "TARGET_CONTEXT_INACTIVE", False, "UNKNOWN", "BLOCKED")
         exact = (
             observation["route_id"] == export["route_id"]
-            and observation["target_context_id"] == export["target_context_id"] == route["target_context_id"]
+            and (
+                observation["target_context_id"]
+                == export["target_context_id"]
+                == route["target_context_id"]
+            )
             and observation["artifact_digest"] == export["artifact_digest"]
             and observation["scope_digest"] == export["scope_digest"] == route["scope_digest"]
-            and observation["target_policy_epoch"] == route["target_policy_epoch"] == target["policy_epoch"]
+            and (
+                observation["target_policy_epoch"]
+                == route["target_policy_epoch"]
+                == target["policy_epoch"]
+            )
         )
         if not exact:
             return state, _result(False, "IMPORT_BINDING_MISMATCH", False, "UNKNOWN", "BLOCKED")
         if observation["semantic_status"] != "UNKNOWN" or observation["enforcement"] != "BLOCKED":
             return state, _result(False, "IMPORT_MUST_START_BLOCKED", False, "UNKNOWN", "BLOCKED")
         state["imports"][iid] = copy.deepcopy(observation)
-        return _append(state, transition, _result(True, "IMPORT_OBSERVED", True, "UNKNOWN", "BLOCKED"))
+        return _append(
+            state,
+            transition,
+            _result(True, "IMPORT_OBSERVED", True, "UNKNOWN", "BLOCKED"),
+        )
 
     if kind == "RECORD_RECOGNITION":
         receipt = payload["recognition"]
         rid = receipt["recognition_id"]
         existing = state["recognitions"].get(rid)
         if existing == receipt:
-            return state, _result(True, "IDEMPOTENT_REPLAY", False, receipt["semantic_status"], receipt["enforcement"])
+            return state, _result(
+                True,
+                "IDEMPOTENT_REPLAY",
+                False,
+                receipt["semantic_status"],
+                receipt["enforcement"],
+            )
         if existing is not None:
             return state, _result(False, "IDENTIFIER_CONFLICT", False, "UNKNOWN", "BLOCKED")
         observation = state["imports"].get(receipt["import_id"])
         if observation is None:
             return state, _result(False, "IMPORT_NOT_FOUND", False, "UNKNOWN", "BLOCKED")
-        exact = all(receipt[k] == observation[k] for k in ("target_context_id", "resolution_id", "question_digest", "scope_digest", "target_policy_epoch"))
+        exact = all(
+            receipt[k] == observation[k]
+            for k in (
+                "target_context_id",
+                "resolution_id",
+                "question_digest",
+                "scope_digest",
+                "target_policy_epoch",
+            )
+        )
         if not exact:
             return state, _result(False, "SEED_BINDING_MISMATCH", False, "UNKNOWN", "BLOCKED")
         status = receipt["semantic_status"]
         enforcement = receipt["enforcement"]
         if status not in {"ACCEPT", "DENY"}:
-            return state, _result(False, "TERMINAL_SEED_DECISION_REQUIRED", False, "UNKNOWN", "BLOCKED")
+            return state, _result(
+                False,
+                "TERMINAL_SEED_DECISION_REQUIRED",
+                False,
+                "UNKNOWN",
+                "BLOCKED",
+            )
         if (status, enforcement) not in {("ACCEPT", "ALLOW"), ("DENY", "BLOCKED")}:
             return state, _result(False, "SEED_ENFORCEMENT_MISMATCH", False, "UNKNOWN", "BLOCKED")
         state["recognitions"][rid] = copy.deepcopy(receipt)
@@ -170,7 +236,12 @@ def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -
             return state, _result(False, "MEMBER_NOT_FOUND", False)
         if member["status"] == "WITHDRAWN":
             return state, _result(True, "IDEMPOTENT_REPLAY", False)
-        active_routes = [r for r in state["routes"].values() if r["status"] == "ACTIVE" and cid in {r["source_context_id"], r["target_context_id"]}]
+        active_routes = [
+            r
+            for r in state["routes"].values()
+            if r["status"] == "ACTIVE"
+            and cid in {r["source_context_id"], r["target_context_id"]}
+        ]
         if active_routes:
             return state, _result(False, "ACTIVE_ROUTE_DEPENDENCY", False)
         member["status"] = "WITHDRAWN"
@@ -179,7 +250,11 @@ def apply_transition(state: dict[str, Any] | None, transition: dict[str, Any]) -
     return before, _result(False, "UNKNOWN_TRANSITION", False)
 
 
-def _append(state: dict[str, Any], transition: dict[str, Any], result: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
+def _append(
+    state: dict[str, Any],
+    transition: dict[str, Any],
+    result: dict[str, Any],
+) -> tuple[dict[str, Any], dict[str, Any]]:
     state["history"].append(_digest({"transition": transition, "result": result}))
     return state, result
 
