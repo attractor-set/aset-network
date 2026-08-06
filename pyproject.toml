@@ -1,0 +1,16 @@
+[project]
+name = "aset-network-extension"
+version = "0.1.0a1"
+description = "Federation and cross-context recognition extension for ASET Seed"
+requires-python = ">=3.12"
+license = {text = "Apache-2.0"}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

@@ -1,0 +1,151 @@
+{
+  "canonicality": {
+    "conformance_cases": "NORMATIVE_BLACK_BOX_EXPECTATIONS",
+    "formal_projection": "ASSURANCE_PROJECTION",
+    "implementation_precedence": "NONE",
+    "machine_readable_model": "NORMATIVE_CANON",
+    "protocol_schemas": "NORMATIVE_WIRE_PROFILE",
+    "reference_implementation": "NON_NORMATIVE"
+  },
+  "document_type": "aset-network-extension-model",
+  "extension_id": "ASET-NETWORK-EXTENSION",
+  "invariants": [
+    {
+      "id": "NET-INV-001",
+      "text": "Membership, ancestry and routing do not create Resolution Authority in another Context."
+    },
+    {
+      "id": "NET-INV-002",
+      "text": "An export alone never changes target-local state and never authorizes an effect."
+    },
+    {
+      "id": "NET-INV-003",
+      "text": "Every accepted import observation begins as Seed semantic status UNKNOWN with enforcement BLOCKED."
+    },
+    {
+      "id": "NET-INV-004",
+      "text": "Recognition requires an exact target-local Seed resolution binding and a terminal ACCEPT or DENY."
+    },
+    {
+      "id": "NET-INV-005",
+      "text": "Target enforcement is ALLOW only for target-local ACCEPT; UNKNOWN and DENY remain BLOCKED."
+    },
+    {
+      "id": "NET-INV-006",
+      "text": "Route, export, import and recognition preserve exact source, target, scope and policy-epoch bindings."
+    },
+    {
+      "id": "NET-INV-007",
+      "text": "Every active route has two distinct active member Contexts."
+    },
+    {
+      "id": "NET-INV-008",
+      "text": "A member may withdraw only after every route involving it is suspended."
+    },
+    {
+      "id": "NET-INV-009",
+      "text": "Federation and metafederation composition does not imply a superior Context or inherited Authority."
+    },
+    {
+      "id": "NET-INV-010",
+      "text": "Accepted transitions append one history digest and never rewrite prior history."
+    },
+    {
+      "id": "NET-INV-011",
+      "text": "An exact replay is idempotent; a conflicting reuse of an identifier is rejected."
+    },
+    {
+      "id": "NET-INV-012",
+      "text": "This extension may strengthen but may not weaken the pinned ASET Seed invariants."
+    }
+  ],
+  "normative_scope": {
+    "defines": [
+      "federation identity and epoch",
+      "explicit Context membership",
+      "bounded route grants between active Contexts",
+      "content-addressed export envelopes",
+      "target-local import observations",
+      "binding of imported artifacts to target-local ASET Seed resolution cycles",
+      "local recognition receipts",
+      "route suspension and bounded withdrawal"
+    ],
+    "does_not_define": [
+      "transport",
+      "peer discovery",
+      "consensus",
+      "storage engine",
+      "durability",
+      "cryptographic provider",
+      "key custody",
+      "homomorphic encryption",
+      "partition reconciliation",
+      "availability",
+      "execution of accepted effects"
+    ]
+  },
+  "principles": [
+    {
+      "id": "NET-PR-001",
+      "text": "Each Context retains its own Constitution, Authority, canonical state and local recognition of Outcome."
+    },
+    {
+      "id": "NET-PR-002",
+      "text": "Federation membership and Context ancestry create no Authority inheritance."
+    },
+    {
+      "id": "NET-PR-003",
+      "text": "A cross-context export is evidence presented to the target Context, not a decision binding the target Context."
+    },
+    {
+      "id": "NET-PR-004",
+      "text": "A federation or metafederation is a composition relation and never a superior Context by implication."
+    }
+  ],
+  "requirements": [
+    {
+      "id": "NET-REQ-001",
+      "text": "Implementations MUST expose deterministic observable results for every conformance case."
+    },
+    {
+      "id": "NET-REQ-002",
+      "text": "Implementations MUST reject cross-context effects not backed by target-local ACCEPT."
+    },
+    {
+      "id": "NET-REQ-003",
+      "text": "Implementations MUST bind all route and recognition operations to exact Context IDs, scope digests and policy epochs."
+    },
+    {
+      "id": "NET-REQ-004",
+      "text": "Implementations MUST retain provenance linking recognition to export, import observation and Seed resolution."
+    },
+    {
+      "id": "NET-REQ-005",
+      "text": "Implementations MUST publish operational security and durability guarantees separately."
+    }
+  ],
+  "schema_version": 1,
+  "state": {
+    "exports": "ExportID -> content-addressed envelope",
+    "federation_epoch": "monotone integer",
+    "federation_id": "immutable identifier",
+    "history": "append-only transition digest sequence",
+    "imports": "ImportID -> target-local UNKNOWN/BLOCKED observation",
+    "members": "ContextID -> member descriptor",
+    "recognitions": "RecognitionID -> target-local terminal Seed result receipt",
+    "routes": "RouteID -> exact source/target/scope/epoch grant"
+  },
+  "status": "FEDERATION_RECOGNITION_CORE_ALPHA",
+  "transition_kinds": [
+    "FEDERATION_GENESIS",
+    "MEMBER_JOIN",
+    "ROUTE_GRANT",
+    "EXPORT_ARTIFACT",
+    "OBSERVE_IMPORT",
+    "RECORD_RECOGNITION",
+    "SUSPEND_ROUTE",
+    "MEMBER_WITHDRAW"
+  ],
+  "upstream_binding_ref": "upstream/ASET_SEED_BINDING.json",
+  "version": "0.1.0-alpha.1"
+}

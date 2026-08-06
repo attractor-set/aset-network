@@ -1,0 +1,5 @@
+ASET Network Extension
+Copyright 2026 Aleksandr Polin
+
+This repository contains a separately versioned extension of ASET Seed.
+ASET Seed remains the normative upstream resolution core and is not modified by this extension.

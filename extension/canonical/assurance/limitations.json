@@ -1,0 +1,36 @@
+{
+  "document_type": "aset-network-extension-assurance-limitations",
+  "limitations": [
+    {
+      "description": "The included TLA+ module is a bounded assurance projection, not an unbounded refinement proof.",
+      "id": "NET-LIMIT-001",
+      "scope": "formal-assurance",
+      "status": "BOUNDED_ONLY"
+    },
+    {
+      "description": "The alpha does not select transport, discovery, consensus, durability or availability mechanisms.",
+      "id": "NET-LIMIT-002",
+      "scope": "transport-and-consensus",
+      "status": "OUT_OF_SCOPE"
+    },
+    {
+      "description": "Cryptographic algorithms, key custody and homomorphic-encryption profiles are not selected.",
+      "id": "NET-LIMIT-003",
+      "scope": "cryptography",
+      "status": "OUT_OF_SCOPE"
+    },
+    {
+      "description": "Partition classes, fork evidence and reconciliation are deferred to a separate coordination profile.",
+      "id": "NET-LIMIT-004",
+      "scope": "partition-reconciliation",
+      "status": "DEFERRED_PROFILE"
+    },
+    {
+      "description": "No independent third-party audit is bound to the exact alpha package digest.",
+      "id": "NET-LIMIT-005",
+      "scope": "external-audit",
+      "status": "PENDING"
+    }
+  ],
+  "schema_version": 1
+}

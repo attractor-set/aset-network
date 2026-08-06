@@ -1,0 +1,8 @@
+{
+  "$id": "https://spec.aset.example/network/0.1/schemas/federation-state.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": [
+    "object",
+    "null"
+  ]
+}

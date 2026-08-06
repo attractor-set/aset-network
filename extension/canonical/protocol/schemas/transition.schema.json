@@ -1,0 +1,31 @@
+{
+  "$id": "https://spec.aset.example/network/0.1/schemas/transition.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "kind": {
+      "enum": [
+        "FEDERATION_GENESIS",
+        "MEMBER_JOIN",
+        "ROUTE_GRANT",
+        "EXPORT_ARTIFACT",
+        "OBSERVE_IMPORT",
+        "RECORD_RECOGNITION",
+        "SUSPEND_ROUTE",
+        "MEMBER_WITHDRAW"
+      ]
+    },
+    "payload": {
+      "type": "object"
+    },
+    "transition_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    }
+  },
+  "required": [
+    "transition_id",
+    "kind",
+    "payload"
+  ],
+  "type": "object"
+}

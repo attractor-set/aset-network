@@ -1,0 +1,74 @@
+{
+  "$id": "https://spec.aset.example/network/0.1/schemas/conformance-case.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "case_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "expected": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted": {
+          "type": "boolean"
+        },
+        "code": {
+          "type": "string"
+        },
+        "enforcement": {
+          "enum": [
+            "NOT_APPLICABLE",
+            "BLOCKED",
+            "ALLOW"
+          ]
+        },
+        "semantic_status": {
+          "enum": [
+            "NOT_APPLICABLE",
+            "UNKNOWN",
+            "ACCEPT",
+            "DENY"
+          ]
+        },
+        "state_changed": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "accepted",
+        "code",
+        "state_changed",
+        "semantic_status",
+        "enforcement"
+      ],
+      "type": "object"
+    },
+    "initial_state": {
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "polarity": {
+      "enum": [
+        "positive",
+        "negative"
+      ]
+    },
+    "steps": {
+      "items": {
+        "$ref": "transition.schema.json"
+      },
+      "minItems": 1,
+      "type": "array"
+    }
+  },
+  "required": [
+    "case_id",
+    "polarity",
+    "initial_state",
+    "steps",
+    "expected"
+  ],
+  "type": "object"
+}

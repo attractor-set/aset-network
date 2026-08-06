@@ -1,0 +1,149 @@
+{
+  "canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA1",
+  "document_type": "aset-extension-canon-package",
+  "extension_id": "ASET-NETWORK-EXTENSION",
+  "extension_version": "0.1.0-alpha.1",
+  "files": [
+    {
+      "path": "extension/canonical/assurance/limitations.json",
+      "sha256": "sha256:230b28e4b64fb60cf2b06efd5956ef67ecebe61b6818aa092c55a37577aafe8c"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-001.json",
+      "sha256": "sha256:b0d8c131af202ed259c8bffca835179f7ad95fae9e9cb409314de2934a920849"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-002.json",
+      "sha256": "sha256:388b898a1e4998fd6a09fe6cff9190ea9735a17c86d5b781389062fe579a72f6"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-003.json",
+      "sha256": "sha256:5a39454402d6c15600461434e2f9a39044537a0f958c8de492ecacbfe3433d31"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-004.json",
+      "sha256": "sha256:a1eb82181230b491fea2b7968b2a7ff82c7c941f12cebac579e7806255cd9091"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-005.json",
+      "sha256": "sha256:e40c58dc7f98d5f86c2b7e331b1d08a0e3505afea513a65e9b6570d46e318ea7"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-006.json",
+      "sha256": "sha256:37bf8592944b0a180211c7e7e36d9347c8d4204e442c3e1b0f36ded9efaf1b4c"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-007.json",
+      "sha256": "sha256:935efad7bbe12a871c5e8f9b2e7215ddaa4d2322198ad39f39074eb4c179d23a"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-008.json",
+      "sha256": "sha256:cb54d5f5d594998fdeb807cabe15a41896942063e3b06c97c84b5a058a379f0a"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-009.json",
+      "sha256": "sha256:cbb4df54292b5a1d96f2567e65ea96f8b799ca4b7aed8a627f48c16ae8a5864f"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/negative/NET-NEG-010.json",
+      "sha256": "sha256:6585924c1dba29a2209bf589d03c1c573f98f77c026c3d9be0760b3f97acbf31"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-001.json",
+      "sha256": "sha256:0f9951c7f4fea4f48f121581dc5ebfab3453c63c8097b9993576a4eb9eaae78b"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-002.json",
+      "sha256": "sha256:cac830db68339c6fd2d42adb511ad43d154ef6092adee8589d629ba7ddb4121d"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-003.json",
+      "sha256": "sha256:bfed9949716fcabb3619c980afcc0a5c8c2b5c0740d448ededd4279b6a589b52"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-004.json",
+      "sha256": "sha256:d22728c55d8622b513b98c6bf0be4c535e6bf55939d11d850bf22d95b5f6fe4f"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-005.json",
+      "sha256": "sha256:7be2c254a9ee5266c191ae65c839bc94d928f056da2387739d1131646d2b2391"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-006.json",
+      "sha256": "sha256:2eb4cd43abe1122db3d6d36b39ba488a807b597e9f6327acdc7e4e18993d579a"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-007.json",
+      "sha256": "sha256:6f321ea1be5517a68ebe120a3cde45c953d82ee42a93f34b6d8abb29fbc7ec27"
+    },
+    {
+      "path": "extension/canonical/conformance/cases/positive/NET-POS-008.json",
+      "sha256": "sha256:48147e71e825ca410f51b88827e5ef4e10f9bb5b70e7218a42230dbeeb5831a0"
+    },
+    {
+      "path": "extension/canonical/conformance/conformance-profile.json",
+      "sha256": "sha256:4a7f759171b5fa455bf4f1a53ed48004b1040df825a0c48a83d0ac6417fa1276"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkExtension.cfg",
+      "sha256": "sha256:4d63026b8b9b344c45005a700dd0e051321cd2942f59775852b855a3b55e521f"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkExtension.tla",
+      "sha256": "sha256:f2d3a5e9b19da03abaac93cf8e15fa31a4048d76af421d7e754bdba8ef876b58"
+    },
+    {
+      "path": "extension/canonical/protocol/protocol-profile.json",
+      "sha256": "sha256:377e0eb1ec69a8237c879bb44a0cd532d979c6717349d50ee9ae3db7777b0c15"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/common.schema.json",
+      "sha256": "sha256:8df06b8a9190aa3d8fea1f29e4f7b9f7346530541a0a36533789548ad5697a27"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/conformance-case.schema.json",
+      "sha256": "sha256:5eb2d50526f5c857393e4e00d651dd74d130d1c1bf116c5013d29320d5c14b94"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/export-envelope.schema.json",
+      "sha256": "sha256:bc81a8200f1e8d8048ea32b8a3c7bd75c8b992a502effea8b5634765c168065b"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/federation-state.schema.json",
+      "sha256": "sha256:314ba2906954dfb7064630ef03ddaaa29764e6c5eb5d34c0c47b329253b4255a"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/import-observation.schema.json",
+      "sha256": "sha256:6b59557f0d0b47630754719411db260473f7449b9dd65d1c2e861f3136510804"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/member-descriptor.schema.json",
+      "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/recognition-receipt.schema.json",
+      "sha256": "sha256:97158bfcafa419cdedb9edc53b028a8144db47836b5f8d7016912a7e1e56e0fe"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/route-grant.schema.json",
+      "sha256": "sha256:5d578c62d587ac916c5b929c64bdde04b5b8afb1450b4a65dd08b7eb19863366"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/transition.schema.json",
+      "sha256": "sha256:295d23d34de9d433a885796da5235772d339bff9432ae2d6a1af4f5452034eec"
+    },
+    {
+      "path": "extension/canonical/source/network-extension-model.json",
+      "sha256": "sha256:cc628cc49fb0909d6ad6e5943ba8156a0f3a6db1317bc8b5d831dc66cdeebe11"
+    },
+    {
+      "path": "upstream/ASET_SEED_BINDING.json",
+      "sha256": "sha256:cd0c630d08f98e29b043b1dcf615ddab0578b87781d394c7e959767164777f9c"
+    }
+  ],
+  "implementation_precedence": "NONE",
+  "normative_source": "extension/canonical/source/network-extension-model.json",
+  "package_digest": "sha256:661b47d488c03d19ef76e4cc7510231a6d0bced4e66949b81ceeefd50f2a90a1",
+  "schema_version": 1,
+  "upstream_binding": "upstream/ASET_SEED_BINDING.json"
+}

@@ -1,0 +1,42 @@
+{
+  "$id": "https://spec.aset.example/network/0.1/schemas/export-envelope.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_digest": {
+      "$ref": "common.schema.json#/$defs/digest"
+    },
+    "export_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "route_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "scope_digest": {
+      "$ref": "common.schema.json#/$defs/digest"
+    },
+    "source_context_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    },
+    "source_policy_epoch": {
+      "$ref": "common.schema.json#/$defs/epoch"
+    },
+    "source_state_root": {
+      "$ref": "common.schema.json#/$defs/digest"
+    },
+    "target_context_id": {
+      "$ref": "common.schema.json#/$defs/id"
+    }
+  },
+  "required": [
+    "export_id",
+    "route_id",
+    "source_context_id",
+    "target_context_id",
+    "artifact_digest",
+    "scope_digest",
+    "source_state_root",
+    "source_policy_epoch"
+  ],
+  "type": "object"
+}
