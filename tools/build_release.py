@@ -78,8 +78,9 @@ def main() -> int:
         encoding="utf-8",
         newline="\n",
     )
-    print(f"ARCHIVE={ARCHIVE}")
-    print(f"SHA256={digest}")
+    print(f"INPI_DEPOSIT_ARCHIVE={ARCHIVE}")
+    print(f"INPI_DEPOSIT_SHA256={digest}")
+    print("INPI_DEPOSIT=PASS")
     return 0
 
 
