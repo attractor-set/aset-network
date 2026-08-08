@@ -1,6 +1,6 @@
 # ASET Network Extension
 
-Status: **0.1.0-alpha.1 / núcleo de reconhecimento federado**
+Status: **0.1.0-alpha.2 / núcleo de reconhecimento federado**
 
 A extensão define uma camada de federação mínima e neutra em relação à implementação sobre o ASET Seed. Contexts independentes trocam artefatos endereçados por conteúdo sem transferir soberania e sem criar um supercontexto com autoridade superior.
 
@@ -16,12 +16,26 @@ Participação na federação, ancestralidade, rota e aceitação na origem não
 
 ## Vínculo com Seed
 
-- Canon: `ASET-SEED-RESOLUTION-CANON-0.2-ALPHA1`
-- Versão: `0.2.0-alpha.1`
-- Protocolo de conformidade: `ASET-SEED-RESOLUTION-CONFORMANCE-V1`
-- SHA-256 do arquivo `CANON_PACKAGE.json`: `sha256:fb4638962eb3fbb19ca18f46066d28e97e037c709b1a4b99bceab68e32e523db`
-- Digest interno do pacote Seed: `sha256:52862a9564a08cfb765ca1cc9d5551d439c75660f1fd11851e8d30d6ff7b1b8e`
+- Release do Seed: `seed-0.3.0-alpha.3`
+- Commit do Seed: `633c130187b2a2bb42f24cfd66662d475de385d2`
+- Canon: `ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1`
+- Versão do canon: `0.3.0-alpha.1`
+- Digest do pacote canon: `sha256:c5d48a418466ea7a60fccb7161adbd5ad568174bbc9a28fc03fd7e6e77955d31`
+- Seed Compatibility Standard: `ASET-SEED-COMPATIBILITY-STANDARD@seed-0.3.0-alpha.3`
+- Compatibility profile: `ASET-SEED-COMPATIBILITY-STANDARD-V1`
+- Seed conformance kit: `sha256:5ecf9b93377a062b8772b4b4b44b4d76a0997d8ba98e8711e717456abbe583db`
 
 O pacote normativo está em `extension/canonical/`. O modelo Python em `reference/` não tem precedência semântica.
 
-Transporte, descoberta, consenso, armazenamento, provedor criptográfico, HE, reconciliação e disponibilidade permanecem fora desta versão alpha.
+Mecanismos concretos de transporte, descoberta, consenso, armazenamento, provedor criptográfico, HE, reconciliação e garantias incondicionais de disponibilidade permanecem fora desta versão alpha. Liveness é definido apenas condicionalmente por `ASET-NETWORK-LIVENESS-V1`.
+
+
+## Verificação formal
+
+O canon legível por máquina continua sendo a fonte normativa. `NetworkExtension.tla` é uma assurance projection verificada com TLC real. `NetworkExtensionSeedProjection.tla` define a projeção fail-closed de cada Context de destino para a álgebra de resolução do Seed. O refinement comportamental exato em relação ao `SeedResolution.tla` fixado permanece explicitamente uma obrigação TLAPS separada e ainda não é reivindicado.
+
+O canon legível por máquina separa explicitamente o estado semântico da rede do histórico canônico de evidências. Ambos permanecem normativos: o estado semântico define a projeção de estado da rede, enquanto o histórico é um evidence trace append-only e, por si só, não confere Authority nem altera a elegibilidade de transições, salvo quando uma regra normativa referencia explicitamente uma transição anterior.
+
+`ASET-NETWORK-LIVENESS-V1` é uma capability claim normativa opcional, e não um requisito do core `ASET-NETWORK-EXTENSION-CONFORMANCE-V1`. Quando reivindicado, exige eventual resolução local (`ACCEPT` ou `DENY`) apenas sob assumptions explícitas de fairness/ambiente; não exige eventual `ACCEPT` nem consenso global.
+
+A ponte TLAPS para o `SeedResolution.tla` fixado é declarada em `NetworkExtensionSeedRefinement.tla` e `NetworkExtensionSeedRefinementProofs.tla`; o módulo upstream não é copiado para o canon e seu SHA-256 exato é verificado antes da prova. Até o proof gate passar, a relação não é marcada como provada.
