@@ -67,11 +67,17 @@ PINNED_SEED_RELEASE_COMMIT=
 PINNED_SEED_RESOLUTION_SHA256=
 TLAPM_COMMIT=
 TLAPM_VERSION=
+
+INPI_DEPOSIT_SHA256=
 ```
 
 The obligation counts are evidence about the frozen proof artifacts. They are not
 part of the normative semantics and may change if a proof is refactored without a
 semantic change.
+
+`INPI_DEPOSIT_SHA256` intentionally uses the same identifier as the ASET Seed
+deposit tooling. It identifies the deterministic deposit snapshot, not the
+normative canon package or the formal-relation digest.
 
 ## 3. Deposit content
 

@@ -450,7 +450,7 @@ def test_formal_release_gate_requires_canon_projection_and_canon_tlaps() -> None
     assert "FORMAL_RELEASE_CANON_REFINEMENT_STATUS" in gate
 
 
-def test_regulator_release_snapshot_matches_seed_deterministic_pattern() -> None:
+def test_inpi_deposit_snapshot_matches_seed_deterministic_pattern() -> None:
     builder = ROOT / "tools/build_release.py"
     archive = ROOT / "dist/ASET-Network-Extension-Repository-Snapshot.zip"
     checksum = archive.with_suffix(archive.suffix + ".sha256")
@@ -502,10 +502,28 @@ def test_regulator_release_snapshot_matches_seed_deterministic_pattern() -> None
         assert all(not (set(Path(name).parts) & banned) for name in names)
 
 
-def test_ci_publishes_regulator_snapshot_and_sha256_sidecar() -> None:
+def test_ci_runs_full_formal_gate_with_pinned_seed_and_tlapm() -> None:
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz" in workflow
+    assert "bfa5e5350ac1ec7202feecad0a4a71a5bb58c16a49660448b35b6f371ba9e2f5" in workflow
+    assert 'test "$("$tlapm_bin" --version)" = "4600b24"' in workflow
+    assert "633c130187b2a2bb42f24cfd66662d475de385d2" in workflow
+    assert "python tools/run_formal_release_gate.py" in workflow
+    assert '--tlapm "$TLAPM_BIN"' in workflow
+    assert '--seed-root "$SEED_ROOT"' in workflow
+    assert "dist/formal-release-gate.json" in workflow
+    assert "dist/network-canon-refinement-proof.json" in workflow
+    assert "dist/network-seed-refinement-proof.json" in workflow
+
+
+def test_ci_publishes_inpi_deposit_sha256_like_seed() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    builder = (ROOT / "tools/build_release.py").read_text(encoding="utf-8")
     assert "python tools/build_release.py" in workflow
-    assert "REGULATOR_SNAPSHOT_SHA256=sha256:%s" in workflow
+    assert "INPI_DEPOSIT_SHA256=%s" in workflow
+    assert "REGULATOR_SNAPSHOT_SHA256" not in workflow
+    assert 'print(f"INPI_DEPOSIT_SHA256={digest}")' in builder
+    assert 'print("INPI_DEPOSIT=PASS")' in builder
     assert "ASET-Network-Extension-Repository-Snapshot.zip.sha256" in workflow
     assert "actions/upload-artifact@v4" in workflow
-    assert "aset-network-extension-regulator-snapshot-${{ github.sha }}" in workflow
+    assert "aset-network-extension-inpi-deposit-${{ github.sha }}" in workflow
