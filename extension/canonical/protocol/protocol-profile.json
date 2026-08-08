@@ -1,6 +1,6 @@
 {
   "document_type": "aset-network-extension-protocol-profile",
-  "extension_version": "0.1.0-alpha.1",
+  "extension_version": "0.1.0-alpha.2",
   "implementation_precedence": "NONE",
   "normative": true,
   "profile_id": "ASET-NETWORK-EXTENSION-WIRE-V1",

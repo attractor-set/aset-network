@@ -1,0 +1,83 @@
+{
+  "assumptions": [
+    {
+      "id": "NET-LIVE-A-001",
+      "name": "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
+      "text": "If a retained export remains eligible for delivery, delivery is not postponed forever.",
+      "tla_fairness": "WF_vars(Deliver(e))"
+    },
+    {
+      "id": "NET-LIVE-A-002",
+      "name": "EVENTUAL_IMPORT_OBSERVATION",
+      "text": "If a delivered export remains eligible for target observation, observation is not postponed forever.",
+      "tla_fairness": "WF_vars(Observe(e))"
+    },
+    {
+      "id": "NET-LIVE-A-003",
+      "name": "EVENTUAL_LOCAL_RESOLUTION",
+      "text": "If a target-local import remains eligible for resolution, local resolution is not postponed forever.",
+      "tla_fairness": "WF_vars(Resolve(e))"
+    },
+    {
+      "id": "NET-LIVE-A-004",
+      "name": "NO_PERMANENT_TARGET_UNAVAILABILITY",
+      "text": "A target required for progress is not permanently unavailable or withdrawn while the progress guarantee is claimed.",
+      "tla_fairness": "ENVIRONMENT_ASSUMPTION"
+    }
+  ],
+  "claim_semantics": {
+    "assumptions_must_be_declared": true,
+    "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
+    "core_conformance_profile": "ASET-NETWORK-EXTENSION-CONFORMANCE-V1",
+    "guarantees_apply_only_while_required_assumptions_hold": true,
+    "required_for_core_conformance": false
+  },
+  "document_type": "aset-network-extension-liveness-profile",
+  "extension_id": "ASET-NETWORK-EXTENSION",
+  "extension_version": "0.1.0-alpha.2",
+  "guarantees": [
+    {
+      "id": "NET-LIVE-G-001",
+      "name": "EVENTUALLY_DELIVERED",
+      "requires": [
+        "NET-LIVE-A-001",
+        "NET-LIVE-A-004"
+      ],
+      "tla_property": "EventuallyDelivered"
+    },
+    {
+      "id": "NET-LIVE-G-002",
+      "name": "EVENTUALLY_OBSERVED",
+      "requires": [
+        "NET-LIVE-A-001",
+        "NET-LIVE-A-002",
+        "NET-LIVE-A-004"
+      ],
+      "tla_property": "EventuallyObserved"
+    },
+    {
+      "id": "NET-LIVE-G-003",
+      "name": "EVENTUALLY_LOCALLY_RESOLVED",
+      "requires": [
+        "NET-LIVE-A-001",
+        "NET-LIVE-A-002",
+        "NET-LIVE-A-003",
+        "NET-LIVE-A-004"
+      ],
+      "tla_property": "EventuallyResolved"
+    }
+  ],
+  "normative": true,
+  "profile_id": "ASET-NETWORK-LIVENESS-V1",
+  "resolution_semantics": {
+    "eventual_accept_required": false,
+    "global_agreement_required": false,
+    "terminal_local_results": [
+      "ACCEPT",
+      "DENY"
+    ],
+    "unconditional_transport_guarantee": false
+  },
+  "schema_version": 1,
+  "scope_rule": "Liveness constrains progress only under declared assumptions; it never requires ACCEPT, global agreement, or authority transfer."
+}

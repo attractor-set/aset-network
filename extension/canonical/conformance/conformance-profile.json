@@ -237,10 +237,19 @@
     }
   ],
   "document_type": "aset-network-extension-conformance-profile",
-  "extension_version": "0.1.0-alpha.1",
+  "extension_version": "0.1.0-alpha.2",
   "negative_count": 10,
+  "optional_claim_profiles": [
+    {
+      "assumptions_must_be_declared": true,
+      "normative_when_claimed": true,
+      "profile_id": "ASET-NETWORK-LIVENESS-V1",
+      "required_for_core_conformance": false
+    }
+  ],
   "positive_count": 8,
   "profile_id": "ASET-NETWORK-EXTENSION-CONFORMANCE-V1",
   "schema_version": 1,
-  "upstream_conformance_protocol": "ASET-SEED-RESOLUTION-CONFORMANCE-V1"
+  "upstream_compatibility_profile": "ASET-SEED-COMPATIBILITY-STANDARD-V1",
+  "upstream_compatibility_standard": "ASET-SEED-COMPATIBILITY-STANDARD@seed-0.3.0-alpha.3"
 }

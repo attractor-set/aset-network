@@ -15,3 +15,37 @@ Each member is an independent Context with its own Constitution, Authority, cano
 ## Metafederation
 
 A metafederation is a graph or composition of federations. It does not imply a root Context, a global Constitution or inherited Resolution Authority. Cross-federation recognition repeats the same local pipeline at every sovereign boundary.
+
+
+## Formal assurance boundary
+
+The normative source is the machine-readable Network Extension canon. The TLA+ modules are assurance projections bound by `extension/canonical/formal/canon-tla-relation.json`.
+
+Safety is checked independently from liveness. `SafetySpec` permits route suspension and member withdrawal while preserving local authority, local recognition, fail-closed import semantics and the absence of an implicit superior Context.
+
+`FairSpec` adds the assumptions from `ASET-NETWORK-LIVENESS-V1`: retained delivery, target observation and local resolution are weakly fair, and the target needed for the claimed progress is not permanently removed. The resulting guarantee is eventual terminal **local** resolution, not eventual `ACCEPT`.
+
+The finite TLC configurations use `CHECK_DEADLOCK FALSE` because terminal safety states (for example, all members withdrawn) and finite-model exhaustion are legitimate quiescent states. This is not a waiver of progress checking: `NoUnexpectedSafetyDeadlock` rejects non-terminal safety deadlocks, `NoPendingProgressDeadlock` together with the liveness properties rejects a quiescent state that still carries an unresolved delivery/import/resolution obligation, and `NoUnexpectedHistoryDeadlock` accepts only exhaustion of the bounded history-digest universe.
+
+### State/trace separation
+
+The machine-readable canon classifies semantic network state and canonical evidence history as distinct normative surfaces. `state_partition.semantic_state_fields` contains the fields projected into the main state machine; `state_partition.evidence_history_fields` contains the append-only evidence trace. Evidence history does not itself confer Authority or change transition eligibility unless an explicit normative rule references a prior transition.
+
+`NetworkExtension.tla` contains only semantic network state needed by sovereignty, routing, import/recognition and liveness properties. It does not carry the complete ordered execution history: including that sequence prevents TLC from merging execution permutations that reach the same semantic state and creates factorial state-space growth. `NetworkHistory.tla` is a separate bounded trace projection for `NET-INV-010`; it checks that every accepted transition appends exactly one fresh opaque history digest and that the pre-existing sequence remains a prefix. This separation therefore mirrors an explicit canon partition rather than merely being a model-checking optimization.
+
+### Core conformance and liveness claim
+
+`ASET-NETWORK-EXTENSION-CONFORMANCE-V1` is the core conformance profile. `ASET-NETWORK-LIVENESS-V1` is a separate optional normative capability claim: an implementation can conform to the core without making a liveness claim. If it does claim liveness, it must declare the required assumptions and may claim only the guarantees that hold while those assumptions hold.
+
+## Seed refinement boundary
+
+`NetworkExtensionSeedProjection.tla` projects each target Context to the Seed-compatible observable resolution algebra: unresolved imports are `UNKNOWN/BLOCKED`, local acceptance is `ACCEPT/ALLOW`, and local denial is `DENY/BLOCKED`. Network actions never transfer `authorityOwner`.
+
+`NetworkExtensionSeedRefinement.tla` adds the explicit refinement mapping to the exact pinned upstream `SeedResolution.tla`. In that mapping, each imported export is a Seed `ResolutionId`, the target-scoped pair `(target Context, artifact)` is the abstract Seed `Binding`, and the target Context is the abstract target-local `Authority`. `Observe` maps to `RegisterRequest`; local `ResolveAccept` and `ResolveDeny` map to `SubmitResolution(..., ALLOW)` and `SubmitResolution(..., BLOCK)` respectively; route, export, delivery, suspension, membership and withdrawal actions stutter at the Seed state boundary. The mapping always uses `NoCommitment` and projects no Seed conflict observation.
+
+The Context-to-Authority and artifact-to-Binding identifications are assurance abstractions, not concrete identity claims. The actual upstream `SeedResolution.tla` is not vendored into the Network canon. `tools/run_seed_refinement_tlaps.py` loads it from a separately supplied ASET checkout, verifies the exact SHA-256 pinned to Seed release `seed-0.3.0-alpha.3`, and only then invokes TLAPS. `NetworkExtensionSeedRefinementProofs.tla` contains the behavioral and evaluator theorems, and the pinned proof gate has mechanically proved all 261 obligations. `extension/canonical/assurance/seed-refinement-proof.json` binds that result to the exact Network mapping/proof artifacts, Seed source and TLAPM commit; the obligation count is recorded evidence rather than a semantic invariant. `canon-tla-relation.json` therefore records the pinned refinement status as `MECHANICALLY_PROVED`.
+
+
+### Formal release gate
+
+`tools/run_formal_release_gate.py` is the aggregate release-time formal gate. It requires repository diff hygiene, rebuilds the canonical package, validates the canon, runs black-box conformance and tests, saturates the three TLC assurance models, and reruns the pinned Seed TLAPS refinement proof. A release-formal pass is emitted only if every stage succeeds on the same working tree. The generated `dist/formal-release-gate.json` is runtime evidence and is not itself part of the normative canon.

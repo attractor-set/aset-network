@@ -15,7 +15,12 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
       - run: python -m pip install -r requirements-ci.txt
+      - run: python tools/bootstrap_tla.py
       - run: python tools/validate_extension.py
       - run: python tools/model_check_network.py
       - run: python tools/run_conformance.py

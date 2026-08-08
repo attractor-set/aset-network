@@ -2,13 +2,36 @@
   "canonicality": {
     "conformance_cases": "NORMATIVE_BLACK_BOX_EXPECTATIONS",
     "formal_projection": "ASSURANCE_PROJECTION",
+    "formal_relation": "MACHINE_CHECKABLE_ASSURANCE_BINDING",
     "implementation_precedence": "NONE",
+    "liveness_profile": "NORMATIVE_CONDITIONAL_PROGRESS_PROFILE",
     "machine_readable_model": "NORMATIVE_CANON",
     "protocol_schemas": "NORMATIVE_WIRE_PROFILE",
     "reference_implementation": "NON_NORMATIVE"
   },
   "document_type": "aset-network-extension-model",
   "extension_id": "ASET-NETWORK-EXTENSION",
+  "formal_assurance": {
+    "canon_tla_relation": "extension/canonical/formal/canon-tla-relation.json",
+    "history_config": "extension/canonical/formal/NetworkHistory.cfg",
+    "history_module": "extension/canonical/formal/NetworkHistory.tla",
+    "liveness_config": "extension/canonical/formal/NetworkExtensionLiveness.cfg",
+    "liveness_profile": "extension/canonical/liveness/liveness-profile.json",
+    "model_checker": "TLC",
+    "network_module": "extension/canonical/formal/NetworkExtension.tla",
+    "normative_precedence": "MACHINE_READABLE_CANON",
+    "projection_surfaces": {
+      "conditional_liveness": "extension/canonical/liveness/liveness-profile.json",
+      "evidence_history_trace": "extension/canonical/formal/NetworkHistory.tla",
+      "semantic_state_safety": "extension/canonical/formal/NetworkExtension.tla"
+    },
+    "safety_config": "extension/canonical/formal/NetworkExtension.cfg",
+    "seed_projection_module": "extension/canonical/formal/NetworkExtensionSeedProjection.tla",
+    "seed_refinement_module": "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
+    "seed_refinement_proof_evidence": "extension/canonical/assurance/seed-refinement-proof.json",
+    "seed_refinement_proof_module": "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
+    "seed_refinement_proof_runner": "tools/run_seed_refinement_tlaps.py"
+  },
   "invariants": [
     {
       "id": "NET-INV-001",
@@ -48,7 +71,7 @@
     },
     {
       "id": "NET-INV-010",
-      "text": "Accepted transitions append one history digest and never rewrite prior history."
+      "text": "Every accepted canonical network transition appends exactly one digest to the canonical evidence history; previously committed history entries are immutable. The evidence history does not itself confer Authority or alter transition eligibility except where an explicit normative rule refers to a prior transition."
     },
     {
       "id": "NET-INV-011",
@@ -68,7 +91,8 @@
       "target-local import observations",
       "binding of imported artifacts to target-local ASET Seed resolution cycles",
       "local recognition receipts",
-      "route suspension and bounded withdrawal"
+      "route suspension and bounded withdrawal",
+      "conditional liveness under explicit fairness and environment assumptions"
     ],
     "does_not_define": [
       "transport",
@@ -80,8 +104,8 @@
       "key custody",
       "homomorphic encryption",
       "partition reconciliation",
-      "availability",
-      "execution of accepted effects"
+      "execution of accepted effects",
+      "unconditional availability"
     ]
   },
   "principles": [
@@ -122,6 +146,18 @@
     {
       "id": "NET-REQ-005",
       "text": "Implementations MUST publish operational security and durability guarantees separately."
+    },
+    {
+      "id": "NET-REQ-006",
+      "text": "Implementations claiming ASET-NETWORK-LIVENESS-V1 MUST declare which liveness assumptions they satisfy and MUST NOT present conditional progress as an unconditional transport guarantee."
+    },
+    {
+      "id": "NET-REQ-007",
+      "text": "Formal assurance MUST preserve the distinction between target-local resolution progress and the substantive result ACCEPT or DENY."
+    },
+    {
+      "id": "NET-REQ-008",
+      "text": "Core ASET Network Extension conformance MUST NOT require an ASET-NETWORK-LIVENESS-V1 claim. An implementation making that optional claim MUST declare the assumptions it relies on and the guarantees it claims under those assumptions."
     }
   ],
   "schema_version": 1,
@@ -129,13 +165,29 @@
     "exports": "ExportID -> content-addressed envelope",
     "federation_epoch": "monotone integer",
     "federation_id": "immutable identifier",
-    "history": "append-only transition digest sequence",
+    "history": "canonical append-only accepted-transition evidence digest sequence",
     "imports": "ImportID -> target-local UNKNOWN/BLOCKED observation",
     "members": "ContextID -> member descriptor",
     "recognitions": "RecognitionID -> target-local terminal Seed result receipt",
     "routes": "RouteID -> exact source/target/scope/epoch grant"
   },
-  "status": "FEDERATION_RECOGNITION_CORE_ALPHA",
+  "state_partition": {
+    "evidence_history_fields": [
+      "history"
+    ],
+    "evidence_history_role": "NORMATIVE_APPEND_ONLY_EVIDENCE_TRACE",
+    "semantic_state_fields": [
+      "federation_id",
+      "federation_epoch",
+      "members",
+      "routes",
+      "exports",
+      "imports",
+      "recognitions"
+    ],
+    "transition_enabling_rule": "Evidence history MUST NOT itself confer Authority or alter transition eligibility unless an explicit normative rule refers to a prior transition."
+  },
+  "status": "FEDERATION_RECOGNITION_CORE_ALPHA2_FORMAL_FOUNDATION",
   "transition_kinds": [
     "FEDERATION_GENESIS",
     "MEMBER_JOIN",
@@ -147,5 +199,5 @@
     "MEMBER_WITHDRAW"
   ],
   "upstream_binding_ref": "upstream/ASET_SEED_BINDING.json",
-  "version": "0.1.0-alpha.1"
+  "version": "0.1.0-alpha.2"
 }
