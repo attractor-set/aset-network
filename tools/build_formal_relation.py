@@ -65,7 +65,9 @@ def main() -> int:
             "tlapm_commit": canon_proof_evidence["tlapm"]["commit"],
             "tlapm_version": canon_proof_evidence["tlapm"]["version"],
             "obligations_proved": canon_proof_evidence["proof_gate"]["obligations_proved"],
-            "obligation_count_semantics": canon_proof_evidence["proof_gate"]["obligation_count_semantics"],
+            "obligation_count_semantics": canon_proof_evidence["proof_gate"][
+                "obligation_count_semantics"
+            ],
             "status": canon_proof_evidence["status"],
         },
         "projection_surfaces": {

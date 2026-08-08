@@ -124,7 +124,10 @@ def main() -> int:
     projection_text = CANON_PROJECTION.read_text(encoding="utf-8")
     if "GENERATED FILE. DO NOT EDIT." not in projection_text:
         raise SystemExit("network generated canon projection marker missing")
-    if "EXTENDS NetworkExtension" in projection_text or "INSTANCE NetworkExtension" in projection_text:
+    if (
+        "EXTENDS NetworkExtension" in projection_text
+        or "INSTANCE NetworkExtension" in projection_text
+    ):
         raise SystemExit("network generated canon projection depends on target model")
     if source.get("sha256") not in projection_text:
         raise SystemExit("network generated canon projection source digest marker mismatch")
@@ -153,10 +156,15 @@ def main() -> int:
     if evidence_binding.get("status") != "MECHANICALLY_PROVED":
         raise SystemExit("network canon refinement proof evidence binding status mismatch")
     if evidence_binding.get("obligations_proved") != 3:
-        raise SystemExit("network canon refinement proof evidence binding obligation count mismatch")
+        raise SystemExit(
+            "network canon refinement proof evidence binding obligation count mismatch"
+        )
     if canon_refinement_evidence.get("status") != "MECHANICALLY_PROVED":
         raise SystemExit("network canon refinement proof evidence status mismatch")
-    if canon_refinement_evidence.get("projection_profile") != "ASET-NETWORK-CANON-TLA-PROJECTION-V2":
+    if (
+        canon_refinement_evidence.get("projection_profile")
+        != "ASET-NETWORK-CANON-TLA-PROJECTION-V2"
+    ):
         raise SystemExit("network canon refinement proof evidence profile mismatch")
     canon_gate = canon_refinement_evidence.get("proof_gate", {})
     if canon_gate.get("verdict") != "PASS":
@@ -190,7 +198,9 @@ def main() -> int:
                 f"network canon refinement proof evidence {key} digest mismatch"
             )
     canon_projection_binding = relation.get("canon_projection", {})
-    if canon_projection_binding.get("relation_path") != CANON_REFINEMENT.relative_to(ROOT).as_posix():
+    if canon_projection_binding.get("relation_path") != CANON_REFINEMENT.relative_to(
+        ROOT
+    ).as_posix():
         raise SystemExit("formal relation canon refinement path mismatch")
     if canon_projection_binding.get("relation_sha256") != sha(CANON_REFINEMENT):
         raise SystemExit("formal relation canon refinement digest mismatch")
@@ -263,7 +273,9 @@ def main() -> int:
         "canon_projection_generator": "tools/generate_canon_tla_projection.py",
         "canon_projection_module": "extension/canonical/formal/NetworkCanonProjection.tla",
         "canon_refinement_relation": "extension/canonical/assurance/canon-tla-refinement.json",
-        "canon_refinement_proof_module": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+        "canon_refinement_proof_module": (
+            "extension/canonical/formal/NetworkCanonRefinementProofs.tla"
+        ),
         "canon_refinement_proof_runner": "tools/run_canon_refinement_tlaps.py",
     }
     for field, expected in expected_canon_assurance.items():

@@ -112,7 +112,10 @@ def main() -> int:
     projection_text = PROJECTION.read_text(encoding="utf-8") if PROJECTION.is_file() else ""
     if "GENERATED FILE. DO NOT EDIT." not in projection_text:
         errors.append("generated projection marker missing")
-    if "EXTENDS NetworkExtension" in projection_text or "INSTANCE NetworkExtension" in projection_text:
+    if (
+        "EXTENDS NetworkExtension" in projection_text
+        or "INSTANCE NetworkExtension" in projection_text
+    ):
         errors.append("generated projection depends on handwritten target model")
 
     proof_text = PROOF.read_text(encoding="utf-8") if PROOF.is_file() else ""

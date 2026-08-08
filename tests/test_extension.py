@@ -4,6 +4,7 @@ import hashlib
 import json
 import subprocess
 import sys
+import zipfile
 from pathlib import Path
 
 from reference.network_reference import execute_case
@@ -447,3 +448,64 @@ def test_formal_release_gate_requires_canon_projection_and_canon_tlaps() -> None
     assert "run_canon_refinement_tlaps.py" in gate
     assert "FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS" in gate
     assert "FORMAL_RELEASE_CANON_REFINEMENT_STATUS" in gate
+
+
+def test_regulator_release_snapshot_matches_seed_deterministic_pattern() -> None:
+    builder = ROOT / "tools/build_release.py"
+    archive = ROOT / "dist/ASET-Network-Extension-Repository-Snapshot.zip"
+    checksum = archive.with_suffix(archive.suffix + ".sha256")
+
+    first = subprocess.run(
+        [sys.executable, str(builder)],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    assert first.returncode == 0, first.stdout
+    first_digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+
+    second = subprocess.run(
+        [sys.executable, str(builder)],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    assert second.returncode == 0, second.stdout
+    second_digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    assert second_digest == first_digest
+
+    declared_digest, declared_name = checksum.read_text(encoding="utf-8").strip().split()
+    assert declared_digest == second_digest
+    assert declared_name == archive.name
+
+    with zipfile.ZipFile(archive) as bundle:
+        names = bundle.namelist()
+        assert names
+        assert all(name.startswith("ASET-Network-Extension/") for name in names)
+        assert all(info.date_time == (1980, 1, 1, 0, 0, 0) for info in bundle.infolist())
+        banned = {
+            ".git",
+            ".venv",
+            "__pycache__",
+            ".pytest_cache",
+            ".ruff_cache",
+            ".tlacache",
+            ".tooling",
+            "states",
+            "dist",
+            "build",
+        }
+        assert all(not (set(Path(name).parts) & banned) for name in names)
+
+
+def test_ci_publishes_regulator_snapshot_and_sha256_sidecar() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "python tools/build_release.py" in workflow
+    assert "REGULATOR_SNAPSHOT_SHA256=sha256:%s" in workflow
+    assert "ASET-Network-Extension-Repository-Snapshot.zip.sha256" in workflow
+    assert "actions/upload-artifact@v4" in workflow
+    assert "aset-network-extension-regulator-snapshot-${{ github.sha }}" in workflow

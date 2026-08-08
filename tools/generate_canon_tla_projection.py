@@ -322,7 +322,7 @@ def main() -> int:
 
     if args.check:
         if not OUTPUT_PATH.is_file():
-            print(f"NETWORK_CANON_PROJECTION_CHECK=FAIL")
+            print("NETWORK_CANON_PROJECTION_CHECK=FAIL")
             print(f"NETWORK_CANON_PROJECTION_ERROR=missing {OUTPUT_PATH.relative_to(ROOT)}")
             return 1
         actual = OUTPUT_PATH.read_bytes()
