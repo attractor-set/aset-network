@@ -12,6 +12,11 @@
   "document_type": "aset-network-extension-model",
   "extension_id": "ASET-NETWORK-EXTENSION",
   "formal_assurance": {
+    "canon_projection_generator": "tools/generate_canon_tla_projection.py",
+    "canon_projection_module": "extension/canonical/formal/NetworkCanonProjection.tla",
+    "canon_refinement_proof_module": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+    "canon_refinement_proof_runner": "tools/run_canon_refinement_tlaps.py",
+    "canon_refinement_relation": "extension/canonical/assurance/canon-tla-refinement.json",
     "canon_tla_relation": "extension/canonical/formal/canon-tla-relation.json",
     "history_config": "extension/canonical/formal/NetworkHistory.cfg",
     "history_module": "extension/canonical/formal/NetworkHistory.tla",
@@ -23,6 +28,7 @@
     "projection_surfaces": {
       "conditional_liveness": "extension/canonical/liveness/liveness-profile.json",
       "evidence_history_trace": "extension/canonical/formal/NetworkHistory.tla",
+      "semantic_state_canon_projection": "extension/canonical/formal/NetworkCanonProjection.tla",
       "semantic_state_safety": "extension/canonical/formal/NetworkExtension.tla"
     },
     "safety_config": "extension/canonical/formal/NetworkExtension.cfg",

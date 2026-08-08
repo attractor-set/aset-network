@@ -10,6 +10,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = ROOT / "dist/formal-release-gate.json"
 TLAPS_REPORT = ROOT / "dist/network-seed-refinement-proof.json"
+CANON_TLAPS_REPORT = ROOT / "dist/network-canon-refinement-proof.json"
 
 
 def write_report(path: Path, report: dict[str, object]) -> None:
@@ -47,11 +48,26 @@ def main() -> int:
     python = sys.executable
     stages = [
         ("DIFF_CHECK", ["git", "diff", "--check"]),
+        (
+            "CANON_PROJECTION_CHECK",
+            [python, "tools/generate_canon_tla_projection.py", "--check"],
+        ),
         ("BUILD_CANON_PACKAGE", [python, "tools/build_canon_package.py"]),
         ("VALIDATE", [python, "tools/validate_extension.py"]),
         ("CONFORMANCE", [python, "tools/run_conformance.py"]),
         ("TESTS", [python, "-m", "pytest", "-q"]),
         ("TLC", [python, "tools/model_check_network.py"]),
+        (
+            "TLAPS_CANON_REFINEMENT",
+            [
+                python,
+                "tools/run_canon_refinement_tlaps.py",
+                "--tlapm",
+                str(tlapm),
+                "--timeout-seconds",
+                str(args.timeout_seconds),
+            ],
+        ),
         (
             "TLAPS_SEED_REFINEMENT",
             [
@@ -84,6 +100,7 @@ def main() -> int:
             print(f"FORMAL_RELEASE_GATE_FAILED_STAGE={name}")
             return 1
 
+    canon_tlaps_report = json.loads(CANON_TLAPS_REPORT.read_text(encoding="utf-8"))
     tlaps_report = json.loads(TLAPS_REPORT.read_text(encoding="utf-8"))
     package = json.loads(
         (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
@@ -99,6 +116,9 @@ def main() -> int:
         "verdict": "PASS",
         "canon_package_digest": package["package_digest"],
         "formal_relation_digest": relation["relation_digest"],
+        "canon_projection_profile": relation["canon_projection"]["profile"],
+        "canon_refinement_status": relation["canon_projection"]["status"],
+        "canon_refinement_obligations_proved": canon_tlaps_report["obligations_proved"],
         "seed_refinement_status": relation["seed_refinement"]["status"],
         "seed_refinement_obligations_proved": tlaps_report["obligations_proved"],
         "tlapm_commit": tlaps_report["tlapm_commit"],
@@ -109,6 +129,14 @@ def main() -> int:
     write_report(output, report)
     print(f"FORMAL_RELEASE_CANON_PACKAGE_DIGEST={package['package_digest']}")
     print(f"FORMAL_RELEASE_RELATION_DIGEST={relation['relation_digest']}")
+    print(
+        "FORMAL_RELEASE_CANON_REFINEMENT_STATUS="
+        f"{relation['canon_projection']['status']}"
+    )
+    print(
+        "FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS="
+        f"{canon_tlaps_report['obligations_proved']}"
+    )
     print(
         "FORMAL_RELEASE_SEED_REFINEMENT_OBLIGATIONS="
         f"{tlaps_report['obligations_proved']}"

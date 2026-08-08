@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import subprocess
+import sys
 from pathlib import Path
 
 from reference.network_reference import execute_case
@@ -356,3 +358,92 @@ def test_formal_release_gate_requires_all_formal_stages() -> None:
         "FORMAL_RELEASE_GATE=PASS",
     ):
         assert marker in gate
+
+
+
+def test_network_canon_projection_is_standalone_generated_from_exact_model() -> None:
+    formal = ROOT / "extension/canonical/formal"
+    model = ROOT / "extension/canonical/source/network-extension-model.json"
+    projection = (formal / "NetworkCanonProjection.tla").read_text(encoding="utf-8")
+    assert "GENERATED FILE. DO NOT EDIT." in projection
+    assert "ASET-NETWORK-CANON-TLA-PROJECTION-V2" in projection
+    assert sha(model) in projection
+    assert "EXTENDS NetworkExtension" not in projection
+    assert "INSTANCE NetworkExtension" not in projection
+    assert "CanonSafetySpec == CanonInit /\\ [][CanonNetworkAction]_CanonVars" in projection
+
+
+def test_network_canon_projection_generator_exact_check_passes() -> None:
+    result = subprocess.run(
+        [sys.executable, "tools/generate_canon_tla_projection.py", "--check"],
+        cwd=ROOT,
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    assert result.returncode == 0, result.stdout
+    assert "NETWORK_CANON_PROJECTION_CHECK=PASS" in result.stdout
+
+
+def test_network_canon_refinement_relation_binds_exact_source_and_target() -> None:
+    relation_path = ROOT / "extension/canonical/assurance/canon-tla-refinement.json"
+    relation = json.loads(relation_path.read_text(encoding="utf-8"))
+    assert relation["relation_type"] == (
+        "STANDALONE_GENERATED_PROJECTION_WITH_BEHAVIORAL_EQUIVALENCE_PROOF"
+    )
+    assert relation["generated_projection"]["profile"] == (
+        "ASET-NETWORK-CANON-TLA-PROJECTION-V2"
+    )
+    assert relation["source_model"]["sha256"] == sha(
+        ROOT / relation["source_model"]["path"]
+    )
+    assert relation["target_model"]["sha256"] == sha(
+        ROOT / relation["target_model"]["path"]
+    )
+    assert relation["proof"]["final_theorem"] == (
+        "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection"
+    )
+    assert relation["status"] == "MECHANICALLY_PROVED"
+    assert relation["proof_evidence"]["status"] == "MECHANICALLY_PROVED"
+    assert relation["proof_evidence"]["obligations_proved"] == 3
+
+
+def test_network_canon_refinement_proof_evidence_is_exact() -> None:
+    evidence = json.loads(
+        (
+            ROOT / "extension/canonical/assurance/canon-refinement-proof.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert evidence["status"] == "MECHANICALLY_PROVED"
+    assert evidence["projection_profile"] == "ASET-NETWORK-CANON-TLA-PROJECTION-V2"
+    assert evidence["proof_gate"]["verdict"] == "PASS"
+    assert evidence["proof_gate"]["obligations_proved"] == 3
+    assert evidence["proof_gate"]["obligation_count_semantics"] == (
+        "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT"
+    )
+    assert evidence["tlapm"]["commit"] == (
+        "4600b24c6d95a25ff081ad37b63b2a01c29d43a5"
+    )
+    for artifact in evidence["network_artifacts"].values():
+        assert artifact["sha256"] == sha(ROOT / artifact["path"])
+
+
+def test_network_canon_refinement_proof_is_seed_style_explicit_instance() -> None:
+    proof = (
+        ROOT / "extension/canonical/formal/NetworkCanonRefinementProofs.tla"
+    ).read_text(encoding="utf-8")
+    assert "EXTENDS NetworkExtension, TLAPS" in proof
+    assert "Canon == INSTANCE NetworkCanonProjection" in proof
+    assert "THEOREM NetworkCanonCoreAlgebraEquivalent ==" in proof
+    assert "THEOREM NetworkCoreSafetyPredicatesEquivalentToCanonProjection ==" in proof
+    assert "THEOREM NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection ==" in proof
+
+
+def test_formal_release_gate_requires_canon_projection_and_canon_tlaps() -> None:
+    gate = (ROOT / "tools/run_formal_release_gate.py").read_text(encoding="utf-8")
+    assert "CANON_PROJECTION_CHECK" in gate
+    assert "TLAPS_CANON_REFINEMENT" in gate
+    assert "run_canon_refinement_tlaps.py" in gate
+    assert "FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS" in gate
+    assert "FORMAL_RELEASE_CANON_REFINEMENT_STATUS" in gate

@@ -13,6 +13,15 @@ Execution history is intentionally excluded from this state vector.  The
 append-only history obligation is checked in the separate bounded
 NetworkHistory module so different execution permutations that reach the same
 network semantic state can collapse to one TLC state.
+
+Three assurance-state fields are intentionally easy to misread:
+  * inTransit is monotonic retention of the fact that transport was initiated;
+    it is not a queue of exports that are still pending delivery.
+  * authorityOwner is a sovereignty witness fixed to Context-local ownership;
+    it is not a mutable cross-context Authority registry.
+  * superiorContexts is a sentinel kept empty so absence of an implicit
+    super-context is explicit and machine-checkable.  It is not a placeholder
+    for a planned federation-wide Authority hierarchy.
 ***************************************************************************)
 
 CONSTANTS Contexts, Artifacts
@@ -94,8 +103,12 @@ ExportArtifact(s, t, a) ==
 
 (***************************************************************************
 Deliver is an environment/transport action. It cannot alter target-local
-Authority or recognition.  Keeping an export in inTransit makes duplicate
-delivery representable as idempotent stuttering after the first delivery.
+Authority or recognition.  Delivery intentionally does not remove an export
+from inTransit: inTransit records that transport was initiated, while
+delivered records successful delivery.  This monotonic retention is an
+assurance abstraction, not transient transport storage or a runtime queue.
+Keeping the export retained also makes duplicate delivery representable as
+idempotent stuttering after the first delivery.
 ***************************************************************************)
 Deliver(e) ==
   /\ e \in inTransit
@@ -251,6 +264,13 @@ NetworkDoesNotWeakenSeedBoundary ==
   /\ NoImplicitSuperContext
   /\ PerContextSeedProjectionWellFormed
 
+(***************************************************************************
+The Eventually* formulas below are conditional liveness assurance obligations,
+not unconditional transport promises.  NetworkExtensionLiveness.cfg checks
+them with TLC under FairSpec for the configured finite model.  That bounded
+model-checking result is not an unbounded proof for arbitrary federation or
+artifact cardinalities.
+***************************************************************************)
 EventuallyDelivered ==
   \A e \in ExportUniverse : (e \in exports) ~> (e \in delivered)
 

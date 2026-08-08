@@ -12,6 +12,10 @@ CANON = ROOT / "extension/canonical"
 FORMAL_RELATION = CANON / "formal/canon-tla-relation.json"
 LIVENESS_PROFILE = CANON / "liveness/liveness-profile.json"
 SEED_REFINEMENT_EVIDENCE = CANON / "assurance/seed-refinement-proof.json"
+CANON_REFINEMENT = CANON / "assurance/canon-tla-refinement.json"
+CANON_REFINEMENT_EVIDENCE = CANON / "assurance/canon-refinement-proof.json"
+CANON_PROJECTION = CANON / "formal/NetworkCanonProjection.tla"
+CANON_PROOF = CANON / "formal/NetworkCanonRefinementProofs.tla"
 UPSTREAM_BINDING = ROOT / "upstream/ASET_SEED_BINDING.json"
 
 EXPECTED_SEED = {
@@ -68,8 +72,11 @@ def main() -> int:
         raise SystemExit("implementation precedence must remain NONE")
 
     relation = verify_self_digest(FORMAL_RELATION, "relation_digest")
+    if relation.get("profile") != "ASET-NETWORK-CANON-TLA-PROJECTION-V2":
+        raise SystemExit("network canon-to-TLA profile mismatch")
     for section, digest_field in (
         ("source_model", "sha256"),
+        ("canon_projection", "sha256"),
         ("target_model", "sha256"),
         ("seed_projection", "sha256"),
         ("history_model", "sha256"),
@@ -88,6 +95,124 @@ def main() -> int:
         path = ROOT / item[path_field]
         if sha(path) != item[digest_field]:
             raise SystemExit(f"formal relation digest mismatch: {item[path_field]}")
+
+    canon_refinement = json.loads(CANON_REFINEMENT.read_text(encoding="utf-8"))
+    canon_refinement_evidence = json.loads(
+        CANON_REFINEMENT_EVIDENCE.read_text(encoding="utf-8")
+    )
+    if canon_refinement.get("relation_type") != (
+        "STANDALONE_GENERATED_PROJECTION_WITH_BEHAVIORAL_EQUIVALENCE_PROOF"
+    ):
+        raise SystemExit("network canon refinement relation type mismatch")
+    if canon_refinement.get("scope") != "DECLARED_CANONICAL_SAFETY_PROJECTION":
+        raise SystemExit("network canon refinement scope mismatch")
+    generated = canon_refinement.get("generated_projection", {})
+    if generated.get("profile") != "ASET-NETWORK-CANON-TLA-PROJECTION-V2":
+        raise SystemExit("network generated canon projection profile mismatch")
+    if generated.get("generator") != "tools/generate_canon_tla_projection.py":
+        raise SystemExit("network canon projection generator mismatch")
+    if generated.get("path") != CANON_PROJECTION.relative_to(ROOT).as_posix():
+        raise SystemExit("network canon projection path mismatch")
+    source = canon_refinement.get("source_model", {})
+    source_path = ROOT / source.get("path", "")
+    if not source_path.is_file() or source.get("sha256") != sha(source_path):
+        raise SystemExit("network canon refinement source-model digest mismatch")
+    target = canon_refinement.get("target_model", {})
+    target_path = ROOT / target.get("path", "")
+    if not target_path.is_file() or target.get("sha256") != sha(target_path):
+        raise SystemExit("network canon refinement target-model digest mismatch")
+    projection_text = CANON_PROJECTION.read_text(encoding="utf-8")
+    if "GENERATED FILE. DO NOT EDIT." not in projection_text:
+        raise SystemExit("network generated canon projection marker missing")
+    if "EXTENDS NetworkExtension" in projection_text or "INSTANCE NetworkExtension" in projection_text:
+        raise SystemExit("network generated canon projection depends on target model")
+    if source.get("sha256") not in projection_text:
+        raise SystemExit("network generated canon projection source digest marker mismatch")
+    proof_binding = canon_refinement.get("proof", {})
+    if proof_binding.get("module") != CANON_PROOF.relative_to(ROOT).as_posix():
+        raise SystemExit("network canon refinement proof path mismatch")
+    if proof_binding.get("final_theorem") != (
+        "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection"
+    ):
+        raise SystemExit("network canon refinement final theorem mismatch")
+    proof_text = CANON_PROOF.read_text(encoding="utf-8")
+    if "Canon == INSTANCE NetworkCanonProjection" not in proof_text:
+        raise SystemExit("network canon refinement proof instance missing")
+    if "THEOREM NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection ==" not in proof_text:
+        raise SystemExit("network canon refinement behavioral theorem missing")
+    if canon_refinement.get("status") != "MECHANICALLY_PROVED":
+        raise SystemExit("network canon refinement must be mechanically proved")
+    expected_canon_theorems = [
+        "NetworkCanonCoreAlgebraEquivalent",
+        "NetworkCoreSafetyPredicatesEquivalentToCanonProjection",
+        "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection",
+    ]
+    evidence_binding = canon_refinement.get("proof_evidence", {})
+    if evidence_binding.get("path") != CANON_REFINEMENT_EVIDENCE.relative_to(ROOT).as_posix():
+        raise SystemExit("network canon refinement proof evidence path mismatch")
+    if evidence_binding.get("status") != "MECHANICALLY_PROVED":
+        raise SystemExit("network canon refinement proof evidence binding status mismatch")
+    if evidence_binding.get("obligations_proved") != 3:
+        raise SystemExit("network canon refinement proof evidence binding obligation count mismatch")
+    if canon_refinement_evidence.get("status") != "MECHANICALLY_PROVED":
+        raise SystemExit("network canon refinement proof evidence status mismatch")
+    if canon_refinement_evidence.get("projection_profile") != "ASET-NETWORK-CANON-TLA-PROJECTION-V2":
+        raise SystemExit("network canon refinement proof evidence profile mismatch")
+    canon_gate = canon_refinement_evidence.get("proof_gate", {})
+    if canon_gate.get("verdict") != "PASS":
+        raise SystemExit("network canon refinement proof evidence verdict mismatch")
+    if canon_gate.get("final_theorems") != expected_canon_theorems:
+        raise SystemExit("network canon refinement proof evidence theorem set mismatch")
+    if canon_gate.get("obligations_proved") != 3:
+        raise SystemExit("network canon refinement proof evidence obligation count mismatch")
+    if (
+        canon_gate.get("obligation_count_semantics")
+        != "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT"
+    ):
+        raise SystemExit("network canon refinement obligation-count semantics mismatch")
+    if (
+        canon_refinement_evidence.get("tlapm", {}).get("commit")
+        != "4600b24c6d95a25ff081ad37b63b2a01c29d43a5"
+    ):
+        raise SystemExit("network canon refinement TLAPM commit mismatch")
+    if canon_refinement_evidence.get("tlapm", {}).get("version") != "4600b24":
+        raise SystemExit("network canon refinement TLAPM version mismatch")
+    evidence_artifacts = canon_refinement_evidence.get("network_artifacts", {})
+    artifact_paths = {
+        "source_model": CANON / "source/network-extension-model.json",
+        "generated_projection": CANON_PROJECTION,
+        "target_model": CANON / "formal/NetworkExtension.tla",
+        "proof": CANON_PROOF,
+    }
+    for key, path in artifact_paths.items():
+        if evidence_artifacts.get(key, {}).get("sha256") != sha(path):
+            raise SystemExit(
+                f"network canon refinement proof evidence {key} digest mismatch"
+            )
+    canon_projection_binding = relation.get("canon_projection", {})
+    if canon_projection_binding.get("relation_path") != CANON_REFINEMENT.relative_to(ROOT).as_posix():
+        raise SystemExit("formal relation canon refinement path mismatch")
+    if canon_projection_binding.get("relation_sha256") != sha(CANON_REFINEMENT):
+        raise SystemExit("formal relation canon refinement digest mismatch")
+    if canon_projection_binding.get("proof_path") != CANON_PROOF.relative_to(ROOT).as_posix():
+        raise SystemExit("formal relation canon refinement proof path mismatch")
+    if canon_projection_binding.get("proof_sha256") != sha(CANON_PROOF):
+        raise SystemExit("formal relation canon refinement proof digest mismatch")
+    if canon_projection_binding.get("status") != "MECHANICALLY_PROVED":
+        raise SystemExit("formal relation canon refinement proof status mismatch")
+    if (
+        canon_projection_binding.get("proof_evidence_path")
+        != CANON_REFINEMENT_EVIDENCE.relative_to(ROOT).as_posix()
+    ):
+        raise SystemExit("formal relation canon refinement evidence path mismatch")
+    if canon_projection_binding.get("proof_evidence_sha256") != sha(
+        CANON_REFINEMENT_EVIDENCE
+    ):
+        raise SystemExit("formal relation canon refinement evidence digest mismatch")
+    if canon_projection_binding.get("obligations_proved") != 3:
+        raise SystemExit("formal relation canon refinement obligation count mismatch")
+    if canon_projection_binding.get("final_theorems") != expected_canon_theorems:
+        raise SystemExit("formal relation canon refinement theorem set mismatch")
 
     if (
         relation["upstream_seed"]["compatibility_standard"]
@@ -134,6 +259,16 @@ def main() -> int:
         "tools/run_seed_refinement_tlaps.py"
     ):
         raise SystemExit("network model Seed refinement proof runner mismatch")
+    expected_canon_assurance = {
+        "canon_projection_generator": "tools/generate_canon_tla_projection.py",
+        "canon_projection_module": "extension/canonical/formal/NetworkCanonProjection.tla",
+        "canon_refinement_relation": "extension/canonical/assurance/canon-tla-refinement.json",
+        "canon_refinement_proof_module": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+        "canon_refinement_proof_runner": "tools/run_canon_refinement_tlaps.py",
+    }
+    for field, expected in expected_canon_assurance.items():
+        if formal_assurance.get(field) != expected:
+            raise SystemExit(f"network model canon assurance binding mismatch: {field}")
 
     state_fields = set(model.get("state", {}))
     partition = model.get("state_partition", {})
@@ -166,8 +301,13 @@ def main() -> int:
         raise SystemExit("claimed liveness profile must remain normative")
 
     surfaces = relation.get("projection_surfaces", {})
-    if surfaces.get("semantic_state", {}).get("formal_model") != "NetworkExtension":
+    semantic_surface = surfaces.get("semantic_state", {})
+    if semantic_surface.get("formal_model") != "NetworkExtension":
         raise SystemExit("semantic-state formal projection mismatch")
+    if semantic_surface.get("generated_canon_projection") != "NetworkCanonProjection":
+        raise SystemExit("semantic-state generated canon projection mismatch")
+    if semantic_surface.get("equivalence_proof") != "NetworkCanonRefinementProofs":
+        raise SystemExit("semantic-state canon equivalence proof mismatch")
     if surfaces.get("evidence_history", {}).get("formal_model") != "NetworkHistory":
         raise SystemExit("evidence-history formal projection mismatch")
     if (
@@ -204,6 +344,8 @@ def main() -> int:
     print("OK: semantic state / evidence history partition exact")
     print("OK: optional conditional liveness claim exact")
     print("OK: liveness profile exact")
+    print("OK: standalone Network canon projection exact")
+    print("OK: Network canon refinement mechanically proved")
     refinement = relation.get("seed_refinement", {})
     expected_seed_resolution_sha = (
         "sha256:1c0ebb27ed52da289f0981dcb11b61b6"

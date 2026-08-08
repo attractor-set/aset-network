@@ -1,4 +1,31 @@
 {
+  "canon_projection": {
+    "final_theorem": "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection",
+    "final_theorems": [
+      "NetworkCanonCoreAlgebraEquivalent",
+      "NetworkCoreSafetyPredicatesEquivalentToCanonProjection",
+      "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection"
+    ],
+    "generator": "tools/generate_canon_tla_projection.py",
+    "module": "NetworkCanonProjection",
+    "obligation_count_semantics": "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT",
+    "obligations_proved": 3,
+    "path": "extension/canonical/formal/NetworkCanonProjection.tla",
+    "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V2",
+    "proof_evidence_path": "extension/canonical/assurance/canon-refinement-proof.json",
+    "proof_evidence_sha256": "sha256:5de933e77861fbb94f488b66958f382838ec287dd3396290ea2d849cc8750352",
+    "proof_module": "NetworkCanonRefinementProofs",
+    "proof_path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+    "proof_sha256": "sha256:54f426f03658ab4efa6b20d1fb52c25f72b62b7dca9985a9f704ea2d1070b2fe",
+    "relation_path": "extension/canonical/assurance/canon-tla-refinement.json",
+    "relation_sha256": "sha256:64ffbdcdb836ab8dc11095667728cf65276d56682760cca8b04e48f97081588e",
+    "relation_type": "STANDALONE_GENERATED_PROJECTION_WITH_BEHAVIORAL_EQUIVALENCE_PROOF",
+    "sha256": "sha256:6921f9b35e394e033759771032c3852654020623922a0cff7c075ae6552511ea",
+    "status": "MECHANICALLY_PROVED",
+    "tlapm_commit": "4600b24c6d95a25ff081ad37b63b2a01c29d43a5",
+    "tlapm_version": "4600b24",
+    "verification_method": "ASET-VERIFY-NETWORK-CANON-TLA-REFINEMENT"
+  },
   "document_type": "aset-network-canon-tla-relation",
   "excluded_claims": [
     "unbounded state-space proof",
@@ -145,7 +172,7 @@
       "tla_action": "Init"
     }
   ],
-  "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V1",
+  "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V2",
   "projection_surfaces": {
     "conditional_liveness": {
       "canon_selector": "extension/canonical/liveness/liveness-profile.json",
@@ -159,11 +186,13 @@
     },
     "semantic_state": {
       "canon_selector": "/state_partition/semantic_state_fields",
+      "equivalence_proof": "NetworkCanonRefinementProofs",
       "formal_model": "NetworkExtension",
+      "generated_canon_projection": "NetworkCanonProjection",
       "scope": "SAFETY_AND_SEED_PROJECTION"
     }
   },
-  "relation_digest": "sha256:be8e191615c52e3d611f661735792e5bf896105cae2201369eaabf667bf3d79b",
+  "relation_digest": "sha256:9047d913e32c4963dfd4eb90671d459594a4763a31673b57119d7cb3f8b23bda",
   "safety_model": {
     "config": "extension/canonical/formal/NetworkExtension.cfg",
     "sha256": "sha256:3ddd779e5636fa573e3983fa4ed9359302cd66802c040df6b102ae40a9765718",
@@ -215,13 +244,13 @@
   },
   "source_model": {
     "path": "extension/canonical/source/network-extension-model.json",
-    "sha256": "sha256:0620ca50d946444a657ded67c018aa405b09bbff0f69cae5d7f6b5828c1d5dc0"
+    "sha256": "sha256:ce8ae7650a0d17dc0a2bee01428793ea5e204be34360d6d58b07a2b0377ba24c"
   },
   "target_model": {
     "module": "NetworkExtension",
     "path": "extension/canonical/formal/NetworkExtension.tla",
-    "scope": "SEMANTIC_STATE_SAFETY_AND_PROGRESS",
-    "sha256": "sha256:2e0801c49b279bcaf8af83b6eebcbbaaa59291aad48d9a2f75b0ec17379b7674"
+    "scope": "HANDWRITTEN_SEMANTIC_STATE_SAFETY_MODEL",
+    "sha256": "sha256:42d66d614137a55f1c0771931c781bd7cb328aadb4c5446e5102f921aff81978"
   },
   "upstream_seed": {
     "canon_id": "ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1",

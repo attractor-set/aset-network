@@ -11,6 +11,10 @@ RELATION = FORMAL / "canon-tla-relation.json"
 BINDING = ROOT / "upstream/ASET_SEED_BINDING.json"
 LIVENESS = ROOT / "extension/canonical/liveness/liveness-profile.json"
 PROOF_EVIDENCE = ROOT / "extension/canonical/assurance/seed-refinement-proof.json"
+CANON_REFINEMENT = ROOT / "extension/canonical/assurance/canon-tla-refinement.json"
+CANON_PROOF_EVIDENCE = ROOT / "extension/canonical/assurance/canon-refinement-proof.json"
+CANON_PROJECTION = FORMAL / "NetworkCanonProjection.tla"
+CANON_PROOF = FORMAL / "NetworkCanonRefinementProofs.tla"
 
 
 def sha(path: Path) -> str:
@@ -24,10 +28,12 @@ def canonical_bytes(value: object) -> bytes:
 def main() -> int:
     binding = json.loads(BINDING.read_text(encoding="utf-8"))
     proof_evidence = json.loads(PROOF_EVIDENCE.read_text(encoding="utf-8"))
+    canon_refinement = json.loads(CANON_REFINEMENT.read_text(encoding="utf-8"))
+    canon_proof_evidence = json.loads(CANON_PROOF_EVIDENCE.read_text(encoding="utf-8"))
     relation = {
         "document_type": "aset-network-canon-tla-relation",
         "schema_version": 1,
-        "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V1",
+        "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V2",
         "normative_precedence": "MACHINE_READABLE_CANON",
         "source_model": {
             "path": MODEL.relative_to(ROOT).as_posix(),
@@ -37,12 +43,37 @@ def main() -> int:
             "module": "NetworkExtension",
             "path": (FORMAL / "NetworkExtension.tla").relative_to(ROOT).as_posix(),
             "sha256": sha(FORMAL / "NetworkExtension.tla"),
-            "scope": "SEMANTIC_STATE_SAFETY_AND_PROGRESS",
+            "scope": "HANDWRITTEN_SEMANTIC_STATE_SAFETY_MODEL",
+        },
+        "canon_projection": {
+            "profile": canon_refinement["generated_projection"]["profile"],
+            "generator": canon_refinement["generated_projection"]["generator"],
+            "module": canon_refinement["generated_projection"]["module"],
+            "path": CANON_PROJECTION.relative_to(ROOT).as_posix(),
+            "sha256": sha(CANON_PROJECTION),
+            "relation_path": CANON_REFINEMENT.relative_to(ROOT).as_posix(),
+            "relation_sha256": sha(CANON_REFINEMENT),
+            "proof_module": "NetworkCanonRefinementProofs",
+            "proof_path": CANON_PROOF.relative_to(ROOT).as_posix(),
+            "proof_sha256": sha(CANON_PROOF),
+            "final_theorem": canon_refinement["proof"]["final_theorem"],
+            "final_theorems": canon_proof_evidence["proof_gate"]["final_theorems"],
+            "verification_method": canon_refinement["proof"]["verification_method"],
+            "relation_type": canon_refinement["relation_type"],
+            "proof_evidence_path": CANON_PROOF_EVIDENCE.relative_to(ROOT).as_posix(),
+            "proof_evidence_sha256": sha(CANON_PROOF_EVIDENCE),
+            "tlapm_commit": canon_proof_evidence["tlapm"]["commit"],
+            "tlapm_version": canon_proof_evidence["tlapm"]["version"],
+            "obligations_proved": canon_proof_evidence["proof_gate"]["obligations_proved"],
+            "obligation_count_semantics": canon_proof_evidence["proof_gate"]["obligation_count_semantics"],
+            "status": canon_proof_evidence["status"],
         },
         "projection_surfaces": {
             "semantic_state": {
                 "canon_selector": "/state_partition/semantic_state_fields",
                 "formal_model": "NetworkExtension",
+                "generated_canon_projection": "NetworkCanonProjection",
+                "equivalence_proof": "NetworkCanonRefinementProofs",
                 "scope": "SAFETY_AND_SEED_PROJECTION",
             },
             "evidence_history": {

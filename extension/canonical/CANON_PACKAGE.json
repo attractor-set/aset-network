@@ -5,6 +5,14 @@
   "extension_version": "0.1.0-alpha.2",
   "files": [
     {
+      "path": "extension/canonical/assurance/canon-refinement-proof.json",
+      "sha256": "sha256:5de933e77861fbb94f488b66958f382838ec287dd3396290ea2d849cc8750352"
+    },
+    {
+      "path": "extension/canonical/assurance/canon-tla-refinement.json",
+      "sha256": "sha256:64ffbdcdb836ab8dc11095667728cf65276d56682760cca8b04e48f97081588e"
+    },
+    {
       "path": "extension/canonical/assurance/limitations.json",
       "sha256": "sha256:b4e83ea352494eea568314e5f2a5e050372faf5e8a29c1bbbdb2a8e9117be440"
     },
@@ -89,12 +97,20 @@
       "sha256": "sha256:0d46f6a7eb0aedcc034ace08a80fc53c2a9b8bb40b98e677405ab4944a397237"
     },
     {
+      "path": "extension/canonical/formal/NetworkCanonProjection.tla",
+      "sha256": "sha256:6921f9b35e394e033759771032c3852654020623922a0cff7c075ae6552511ea"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+      "sha256": "sha256:54f426f03658ab4efa6b20d1fb52c25f72b62b7dca9985a9f704ea2d1070b2fe"
+    },
+    {
       "path": "extension/canonical/formal/NetworkExtension.cfg",
       "sha256": "sha256:3ddd779e5636fa573e3983fa4ed9359302cd66802c040df6b102ae40a9765718"
     },
     {
       "path": "extension/canonical/formal/NetworkExtension.tla",
-      "sha256": "sha256:2e0801c49b279bcaf8af83b6eebcbbaaa59291aad48d9a2f75b0ec17379b7674"
+      "sha256": "sha256:42d66d614137a55f1c0771931c781bd7cb328aadb4c5446e5102f921aff81978"
     },
     {
       "path": "extension/canonical/formal/NetworkExtensionLiveness.cfg",
@@ -122,7 +138,7 @@
     },
     {
       "path": "extension/canonical/formal/canon-tla-relation.json",
-      "sha256": "sha256:26880f20dfad69601c051dcf6d5ddda7e330d20f0fbb89961655caf5f34407c9"
+      "sha256": "sha256:4a63c0e94192f7c3370cd4f88604264347c980a860c948c77e5c00150374c5bb"
     },
     {
       "path": "extension/canonical/liveness/liveness-profile.json",
@@ -170,7 +186,7 @@
     },
     {
       "path": "extension/canonical/source/network-extension-model.json",
-      "sha256": "sha256:0620ca50d946444a657ded67c018aa405b09bbff0f69cae5d7f6b5828c1d5dc0"
+      "sha256": "sha256:ce8ae7650a0d17dc0a2bee01428793ea5e204be34360d6d58b07a2b0377ba24c"
     },
     {
       "path": "upstream/ASET_SEED_BINDING.json",
@@ -179,7 +195,7 @@
   ],
   "implementation_precedence": "NONE",
   "normative_source": "extension/canonical/source/network-extension-model.json",
-  "package_digest": "sha256:504ee6877e13b0af89ba7baec0630ad0018be4c65416421347ab9c4d0d3eee06",
+  "package_digest": "sha256:64d718812cea7768f21b288fc525298516d9150ecd790016ffb6513bfe68c1c1",
   "schema_version": 1,
   "upstream_binding": "upstream/ASET_SEED_BINDING.json"
 }
