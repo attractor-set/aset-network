@@ -9,3 +9,6 @@ build/
 .tooling/tlc/
 .tooling/seed-formal/
 .tlacache/
+
+# Local formal-verification tooling
+.tooling/
