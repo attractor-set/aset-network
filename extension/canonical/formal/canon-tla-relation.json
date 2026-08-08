@@ -1,0 +1,266 @@
+{
+  "canon_projection": {
+    "final_theorem": "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection",
+    "final_theorems": [
+      "NetworkCanonCoreAlgebraEquivalent",
+      "NetworkCoreSafetyPredicatesEquivalentToCanonProjection",
+      "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection"
+    ],
+    "generator": "tools/generate_canon_tla_projection.py",
+    "module": "NetworkCanonProjection",
+    "obligation_count_semantics": "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT",
+    "obligations_proved": 3,
+    "path": "extension/canonical/formal/NetworkCanonProjection.tla",
+    "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V2",
+    "proof_evidence_path": "extension/canonical/assurance/canon-refinement-proof.json",
+    "proof_evidence_sha256": "sha256:5de933e77861fbb94f488b66958f382838ec287dd3396290ea2d849cc8750352",
+    "proof_module": "NetworkCanonRefinementProofs",
+    "proof_path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+    "proof_sha256": "sha256:54f426f03658ab4efa6b20d1fb52c25f72b62b7dca9985a9f704ea2d1070b2fe",
+    "relation_path": "extension/canonical/assurance/canon-tla-refinement.json",
+    "relation_sha256": "sha256:64ffbdcdb836ab8dc11095667728cf65276d56682760cca8b04e48f97081588e",
+    "relation_type": "STANDALONE_GENERATED_PROJECTION_WITH_BEHAVIORAL_EQUIVALENCE_PROOF",
+    "sha256": "sha256:6921f9b35e394e033759771032c3852654020623922a0cff7c075ae6552511ea",
+    "status": "MECHANICALLY_PROVED",
+    "tlapm_commit": "4600b24c6d95a25ff081ad37b63b2a01c29d43a5",
+    "tlapm_version": "4600b24",
+    "verification_method": "ASET-VERIFY-NETWORK-CANON-TLA-REFINEMENT"
+  },
+  "document_type": "aset-network-canon-tla-relation",
+  "excluded_claims": [
+    "unbounded state-space proof",
+    "wire-schema equivalence",
+    "cryptographic security",
+    "unconditional transport availability",
+    "global agreement or eventual ACCEPT",
+    "concrete Authority-ID and Binding construction beyond the declared refinement abstraction mapping"
+  ],
+  "history_model": {
+    "config": "extension/canonical/formal/NetworkHistory.cfg",
+    "config_sha256": "sha256:2442157b7190b32ba05a3338c1fb42920a33c4d45fa34e3f410981197dada91f",
+    "module": "NetworkHistory",
+    "path": "extension/canonical/formal/NetworkHistory.tla",
+    "properties": [
+      "HistoryPrefixPreserved",
+      "AcceptedTransitionAppendsExactlyOne"
+    ],
+    "scope": "NET-INV-010_TRACE_PROJECTION",
+    "sha256": "sha256:3fc47fc3b5fe049d90448260a7d427835c39871df4855fb6ca3f5dc793f59286",
+    "specification": "HistorySpec"
+  },
+  "invariant_coverage": [
+    {
+      "id": "NET-INV-001",
+      "status": "TLC_INVARIANT",
+      "tla": "LocalAuthoritySovereignty"
+    },
+    {
+      "id": "NET-INV-002",
+      "status": "TLC_ACTION_ABSTRACTION",
+      "tla": "ExportArtifact action frame conditions"
+    },
+    {
+      "id": "NET-INV-003",
+      "status": "TLC_PROJECTION_INVARIANT",
+      "tla": "ProjectedStatus / ProjectedEnforcement"
+    },
+    {
+      "id": "NET-INV-004",
+      "status": "TLC_INVARIANT",
+      "tla": "RecognitionRequiresImport / TerminalRecognitionDisjoint"
+    },
+    {
+      "id": "NET-INV-005",
+      "status": "TLC_PROJECTION_INVARIANT",
+      "tla": "ProjectionFailClosed / ProjectionAllowRequiresLocalAccept"
+    },
+    {
+      "id": "NET-INV-006",
+      "status": "TLC_INVARIANT",
+      "tla": "ExportBindingPreserved"
+    },
+    {
+      "id": "NET-INV-007",
+      "status": "TLC_INVARIANT",
+      "tla": "ActiveRouteMembersActive / NoSelfRoute"
+    },
+    {
+      "id": "NET-INV-008",
+      "status": "TLC_ACTION_ABSTRACTION",
+      "tla": "Withdraw guard"
+    },
+    {
+      "id": "NET-INV-009",
+      "status": "TLC_INVARIANT",
+      "tla": "NoImplicitSuperContext"
+    },
+    {
+      "id": "NET-INV-010",
+      "status": "TLC_TRACE_PROPERTY",
+      "tla": "NetworkHistory.HistoryPrefixPreserved / AcceptedTransitionAppendsExactlyOne"
+    },
+    {
+      "id": "NET-INV-011",
+      "status": "TLC_STATE_ABSTRACTION",
+      "tla": "set membership guards plus stuttering"
+    },
+    {
+      "id": "NET-INV-012",
+      "status": "TLC_PROJECTION_INVARIANT",
+      "tla": "NetworkDoesNotWeakenSeedBoundary"
+    }
+  ],
+  "liveness_coverage": [
+    {
+      "id": "NET-LIVE-G-001",
+      "status": "TLC_LIVENESS_PROPERTY",
+      "tla": "EventuallyDelivered"
+    },
+    {
+      "id": "NET-LIVE-G-002",
+      "status": "TLC_LIVENESS_PROPERTY",
+      "tla": "EventuallyObserved"
+    },
+    {
+      "id": "NET-LIVE-G-003",
+      "status": "TLC_LIVENESS_PROPERTY",
+      "tla": "EventuallyResolved"
+    }
+  ],
+  "liveness_model": {
+    "config": "extension/canonical/formal/NetworkExtensionLiveness.cfg",
+    "config_sha256": "sha256:caa8e32e6e8bea75ef1ed83434e261e45e6375a3248a2d920e0498df8d00ddb3",
+    "profile": "ASET-NETWORK-LIVENESS-V1",
+    "profile_path": "extension/canonical/liveness/liveness-profile.json",
+    "profile_sha256": "sha256:890d36df457794c706a2e1f4165fd4e583fa6ed765a2d6135256118a4a3c81c0",
+    "required_for_core_conformance": false,
+    "specification": "FairSpec"
+  },
+  "normative_precedence": "MACHINE_READABLE_CANON",
+  "operation_coverage": [
+    {
+      "kind": "MEMBER_JOIN",
+      "tla_action": "Join"
+    },
+    {
+      "kind": "ROUTE_GRANT",
+      "tla_action": "GrantRoute"
+    },
+    {
+      "kind": "EXPORT_ARTIFACT",
+      "tla_action": "ExportArtifact"
+    },
+    {
+      "kind": "OBSERVE_IMPORT",
+      "tla_action": "Observe"
+    },
+    {
+      "kind": "RECORD_RECOGNITION",
+      "tla_action": "ResolveAccept / ResolveDeny"
+    },
+    {
+      "kind": "SUSPEND_ROUTE",
+      "tla_action": "SuspendRoute"
+    },
+    {
+      "kind": "MEMBER_WITHDRAW",
+      "tla_action": "Withdraw"
+    },
+    {
+      "kind": "FEDERATION_GENESIS",
+      "status": "ABSTRACTED_IN_INIT",
+      "tla_action": "Init"
+    }
+  ],
+  "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V2",
+  "projection_surfaces": {
+    "conditional_liveness": {
+      "canon_selector": "extension/canonical/liveness/liveness-profile.json",
+      "formal_model": "NetworkExtension.FairSpec",
+      "scope": "ASET-NETWORK-LIVENESS-V1"
+    },
+    "evidence_history": {
+      "canon_selector": "/state_partition/evidence_history_fields",
+      "formal_model": "NetworkHistory",
+      "scope": "NET-INV-010_TRACE_PROJECTION"
+    },
+    "semantic_state": {
+      "canon_selector": "/state_partition/semantic_state_fields",
+      "equivalence_proof": "NetworkCanonRefinementProofs",
+      "formal_model": "NetworkExtension",
+      "generated_canon_projection": "NetworkCanonProjection",
+      "scope": "SAFETY_AND_SEED_PROJECTION"
+    }
+  },
+  "relation_digest": "sha256:9047d913e32c4963dfd4eb90671d459594a4763a31673b57119d7cb3f8b23bda",
+  "safety_model": {
+    "config": "extension/canonical/formal/NetworkExtension.cfg",
+    "sha256": "sha256:3ddd779e5636fa573e3983fa4ed9359302cd66802c040df6b102ae40a9765718",
+    "specification": "SafetySpec"
+  },
+  "schema_version": 1,
+  "seed_projection": {
+    "contract": "PerContextSeedProjectionContract",
+    "exact_seed_tlaps_refinement": "MECHANICALLY_PROVED",
+    "module": "NetworkExtensionSeedProjection",
+    "path": "extension/canonical/formal/NetworkExtensionSeedProjection.tla",
+    "sha256": "sha256:4c6de2a5a676aeeac7412ccbf26552c2b60827b58d4c3e5fc33b701308d9675c"
+  },
+  "seed_refinement": {
+    "final_theorems": [
+      "NetworkSafetyRefinesSeedResolution",
+      "NetworkEvaluatorMatchesSeedResolution"
+    ],
+    "mapping": {
+      "allow_terminals": "accepted",
+      "authorities": "Contexts",
+      "bindings": "target-scoped Contexts x Artifacts",
+      "block_terminals": "denied",
+      "conflicts": "EMPTY_IN_NETWORK_PROJECTION",
+      "requests": "imports",
+      "resolution_ids": "ExportUniverse"
+    },
+    "mapping_module": "NetworkExtensionSeedRefinement",
+    "mapping_path": "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
+    "mapping_sha256": "sha256:e009ea452dbec8355af0f3029089f0d12d7276a36c30ea783551f6799a8e7348",
+    "network_only_actions": "SEED_STUTTER",
+    "obligation_count_semantics": "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT",
+    "obligations_proved": 261,
+    "observe_import": "SeedResolution.RegisterRequest",
+    "proof_evidence_path": "extension/canonical/assurance/seed-refinement-proof.json",
+    "proof_evidence_sha256": "sha256:c381a981c1c3c912196122e37438b860aecebe2d519aa5e2060800d25a1044d5",
+    "proof_module": "NetworkExtensionSeedRefinementProofs",
+    "proof_path": "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
+    "proof_sha256": "sha256:c5392cea3c6cea2e30f00959d178f83f2c2c668cd1dbea6bd687fcd366bd6e6d",
+    "resolve_accept": "SeedResolution.SubmitResolution(ALLOW)",
+    "resolve_deny": "SeedResolution.SubmitResolution(BLOCK)",
+    "status": "MECHANICALLY_PROVED",
+    "tlapm_commit": "4600b24c6d95a25ff081ad37b63b2a01c29d43a5",
+    "tlapm_version": "4600b24",
+    "upstream_materialization": "EXTERNAL_PINNED_SEED_SOURCE_NOT_VENDORED",
+    "upstream_module": "SeedResolution",
+    "upstream_path": "seed/canonical/formal/SeedResolution.tla",
+    "upstream_sha256": "sha256:1c0ebb27ed52da289f0981dcb11b61b6a7fc5c4a030ba434ae0b1d53b286b926"
+  },
+  "source_model": {
+    "path": "extension/canonical/source/network-extension-model.json",
+    "sha256": "sha256:ce8ae7650a0d17dc0a2bee01428793ea5e204be34360d6d58b07a2b0377ba24c"
+  },
+  "target_model": {
+    "module": "NetworkExtension",
+    "path": "extension/canonical/formal/NetworkExtension.tla",
+    "scope": "HANDWRITTEN_SEMANTIC_STATE_SAFETY_MODEL",
+    "sha256": "sha256:42d66d614137a55f1c0771931c781bd7cb328aadb4c5446e5102f921aff81978"
+  },
+  "upstream_seed": {
+    "canon_id": "ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1",
+    "canon_package_digest": "sha256:c5d48a418466ea7a60fccb7161adbd5ad568174bbc9a28fc03fd7e6e77955d31",
+    "canon_version": "0.3.0-alpha.1",
+    "compatibility_standard": "ASET-SEED-COMPATIBILITY-STANDARD@seed-0.3.0-alpha.3",
+    "compatibility_standard_profile": "ASET-SEED-COMPATIBILITY-STANDARD-V1",
+    "conformance_kit_sha256": "sha256:5ecf9b93377a062b8772b4b4b44b4d76a0997d8ba98e8711e717456abbe583db",
+    "release_commit": "633c130187b2a2bb42f24cfd66662d475de385d2",
+    "release_tag": "seed-0.3.0-alpha.3",
+    "seed_canon_tla_projection_profile": "ASET-SEED-CANON-TLA-PROJECTION-V5"
+  }
+}

@@ -1,0 +1,165 @@
+{
+  "abstractions": [
+    {
+      "description": "Contexts and Artifacts are opaque finite identities. Concrete Context construction, cryptographic naming and content-address derivation are outside the generated projection.",
+      "id": "OPAQUE_CONTEXT_AND_ARTIFACT_IDENTITIES"
+    },
+    {
+      "description": "Transport delivery is represented as an assurance environment action over the exported artifact set. Transport protocol, retry policy, durability and partition healing are outside this projection.",
+      "id": "TRANSPORT_ENVIRONMENT_BOUNDARY"
+    },
+    {
+      "description": "authorityOwner and superiorContexts are assurance witnesses for local sovereignty and absence of an implicit super-context; they are not operational authority registries.",
+      "id": "SOVEREIGNTY_WITNESS_STATE"
+    }
+  ],
+  "claim_boundary": "The proof establishes behavioral equivalence between NetworkExtension.tla and a standalone TLA+ safety projection generated deterministically from the exact machine-readable Network Extension model under ASET-NETWORK-CANON-TLA-PROJECTION-V2. The generated projection does not import or extend NetworkExtension; the proof explicitly instantiates the independent projection onto the handwritten assurance model state. Evidence-history trace semantics, conditional liveness, concrete transport, cryptography, wire-schema equivalence, concrete Authority evidence and the separate refinement to pinned SeedResolution.tla remain outside this proof boundary. The deterministic generator remains part of the assurance trusted computing base.",
+  "document_type": "aset-network-canon-tla-refinement",
+  "environment_action_coverage": [
+    {
+      "kind": "TRANSPORT_DELIVERY",
+      "status": "ASSURANCE_ENVIRONMENT_ACTION_NOT_CANONICAL_TRANSITION",
+      "tla_action": "CanonDeliver"
+    }
+  ],
+  "excluded_claims": [
+    "natural-language-text equivalence",
+    "wire-schema equivalence",
+    "cryptographic digest correctness",
+    "transport implementation refinement",
+    "unbounded liveness",
+    "evidence-history trace equivalence",
+    "formal proof of projection-generator correctness",
+    "concrete Authority evidence or credential validation",
+    "direct proof of the separate Network-to-Seed refinement"
+  ],
+  "generated_projection": {
+    "generator": "tools/generate_canon_tla_projection.py",
+    "module": "NetworkCanonProjection",
+    "path": "extension/canonical/formal/NetworkCanonProjection.tla",
+    "profile": "ASET-NETWORK-CANON-TLA-PROJECTION-V2"
+  },
+  "invariant_coverage": [
+    {
+      "id": "NET-INV-001",
+      "status": "PROVED_IN_DECLARED_PROJECTION"
+    },
+    {
+      "id": "NET-INV-002",
+      "status": "PROVED_ACTION_FRAME_CONDITION"
+    },
+    {
+      "id": "NET-INV-003",
+      "status": "SEPARATE_SEED_OBSERVER_PROJECTION"
+    },
+    {
+      "id": "NET-INV-004",
+      "status": "PROVED_IN_DECLARED_PROJECTION"
+    },
+    {
+      "id": "NET-INV-005",
+      "status": "SEPARATE_SEED_OBSERVER_PROJECTION"
+    },
+    {
+      "id": "NET-INV-006",
+      "status": "PROVED_IN_DECLARED_PROJECTION"
+    },
+    {
+      "id": "NET-INV-007",
+      "status": "PROVED_IN_DECLARED_PROJECTION"
+    },
+    {
+      "id": "NET-INV-008",
+      "status": "PROVED_ACTION_GUARD"
+    },
+    {
+      "id": "NET-INV-009",
+      "status": "PROVED_IN_DECLARED_PROJECTION"
+    },
+    {
+      "id": "NET-INV-010",
+      "status": "SEPARATE_HISTORY_TRACE_SURFACE"
+    },
+    {
+      "id": "NET-INV-011",
+      "status": "PARTIAL_SET_MEMBERSHIP_AND_STUTTER_ABSTRACTION"
+    },
+    {
+      "id": "NET-INV-012",
+      "status": "SEPARATE_PINNED_SEED_REFINEMENT_PROOF"
+    }
+  ],
+  "operation_coverage": [
+    {
+      "kind": "FEDERATION_GENESIS",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonInit"
+    },
+    {
+      "kind": "MEMBER_JOIN",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonJoin"
+    },
+    {
+      "kind": "ROUTE_GRANT",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonGrantRoute"
+    },
+    {
+      "kind": "EXPORT_ARTIFACT",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonExportArtifact"
+    },
+    {
+      "kind": "OBSERVE_IMPORT",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonObserve"
+    },
+    {
+      "kind": "RECORD_RECOGNITION",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonResolveAccept / CanonResolveDeny"
+    },
+    {
+      "kind": "SUSPEND_ROUTE",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonSuspendRoute"
+    },
+    {
+      "kind": "MEMBER_WITHDRAW",
+      "status": "PROVED_IN_DECLARED_PROJECTION",
+      "tla_action": "CanonWithdraw"
+    }
+  ],
+  "proof": {
+    "final_theorem": "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection",
+    "final_theorems": [
+      "NetworkCanonCoreAlgebraEquivalent",
+      "NetworkCoreSafetyPredicatesEquivalentToCanonProjection",
+      "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection"
+    ],
+    "module": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+    "verification_method": "ASET-VERIFY-NETWORK-CANON-TLA-REFINEMENT"
+  },
+  "proof_evidence": {
+    "obligation_count_semantics": "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT",
+    "obligations_proved": 3,
+    "path": "extension/canonical/assurance/canon-refinement-proof.json",
+    "status": "MECHANICALLY_PROVED"
+  },
+  "relation_type": "STANDALONE_GENERATED_PROJECTION_WITH_BEHAVIORAL_EQUIVALENCE_PROOF",
+  "schema_version": 1,
+  "scope": "DECLARED_CANONICAL_SAFETY_PROJECTION",
+  "source_model": {
+    "model_id": "ASET-NETWORK-EXTENSION",
+    "path": "extension/canonical/source/network-extension-model.json",
+    "sha256": "sha256:ce8ae7650a0d17dc0a2bee01428793ea5e204be34360d6d58b07a2b0377ba24c",
+    "version": "0.1.0-alpha.2"
+  },
+  "status": "MECHANICALLY_PROVED",
+  "target_model": {
+    "module": "NetworkExtension",
+    "path": "extension/canonical/formal/NetworkExtension.tla",
+    "sha256": "sha256:42d66d614137a55f1c0771931c781bd7cb328aadb4c5446e5102f921aff81978"
+  }
+}

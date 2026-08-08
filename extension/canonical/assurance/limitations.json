@@ -2,16 +2,16 @@
   "document_type": "aset-network-extension-assurance-limitations",
   "limitations": [
     {
-      "description": "The included TLA+ module is a bounded assurance projection, not an unbounded refinement proof.",
+      "description": "TLC model checking is finite-state assurance over the declared model constants; it is not an unbounded proof.",
       "id": "NET-LIMIT-001",
       "scope": "formal-assurance",
-      "status": "BOUNDED_ONLY"
+      "status": "FINITE_STATE_MODEL_CHECKING_REQUIRED"
     },
     {
-      "description": "The alpha does not select transport, discovery, consensus, durability or availability mechanisms.",
+      "description": "The alpha does not select transport, discovery, consensus or durability mechanisms; liveness is an optional normative claim profile and remains conditional on the explicit ASET-NETWORK-LIVENESS-V1 assumptions.",
       "id": "NET-LIMIT-002",
       "scope": "transport-and-consensus",
-      "status": "OUT_OF_SCOPE"
+      "status": "OUT_OF_SCOPE_WITH_CONDITIONAL_LIVENESS"
     },
     {
       "description": "Cryptographic algorithms, key custody and homomorphic-encryption profiles are not selected.",
@@ -26,8 +26,14 @@
       "status": "DEFERRED_PROFILE"
     },
     {
-      "description": "No independent third-party audit is bound to the exact alpha package digest.",
+      "description": "Exact behavioral refinement to the pinned SeedResolution.tla is mechanically proved by TLAPS for the declared Network-to-Seed abstraction mapping. The proof does not establish concrete Context-to-Authority or artifact-to-Binding identity construction beyond that mapping.",
       "id": "NET-LIMIT-005",
+      "scope": "seed-refinement",
+      "status": "PINNED_ABSTRACTION_REFINEMENT_PROVED"
+    },
+    {
+      "description": "No independent third-party audit is bound to the exact alpha package digest.",
+      "id": "NET-LIMIT-006",
       "scope": "external-audit",
       "status": "PENDING"
     }

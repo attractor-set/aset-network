@@ -15,9 +15,32 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
       - run: python -m pip install -r requirements-ci.txt
+      - run: python tools/bootstrap_tla.py
       - run: python tools/validate_extension.py
       - run: python tools/model_check_network.py
       - run: python tools/run_conformance.py
       - run: python -m pytest -q
       - run: ruff check .
+      - name: Build regulator-ready deterministic snapshot
+        id: regulator_snapshot
+        shell: bash
+        run: |
+          python tools/build_release.py
+          (cd dist && sha256sum --check ASET-Network-Extension-Repository-Snapshot.zip.sha256)
+          digest="$(cut -d' ' -f1 dist/ASET-Network-Extension-Repository-Snapshot.zip.sha256)"
+          printf 'REGULATOR_SNAPSHOT_SHA256=sha256:%s\n' "$digest"
+          printf 'sha256=%s\n' "$digest" >> "$GITHUB_OUTPUT"
+          printf '### Regulator snapshot\n\n`sha256:%s`\n' "$digest" >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload regulator-ready snapshot
+        uses: actions/upload-artifact@v4
+        with:
+          name: aset-network-extension-regulator-snapshot-${{ github.sha }}
+          if-no-files-found: error
+          path: |
+            dist/ASET-Network-Extension-Repository-Snapshot.zip
+            dist/ASET-Network-Extension-Repository-Snapshot.zip.sha256
