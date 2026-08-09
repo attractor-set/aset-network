@@ -39,3 +39,10 @@ Machine-readable canon явно разделяет семантическое с
 `ASET-NETWORK-LIVENESS-V1` — опциональное нормативное capability claim, а не требование core `ASET-NETWORK-EXTENSION-CONFORMANCE-V1`. При его заявлении требуется eventual local resolution (`ACCEPT` или `DENY`) только при явных fairness/environment assumptions; он не требует eventual `ACCEPT` или глобального согласия.
 
 TLAPS-мост к закреплённому `SeedResolution.tla` объявлен в `NetworkExtensionSeedRefinement.tla` и `NetworkExtensionSeedRefinementProofs.tla`; upstream-модуль не копируется в канон и перед доказательством проверяется по точному SHA-256. До успешного proof gate связь не маркируется как доказанная.
+
+## Связь репозиториев
+
+- Вышестоящий Seed: [ASET](https://github.com/attractor-set/ASET).
+- Это нормативное расширение: [aset-network-extension](https://github.com/attractor-set/aset-network-extension).
+- Эталонная реализация Seed: [aset-python-sqlite](https://github.com/attractor-set/aset-python-sqlite).
+- Сетевая эталонная реализация: [aset-network-python-sqlite](https://github.com/attractor-set/aset-network-python-sqlite) — ненормативная реализация этого расширения, композирующая `aset-python-sqlite` как Seed-слой.

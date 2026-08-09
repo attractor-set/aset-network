@@ -73,7 +73,9 @@ ruff check .
 
 ## Repository relation
 
-- Upstream Seed: `https://github.com/attractor-set/ASET`
-- This extension: `https://github.com/attractor-set/aset-network-extension`
+- Upstream Seed: [ASET](https://github.com/attractor-set/ASET).
+- This normative extension: [aset-network-extension](https://github.com/attractor-set/aset-network-extension).
+- Seed reference implementation: [aset-python-sqlite](https://github.com/attractor-set/aset-python-sqlite).
+- Network reference implementation: [aset-network-python-sqlite](https://github.com/attractor-set/aset-network-python-sqlite) — a non-normative implementation of this extension that composes `aset-python-sqlite` as its Seed layer.
 
 Apache-2.0 licensed. No implementation has semantic precedence over the machine-readable canon.

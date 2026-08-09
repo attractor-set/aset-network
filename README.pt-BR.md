@@ -39,3 +39,10 @@ O canon legível por máquina separa explicitamente o estado semântico da rede 
 `ASET-NETWORK-LIVENESS-V1` é uma capability claim normativa opcional, e não um requisito do core `ASET-NETWORK-EXTENSION-CONFORMANCE-V1`. Quando reivindicado, exige eventual resolução local (`ACCEPT` ou `DENY`) apenas sob assumptions explícitas de fairness/ambiente; não exige eventual `ACCEPT` nem consenso global.
 
 A ponte TLAPS para o `SeedResolution.tla` fixado é declarada em `NetworkExtensionSeedRefinement.tla` e `NetworkExtensionSeedRefinementProofs.tla`; o módulo upstream não é copiado para o canon e seu SHA-256 exato é verificado antes da prova. Até o proof gate passar, a relação não é marcada como provada.
+
+## Relação entre repositórios
+
+- Seed upstream: [ASET](https://github.com/attractor-set/ASET).
+- Esta extensão normativa: [aset-network-extension](https://github.com/attractor-set/aset-network-extension).
+- Implementação de referência do Seed: [aset-python-sqlite](https://github.com/attractor-set/aset-python-sqlite).
+- Implementação de referência de rede: [aset-network-python-sqlite](https://github.com/attractor-set/aset-network-python-sqlite) — implementação não normativa desta extensão que compõe `aset-python-sqlite` como sua camada Seed.
