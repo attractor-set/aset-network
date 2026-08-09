@@ -14,3 +14,9 @@ target-version = "py312"
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]
+
+[project.urls]
+SeedSpecification = "https://github.com/attractor-set/ASET"
+Repository = "https://github.com/attractor-set/aset-network-extension"
+SeedReferenceImplementation = "https://github.com/attractor-set/aset-python-sqlite"
+ReferenceImplementation = "https://github.com/attractor-set/aset-network-python-sqlite"
