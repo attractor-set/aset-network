@@ -8,9 +8,10 @@
   "normative_when_claimed": true,
   "not_owned": [
     "imports",
+    "liveness guarantees",
     "recognitions"
   ],
-  "note": "This optional profile owns federation lifecycle. Federation membership or routing never creates target-local Authority.",
+  "note": "This optional profile owns federation lifecycle only. Federation membership or routing never creates target-local Authority; progress/liveness claims require a separately composed profile.",
   "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
   "schema_version": 1,
   "state_ownership": [

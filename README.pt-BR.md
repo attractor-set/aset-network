@@ -14,7 +14,7 @@ foreign evidence -> ADMIT_IMPORT -> UNKNOWN/BLOCKED -> target-local Seed
 
 O Network possui uma única estrutura de estado semântico, `imports`, e uma única transição mutável, `ADMIT_IMPORT`. A admissão não cria Authority nem autoriza efeitos. `ALLOW/BLOCK` terminais pertencem exclusivamente ao Seed local.
 
-Federação, rotas, ciclo de exportação e liveness condicional são perfis opcionais. Qualquer garantia de terminal-resolution permanece explicitamente sob o Seed local do alvo.
+Federação/rotas e liveness condicional são dois perfis opcionais separados. O Federation Profile possui apenas o lifecycle federativo; o Liveness Profile possui apenas claims condicionais de progresso. Eles podem ser compostos sem relação parent/child, e o progresso de terminal-resolution continua sob o Seed local do alvo.
 
 ## Vínculo com Seed
 
@@ -27,13 +27,17 @@ Network pode fortalecer as restrições de Seed, mas não enfraquecê-las nem su
 
 ## Federation Profile
 
-`ASET-NETWORK-FEDERATION-PROFILE-V1` é um dynamic profile opcional e autocontido. Ele possui o estado do ciclo de vida federativo e as transições `FEDERATION_GENESIS`, `MEMBER_JOIN`, `ROUTE_GRANT`, `EXPORT_ARTIFACT`, `SUSPEND_ROUTE`, `MEMBER_WITHDRAW`. O oracle não normativo está em `reference/federation_profile_reference.py` e os 10 casos nativos de conformidade estão em `extension/canonical/conformance/federation-profile-cases/`.
+`ASET-NETWORK-FEDERATION-PROFILE-V1` é um dynamic profile opcional e autocontido. Ele possui o estado do ciclo de vida federativo e as transições `FEDERATION_GENESIS`, `MEMBER_JOIN`, `ROUTE_GRANT`, `EXPORT_ARTIFACT`, `SUSPEND_ROUTE`, `MEMBER_WITHDRAW`. Todos os artefatos pertencentes à Federation ficam em `extension/canonical/profiles/federation/`. O oracle não normativo está em `reference/profiles/federation.py` e os 10 casos nativos de conformidade ficam no mesmo diretório de perfil.
 
 As transições de Federation são stutter em relação ao estado de admission da Network. Terminal recognition não é uma operação de Federation e continua exclusivamente sob o Seed local do Context alvo.
 
+## Liveness Profile
+
+`ASET-NETWORK-LIVENESS-V1` é um dynamic profile opcional independente, sem estado ou transitions próprios da Network. Ele declara garantias condicionais de progresso e capacidades exigidas de um perfil composto separadamente. A composição atualmente verificada usa o Federation Profile sem tornar um perfil pai do outro.
+
 ## Verificação formal
 
-A cadeia TLAPS atual contém duas relações mecanicamente provadas: canon->`NetworkExtension.tla` `3/3` e minimal Network->Seed `35/35`. O Federation Profile possui modelos TLC separados de safety e composition-liveness: `FederationProfile.tla` e `FederationCompositionLiveness.tla`. `Resolve(e)` no modelo de liveness é apenas um witness de assurance do progresso do Seed local e não cria estado de recognition da Network/Federation.
+A cadeia TLAPS do core contém canon->`NetworkExtension.tla` `3/3` e minimal Network->Seed `35/35`. A safety da Federation é assurance local ao perfil em `extension/canonical/profiles/federation/assurance/`. Liveness é um perfil separado em `extension/canonical/profiles/liveness/`. A assurance da composição fica em `extension/canonical/assurance/profile-compositions/federation-liveness/` e não cria relação parent/child nem transfere ownership.
 
 A compatibilidade histórica de releases antigos da Network fica preservada no histórico Git e em tags imutáveis, não no canon package ou release gate atual.
 

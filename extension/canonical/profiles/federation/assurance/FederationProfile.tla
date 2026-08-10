@@ -2,10 +2,10 @@
 EXTENDS FiniteSets
 
 (***************************************************************************
-Safety assurance model for ASET-NETWORK-FEDERATION-PROFILE-V1.
+TLC safety assurance specification for ASET-NETWORK-FEDERATION-PROFILE-V1.
 
 The profile is optional and has no authority to recognize evidence in a target
-Context.  This model therefore contains federation lifecycle state only; it
+Context.  This assurance specification therefore contains federation lifecycle state only; it
 contains no Network imports and no Seed terminal-recognition state.
 ***************************************************************************)
 

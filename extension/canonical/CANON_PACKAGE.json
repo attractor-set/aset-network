@@ -6,15 +6,27 @@
   "files": [
     {
       "path": "extension/canonical/assurance/canon-refinement-proof.json",
-      "sha256": "sha256:0c39bad70ca78d8b355aad360ea29ab21b59130422fc60974343c08fbd2d6134"
+      "sha256": "sha256:8ae6a5443023810e36da629faf4955b2db28252ad68aca786b0e39b43e48edf7"
     },
     {
       "path": "extension/canonical/assurance/canon-tla-refinement.json",
-      "sha256": "sha256:6ff729744859f541cb5ba7859355ea05750eb5d95584041ee910ce694bc36bb0"
+      "sha256": "sha256:27144ef3ba2c910236c8155f9338841aae8ea0f4bf591176458fb3e9cc3580f1"
     },
     {
       "path": "extension/canonical/assurance/limitations.json",
-      "sha256": "sha256:360b5ac994675306e3b4b9dfde940e20d804a5a898379fd961a443693243f60d"
+      "sha256": "sha256:dec6b18e31cc27d6b79dd29eb1c6ff52e5a713711d9c3a1ec3963a7f4913db6b"
+    },
+    {
+      "path": "extension/canonical/assurance/profile-compositions/federation-liveness/FederationCompositionLiveness.cfg",
+      "sha256": "sha256:4e8032e34ac71c62af33e476d68d3ca6a6d6823bb1c901164976401af0f95999"
+    },
+    {
+      "path": "extension/canonical/assurance/profile-compositions/federation-liveness/FederationCompositionLiveness.tla",
+      "sha256": "sha256:41336211341a5ff208c00cc627bcf87736f1280979c05f69ec964f9c372392b1"
+    },
+    {
+      "path": "extension/canonical/assurance/profile-compositions/federation-liveness/composition.json",
+      "sha256": "sha256:6aec3cb4ee7ae5e847d7435caa0d2d7600b4423bdf5d8116ffdd125bf727aa91"
     },
     {
       "path": "extension/canonical/assurance/seed-refinement-proof.json",
@@ -38,107 +50,11 @@
     },
     {
       "path": "extension/canonical/conformance/conformance-profile.json",
-      "sha256": "sha256:7404b74d712b2e9b3e174074c211b5a06c1a5cd4d5683608ca50f6e340eab59f"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-001.json",
-      "sha256": "sha256:0fe9314c7096e486c8606e8bf8b55e2f47f433d9df8bd1c8e9d9f7cd7fc86853"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-002.json",
-      "sha256": "sha256:c96a40985e7f1e18593c802828c6666def7c4db1c6bb19cb378e51853be36a5a"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-003.json",
-      "sha256": "sha256:00349bad13039a3fdd4994927c4604c47d47ec106eb5b8c9e8b366cb9af1926b"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json",
-      "sha256": "sha256:5d68328fc5fa7b3acd6222b68187dddfbedc4dfd388012b9cf1af0d99755980f"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-005.json",
-      "sha256": "sha256:98e0864ccb83b7f2256188988cc64b5276ac2870af08c40583d68859251a4187"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json",
-      "sha256": "sha256:373143920a44225817bcf8e7315c9f6506b284ef32dec2e6c46c8a7c996de006"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json",
-      "sha256": "sha256:69f15952e87694912719545dbe230ec74601088f5cdebf71dc50bd295cd3e545"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-003.json",
-      "sha256": "sha256:1522980c2b154cdb60970268dadf072db99865ea5febb54c79982eba40bbb664"
-    },
-    {
-      "path": "extension/canonical/conformance/dynamic-profile-conformance-profile.json",
-      "sha256": "sha256:3352d5f9429a6dbed9f2122cde67420e6df99b2a49302f71e8b198741c2eb5e3"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-001.json",
-      "sha256": "sha256:8ca3dad9e0f8f3b58c4f3e8769efe57c0ad1d21cc1fa70c7a4d010c3bdb3b7cb"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-002.json",
-      "sha256": "sha256:012b5f5bf890a625bd1d66cf96ded6a9ff58815345b600bba031af19ea3befcd"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-003.json",
-      "sha256": "sha256:4ee5a684e946cad4d6a62ae9ef6d43259989b13b74971822ad547d11b5b3bc37"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-004.json",
-      "sha256": "sha256:0ad2b0daa9d4019870c08121435f08c62704f5309386507e5cab1e121436fc6b"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-010.json",
-      "sha256": "sha256:b637686b74e74a49ffb10bbfc70b144393aa8e884586408ce7eabb4db045ead7"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-001.json",
-      "sha256": "sha256:abb0e54d213b3b301f161d733c41fddc3462d40beb1bd3fbc89c2b6f7fda1861"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-002.json",
-      "sha256": "sha256:7a7bf13a05931b5cb9da7b6e15bbb698f40a40488471c769173bd39398e55287"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-003.json",
-      "sha256": "sha256:516f15fc4dbc994a528c9d4b57cf11cff1deb5746694f7335b1b81110a41ef13"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-004.json",
-      "sha256": "sha256:585918de832e1a9916e3aae92a6b955f801c5b118103c9c233a67febbc1d7dde"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-008.json",
-      "sha256": "sha256:b3ae7490254bec7097abd5030b27bf70bc043b3bee0d40317431033f07e995b4"
-    },
-    {
-      "path": "extension/canonical/conformance/federation-profile-conformance-profile.json",
-      "sha256": "sha256:b91b5b5b2092849a52df88120fc285a0963629fc412b6c56006c09599bb6ed02"
-    },
-    {
-      "path": "extension/canonical/formal/FederationCompositionLiveness.cfg",
-      "sha256": "sha256:4e8032e34ac71c62af33e476d68d3ca6a6d6823bb1c901164976401af0f95999"
-    },
-    {
-      "path": "extension/canonical/formal/FederationCompositionLiveness.tla",
-      "sha256": "sha256:8311f1b34e6a8f7f47e49afd7870680891d4744a32ac33d2ab2564af57ee410c"
-    },
-    {
-      "path": "extension/canonical/formal/FederationProfile.cfg",
-      "sha256": "sha256:56521ce429c773908ea9bd0bc552b68ad309424bdde037f36baf05205f0c487c"
-    },
-    {
-      "path": "extension/canonical/formal/FederationProfile.tla",
-      "sha256": "sha256:33fd90486aabb5067a66f1f3ca923a684ac9b29fbaf611cdce41aa8b491e119a"
+      "sha256": "sha256:4c3def4900ffaea3ab716dc460507e580d4f130bb68ca9e36f8f89ecd412e464"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonProjection.tla",
-      "sha256": "sha256:7fd4946c113e5adf4ed4f8628f8aa06f98fcd26e6c9699cab290efe0b618f003"
+      "sha256": "sha256:ba8810cd0dc1c71ba1f2f8d7dcb678abe306919af1966591449623185edb6ccb"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
@@ -182,39 +98,171 @@
     },
     {
       "path": "extension/canonical/formal/canon-tla-relation.json",
-      "sha256": "sha256:1b23da4fdd2c835555812234a21faf81078d944f3cf2934dcc7d53f32dca070b"
+      "sha256": "sha256:dafa2d2f0b2f8e3d5a0d89733f9d13c88e2766e0f91946ed44c86d960ce89eff"
     },
     {
-      "path": "extension/canonical/liveness/liveness-profile.json",
-      "sha256": "sha256:a83a7b5225f21f7301d63d5e68278512a67503cb6d4d3cd2dee4bb0e0b0a0027"
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/negative/DP-NEG-001.json",
+      "sha256": "sha256:0fe9314c7096e486c8606e8bf8b55e2f47f433d9df8bd1c8e9d9f7cd7fc86853"
     },
     {
-      "path": "extension/canonical/protocol/dynamic-profile-profile.json",
-      "sha256": "sha256:3351675e80549390d89c18f18bf59a20df5d8122875ff552d99ebafd546b7c45"
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/negative/DP-NEG-002.json",
+      "sha256": "sha256:c96a40985e7f1e18593c802828c6666def7c4db1c6bb19cb378e51853be36a5a"
     },
     {
-      "path": "extension/canonical/protocol/federation-profile.json",
-      "sha256": "sha256:90567a57243804978f5e8721ddf0d3168a7bde5c470d1d891dd85c2a9a18dccb"
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/negative/DP-NEG-003.json",
+      "sha256": "sha256:00349bad13039a3fdd4994927c4604c47d47ec106eb5b8c9e8b366cb9af1926b"
     },
     {
-      "path": "extension/canonical/protocol/profiles/federation-profile-definition.json",
-      "sha256": "sha256:35017328e109277b88956f401ce11f9e8d44ffbd2def823776cf3fb05ccfcc9d"
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/negative/DP-NEG-004.json",
+      "sha256": "sha256:5d68328fc5fa7b3acd6222b68187dddfbedc4dfd388012b9cf1af0d99755980f"
     },
     {
-      "path": "extension/canonical/protocol/profiles/federation-profile-invariants.json",
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/negative/DP-NEG-005.json",
+      "sha256": "sha256:98e0864ccb83b7f2256188988cc64b5276ac2870af08c40583d68859251a4187"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/positive/DP-POS-001.json",
+      "sha256": "sha256:373143920a44225817bcf8e7315c9f6506b284ef32dec2e6c46c8a7c996de006"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/positive/DP-POS-002.json",
+      "sha256": "sha256:69f15952e87694912719545dbe230ec74601088f5cdebf71dc50bd295cd3e545"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/conformance/cases/positive/DP-POS-003.json",
+      "sha256": "sha256:1522980c2b154cdb60970268dadf072db99865ea5febb54c79982eba40bbb664"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/conformance/profile.json",
+      "sha256": "sha256:209c82fb62f52a19989f8555271630caa7aa05ba6686429fd9d164b531312154"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/profile.json",
+      "sha256": "sha256:79298cca53df692d651764dc61fc2db158f639f7e26875a676d1bc77051af6fc"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/schemas/profile-binding.schema.json",
+      "sha256": "sha256:5b5bfa6b04d2a5fb0eb3c87f53030326167046ad6183b7a69240ae5c6f953de1"
+    },
+    {
+      "path": "extension/canonical/profiles/dynamic/schemas/profile-definition.schema.json",
+      "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/assurance/FederationProfile.cfg",
+      "sha256": "sha256:56521ce429c773908ea9bd0bc552b68ad309424bdde037f36baf05205f0c487c"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/assurance/FederationProfile.tla",
+      "sha256": "sha256:561b1438f6cfa958814aeb7d42e817ef02fc81d25188ea0457423fc39a659673"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-001.json",
+      "sha256": "sha256:8ca3dad9e0f8f3b58c4f3e8769efe57c0ad1d21cc1fa70c7a4d010c3bdb3b7cb"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-002.json",
+      "sha256": "sha256:012b5f5bf890a625bd1d66cf96ded6a9ff58815345b600bba031af19ea3befcd"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-003.json",
+      "sha256": "sha256:4ee5a684e946cad4d6a62ae9ef6d43259989b13b74971822ad547d11b5b3bc37"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-004.json",
+      "sha256": "sha256:0ad2b0daa9d4019870c08121435f08c62704f5309386507e5cab1e121436fc6b"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-010.json",
+      "sha256": "sha256:b637686b74e74a49ffb10bbfc70b144393aa8e884586408ce7eabb4db045ead7"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-001.json",
+      "sha256": "sha256:abb0e54d213b3b301f161d733c41fddc3462d40beb1bd3fbc89c2b6f7fda1861"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-002.json",
+      "sha256": "sha256:7a7bf13a05931b5cb9da7b6e15bbb698f40a40488471c769173bd39398e55287"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-003.json",
+      "sha256": "sha256:516f15fc4dbc994a528c9d4b57cf11cff1deb5746694f7335b1b81110a41ef13"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-004.json",
+      "sha256": "sha256:585918de832e1a9916e3aae92a6b955f801c5b118103c9c233a67febbc1d7dde"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-008.json",
+      "sha256": "sha256:b3ae7490254bec7097abd5030b27bf70bc043b3bee0d40317431033f07e995b4"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/conformance/profile.json",
+      "sha256": "sha256:a418be75989c851029fab42865c09c62bda232b6dcb6b288bc4505e432213124"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/definition.json",
+      "sha256": "sha256:67cd2b2d36537942697a779074f66e143f390afdf748469f0cf54d97bc11702d"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/invariants.json",
       "sha256": "sha256:cc08858254cc47c60bd8287bd927db17bcc44f05e40a5e82075e1c2359587fb6"
     },
     {
-      "path": "extension/canonical/protocol/profiles/federation-profile-requirements.json",
+      "path": "extension/canonical/profiles/federation/profile.json",
+      "sha256": "sha256:8f6d1f4c48993fb71b6f0a77bc9ffd480d28b9aa8d19dcbcf3915b18c7506c26"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/requirements.json",
       "sha256": "sha256:c03ae9ccddb066c83c8d35929e259c1c917d302597768179ac0cb944c27f0a3c"
     },
     {
-      "path": "extension/canonical/protocol/profiles/federation-profile-scope.json",
-      "sha256": "sha256:71946c6c4d8da20d5678253a5862d8c33dd5d2db1a7ca741fc9364446de2bc34"
+      "path": "extension/canonical/profiles/federation/schemas/export-envelope.schema.json",
+      "sha256": "sha256:bc81a8200f1e8d8048ea32b8a3c7bd75c8b992a502effea8b5634765c168065b"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/schemas/federation-state.schema.json",
+      "sha256": "sha256:314ba2906954dfb7064630ef03ddaaa29764e6c5eb5d34c0c47b329253b4255a"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/schemas/federation-transition.schema.json",
+      "sha256": "sha256:3fc3d9b9835cbd581f425d8f8f210c04efbb5aa3b5eac009640a7de646d49d74"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/schemas/member-descriptor.schema.json",
+      "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/schemas/route-grant.schema.json",
+      "sha256": "sha256:5d578c62d587ac916c5b929c64bdde04b5b8afb1450b4a65dd08b7eb19863366"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/scope.json",
+      "sha256": "sha256:13b00b21c04132841acc42727235cc4b91193a440db5f16fc9fd76e1593d887c"
+    },
+    {
+      "path": "extension/canonical/profiles/liveness/definition.json",
+      "sha256": "sha256:c815f100f10c4f375d7cb0c6fafc93dad208fab69c64ec1c605cd5faf151f4e0"
+    },
+    {
+      "path": "extension/canonical/profiles/liveness/invariants.json",
+      "sha256": "sha256:365bd4e308444c6ad2bb3b9e552b1069dd837ee88a2f82bc2360f6a805ce65a3"
+    },
+    {
+      "path": "extension/canonical/profiles/liveness/profile.json",
+      "sha256": "sha256:2e9188fe74bb53afb793c02f1f8e9215232667a6502112cbad8bda46a7555924"
+    },
+    {
+      "path": "extension/canonical/profiles/liveness/requirements.json",
+      "sha256": "sha256:80cd394bbe289dec0c72cc9e2adcc57e81ef0e28a7a9ed7deb40ed334e909827"
+    },
+    {
+      "path": "extension/canonical/profiles/liveness/scope.json",
+      "sha256": "sha256:8349e83f2251f285caf5fee577b8bbafdb9c1401e0bb667d157bbf56de57b14e"
     },
     {
       "path": "extension/canonical/protocol/protocol-profile.json",
-      "sha256": "sha256:7ec28951d0e7a2f4887cd2fed02cc74519b0753e347295d1ad7ef052628b5146"
+      "sha256": "sha256:bdaa0b09e493207c8da12a3a14bd928f995918769a2f1e55cd37fa8bff20dec5"
     },
     {
       "path": "extension/canonical/protocol/schemas/common.schema.json",
@@ -225,40 +273,12 @@
       "sha256": "sha256:e81c2fba6dd54361699665f6ea83c6bdebf45930fab5b3248f74611c783e4729"
     },
     {
-      "path": "extension/canonical/protocol/schemas/export-envelope.schema.json",
-      "sha256": "sha256:bc81a8200f1e8d8048ea32b8a3c7bd75c8b992a502effea8b5634765c168065b"
-    },
-    {
-      "path": "extension/canonical/protocol/schemas/federation-state.schema.json",
-      "sha256": "sha256:314ba2906954dfb7064630ef03ddaaa29764e6c5eb5d34c0c47b329253b4255a"
-    },
-    {
-      "path": "extension/canonical/protocol/schemas/federation-transition.schema.json",
-      "sha256": "sha256:3fc3d9b9835cbd581f425d8f8f210c04efbb5aa3b5eac009640a7de646d49d74"
-    },
-    {
       "path": "extension/canonical/protocol/schemas/import-observation.schema.json",
       "sha256": "sha256:83b5f72f3f16138eb15484bc3ecf4bbec8354ad72bbf0bc1f974a9510e4b8d9c"
     },
     {
-      "path": "extension/canonical/protocol/schemas/member-descriptor.schema.json",
-      "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
-    },
-    {
       "path": "extension/canonical/protocol/schemas/network-state.schema.json",
       "sha256": "sha256:f5fcd82f24bfc9ea000192da4039c4edee23cdd44d6ba5844a8109371cf8392b"
-    },
-    {
-      "path": "extension/canonical/protocol/schemas/profile-binding.schema.json",
-      "sha256": "sha256:5b5bfa6b04d2a5fb0eb3c87f53030326167046ad6183b7a69240ae5c6f953de1"
-    },
-    {
-      "path": "extension/canonical/protocol/schemas/profile-definition.schema.json",
-      "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
-    },
-    {
-      "path": "extension/canonical/protocol/schemas/route-grant.schema.json",
-      "sha256": "sha256:5d578c62d587ac916c5b929c64bdde04b5b8afb1450b4a65dd08b7eb19863366"
     },
     {
       "path": "extension/canonical/protocol/schemas/transition.schema.json",
@@ -266,7 +286,7 @@
     },
     {
       "path": "extension/canonical/source/network-extension-model.json",
-      "sha256": "sha256:d3b4c0613e8f698d187e8afc281245f82c1ae61eb3e8e6f2efca129f271b5cae"
+      "sha256": "sha256:725946f92b6ebe12b805169f45d6a39d66b882ad4dc23120a9733780aea1b9d3"
     },
     {
       "path": "upstream/ASET_SEED_BINDING.json",
@@ -275,7 +295,7 @@
   ],
   "implementation_precedence": "NONE",
   "normative_source": "extension/canonical/source/network-extension-model.json",
-  "package_digest": "sha256:91d690d4daf8ae48fc0cb80c33d0963889b6d7f4b0565c3d54ad726e59219d1c",
+  "package_digest": "sha256:82976c30880ed2a6c810b8f0aa5585dee5ab73fa12684a9d17784bac0a1bbbc7",
   "schema_version": 1,
   "upstream_binding": "upstream/ASET_SEED_BINDING.json"
 }

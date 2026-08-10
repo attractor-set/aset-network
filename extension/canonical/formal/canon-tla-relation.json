@@ -13,7 +13,7 @@
     "proof_module": "NetworkCanonRefinementProofs",
     "proof_path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
     "proof_sha256": "sha256:e33d67043fe498059a47c36ba355cada5882403020e9457a8e475c772a333f9f",
-    "sha256": "sha256:7fd4946c113e5adf4ed4f8628f8aa06f98fcd26e6c9699cab290efe0b618f003",
+    "sha256": "sha256:ba8810cd0dc1c71ba1f2f8d7dcb678abe306919af1966591449623185edb6ccb",
     "status": "MECHANICALLY_PROVED"
   },
   "document_type": "aset-network-canon-tla-relation",
@@ -25,25 +25,6 @@
     "terminal recognition as Network state",
     "obligation counts as normative semantics"
   ],
-  "federation_assurance": {
-    "liveness_model": {
-      "config": "extension/canonical/formal/FederationCompositionLiveness.cfg",
-      "config_sha256": "sha256:4e8032e34ac71c62af33e476d68d3ca6a6d6823bb1c901164976401af0f95999",
-      "module": "FederationCompositionLiveness",
-      "path": "extension/canonical/formal/FederationCompositionLiveness.tla",
-      "scope": "OPTIONAL_COMPOSITION_LIVENESS_ASSURANCE",
-      "seed_resolution_owner": "PINNED_TARGET_LOCAL_SEED",
-      "sha256": "sha256:8311f1b34e6a8f7f47e49afd7870680891d4744a32ac33d2ab2564af57ee410c"
-    },
-    "safety_model": {
-      "config": "extension/canonical/formal/FederationProfile.cfg",
-      "config_sha256": "sha256:56521ce429c773908ea9bd0bc552b68ad309424bdde037f36baf05205f0c487c",
-      "module": "FederationProfile",
-      "path": "extension/canonical/formal/FederationProfile.tla",
-      "scope": "OPTIONAL_PROFILE_SAFETY",
-      "sha256": "sha256:33fd90486aabb5067a66f1f3ca923a684ac9b29fbaf611cdce41aa8b491e119a"
-    }
-  },
   "history_model": {
     "config": "extension/canonical/formal/NetworkHistory.cfg",
     "config_sha256": "sha256:2442157b7190b32ba05a3338c1fb42920a33c4d45fa34e3f410981197dada91f",
@@ -98,11 +79,6 @@
       "formal_model": "NetworkHistory",
       "scope": "APPEND_ONLY_ADMISSION_TRACE"
     },
-    "federation_lifecycle": {
-      "formal_model": "FederationProfile",
-      "owner": "ASET-NETWORK-FEDERATION-PROFILE-V1",
-      "required_for_core_conformance": false
-    },
     "semantic_state": {
       "canon_selector": "/state_partition/semantic_state_fields",
       "formal_model": "NetworkExtension",
@@ -112,7 +88,7 @@
       "owner": "PINNED_TARGET_LOCAL_SEED"
     }
   },
-  "relation_digest": "sha256:e3f6f9795e7b771d415d7418191fb3431c1fed53bd3c337e254dd9a700ad0b30",
+  "relation_digest": "sha256:7b3d7316e6bff0f568ae1ea638816dcb7c524978431fc474f101dac8baa0ba83",
   "safety_model": {
     "config": "extension/canonical/formal/NetworkExtension.cfg",
     "sha256": "sha256:2df6ff47534df5fe77fc793cb0f91d84cb310e1c626d7a0c6f535e7497c4bb34",
@@ -149,7 +125,7 @@
   },
   "source_model": {
     "path": "extension/canonical/source/network-extension-model.json",
-    "sha256": "sha256:d3b4c0613e8f698d187e8afc281245f82c1ae61eb3e8e6f2efca129f271b5cae",
+    "sha256": "sha256:725946f92b6ebe12b805169f45d6a39d66b882ad4dc23120a9733780aea1b9d3",
     "version": "0.1.0-alpha.3"
   },
   "target_model": {

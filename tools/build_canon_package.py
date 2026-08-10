@@ -12,7 +12,7 @@ CANON = ROOT / "extension/canonical"
 PACKAGE = CANON / "CANON_PACKAGE.json"
 UPSTREAM_BINDING = ROOT / "upstream/ASET_SEED_BINDING.json"
 CANON_SUFFIXES = {".json", ".tla", ".cfg"}
-CANON_TOP_LEVEL = {"assurance", "conformance", "formal", "liveness", "protocol", "source"}
+CANON_TOP_LEVEL = {"assurance", "conformance", "formal", "profiles", "protocol", "source"}
 
 
 def sha(path: Path) -> str:

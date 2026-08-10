@@ -10,7 +10,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": false
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-001.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-001.json",
       "polarity": "negative",
       "sha256": "sha256:8ca3dad9e0f8f3b58c4f3e8769efe57c0ad1d21cc1fa70c7a4d010c3bdb3b7cb"
     },
@@ -23,7 +23,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": false
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-002.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-002.json",
       "polarity": "negative",
       "sha256": "sha256:012b5f5bf890a625bd1d66cf96ded6a9ff58815345b600bba031af19ea3befcd"
     },
@@ -36,7 +36,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": false
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-003.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-003.json",
       "polarity": "negative",
       "sha256": "sha256:4ee5a684e946cad4d6a62ae9ef6d43259989b13b74971822ad547d11b5b3bc37"
     },
@@ -49,7 +49,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": false
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-004.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-004.json",
       "polarity": "negative",
       "sha256": "sha256:0ad2b0daa9d4019870c08121435f08c62704f5309386507e5cab1e121436fc6b"
     },
@@ -62,7 +62,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": false
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-010.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/negative/FED-NEG-010.json",
       "polarity": "negative",
       "sha256": "sha256:b637686b74e74a49ffb10bbfc70b144393aa8e884586408ce7eabb4db045ead7"
     },
@@ -75,7 +75,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": true
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-001.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-001.json",
       "polarity": "positive",
       "sha256": "sha256:abb0e54d213b3b301f161d733c41fddc3462d40beb1bd3fbc89c2b6f7fda1861"
     },
@@ -88,7 +88,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": true
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-002.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-002.json",
       "polarity": "positive",
       "sha256": "sha256:7a7bf13a05931b5cb9da7b6e15bbb698f40a40488471c769173bd39398e55287"
     },
@@ -101,7 +101,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": true
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-003.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-003.json",
       "polarity": "positive",
       "sha256": "sha256:516f15fc4dbc994a528c9d4b57cf11cff1deb5746694f7335b1b81110a41ef13"
     },
@@ -114,7 +114,7 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": true
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-004.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-004.json",
       "polarity": "positive",
       "sha256": "sha256:585918de832e1a9916e3aae92a6b955f801c5b118103c9c233a67febbc1d7dde"
     },
@@ -127,13 +127,13 @@
         "semantic_status": "NOT_APPLICABLE",
         "state_changed": true
       },
-      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-008.json",
+      "path": "extension/canonical/profiles/federation/conformance/cases/positive/FED-POS-008.json",
       "polarity": "positive",
       "sha256": "sha256:b3ae7490254bec7097abd5030b27bf70bc043b3bee0d40317431033f07e995b4"
     }
   ],
+  "claims_profile": "ASET-NETWORK-FEDERATION-PROFILE-V1",
   "document_type": "aset-network-federation-profile-conformance",
-  "parent_profile": "ASET-NETWORK-FEDERATION-PROFILE-V1",
   "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-CONFORMANCE-V1",
   "required_for_core_conformance": false,
   "schema_version": 1,

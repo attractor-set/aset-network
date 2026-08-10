@@ -3,12 +3,13 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
-from reference.federation_profile_reference import execute_case as execute_federation
 from reference.network_reference import execute_case as execute_core
+from reference.profiles.federation import execute_case as execute_federation
 from tools.dynamic_profile_conformance import run_profile_conformance
 
 ROOT = Path(__file__).resolve().parents[1]
 C = ROOT / "extension/canonical/conformance"
+FEDERATION_CONFORMANCE = ROOT / "extension/canonical/profiles/federation/conformance/profile.json"
 
 
 def run_manifest(path, executor, label):
@@ -36,7 +37,7 @@ def main():
     if dynamic_ok:
         print("OK: dynamic-profile conformance cases")
     federation_ok, _ = run_manifest(
-        C / "federation-profile-conformance-profile.json",
+        FEDERATION_CONFORMANCE,
         execute_federation,
         "federation-profile",
     )

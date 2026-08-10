@@ -4,7 +4,7 @@ EXTENDS FiniteSets
 (***************************************************************************
 GENERATED FILE. DO NOT EDIT.
 Source: extension/canonical/source/network-extension-model.json
-Source SHA-256: sha256:d3b4c0613e8f698d187e8afc281245f82c1ae61eb3e8e6f2efca129f271b5cae
+Source SHA-256: sha256:725946f92b6ebe12b805169f45d6a39d66b882ad4dc23120a9733780aea1b9d3
 Projection profile: ASET-NETWORK-CANON-TLA-PROJECTION-V3
 ***************************************************************************)
 

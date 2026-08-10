@@ -2,10 +2,13 @@
 EXTENDS FederationProfile
 
 (***************************************************************************
-Bounded liveness assurance for composition of the Federation Profile, Network
-admission, transport/environment progress and target-local Seed resolution.
+Bounded assurance for composition of two independent optional profiles:
+ASET-NETWORK-FEDERATION-PROFILE-V1 and ASET-NETWORK-LIVENESS-V1, over the
+Network admission core and target-local Seed resolution.  Neither profile is
+the parent of the other, and composition transfers no state or Authority ownership.
 
-`Resolve(e)` is not a Network or Federation transition.  It is an assurance
+`Deliver(e)`, `Observe(e)` and `Resolve(e)` are composition-assurance witnesses,
+not new Federation-owned transitions. `Resolve(e)` is specifically an assurance
 witness that the pinned target-local Seed eventually reaches a terminal result
 when that local progress assumption is claimed.
 ***************************************************************************)

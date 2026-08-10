@@ -11,8 +11,11 @@ from referencing import Registry, Resource
 
 ROOT = Path(__file__).resolve().parents[1]
 CANON = ROOT / "extension/canonical"
-SCHEMA_DIR = CANON / "protocol/schemas"
-PROFILE_CONFORMANCE = CANON / "conformance/dynamic-profile-conformance-profile.json"
+SCHEMA_DIRS = [
+    CANON / "protocol/schemas",
+    CANON / "profiles/dynamic/schemas",
+]
+PROFILE_CONFORMANCE = CANON / "profiles/dynamic/conformance/profile.json"
 
 PROFILE_CONTEXT_ID_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9._:/\-]*$")
 PROFILE_CONTEXT_ID_MIN = 3
@@ -66,11 +69,12 @@ def content_digest(value: dict[str, Any], digest_field: str) -> str:
 def _schema_registry() -> tuple[Registry, dict[str, dict[str, Any]]]:
     resources = []
     schemas: dict[str, dict[str, Any]] = {}
-    for path in sorted(SCHEMA_DIR.glob("*.json")):
-        data = json.loads(path.read_text(encoding="utf-8"))
-        Draft202012Validator.check_schema(data)
-        resources.append((data["$id"], Resource.from_contents(data)))
-        schemas[path.name] = data
+    for schema_dir in SCHEMA_DIRS:
+        for path in sorted(schema_dir.glob("*.json")):
+            data = json.loads(path.read_text(encoding="utf-8"))
+            Draft202012Validator.check_schema(data)
+            resources.append((data["$id"], Resource.from_contents(data)))
+            schemas[path.name] = data
     return Registry().with_resources(resources), schemas
 
 
