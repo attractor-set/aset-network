@@ -1,22 +1,15 @@
 from __future__ import annotations
 
 import copy
-import importlib
 import json
-import sys
 from pathlib import Path
 from typing import Any
 
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+from reference.legacy_network_reference import apply_transition
+from tools.dynamic_profile_conformance import validate_wire_object
 
-apply_transition = importlib.import_module(
-    "reference.legacy_network_reference"
-).apply_transition
-validate_wire_object = importlib.import_module(
-    "tools.dynamic_profile_conformance"
-).validate_wire_object
+ROOT = Path(__file__).resolve().parents[1]
+
 
 CANON = ROOT / "extension/canonical"
 REDUCTION = CANON / "assurance/minimal-core-reduction.json"
@@ -39,10 +32,9 @@ def verify_profile_definition() -> None:
 def verify_decomposition() -> None:
     reduction = json.loads(REDUCTION.read_text())
     federation = json.loads(FED.read_text())
-    if (
-        reduction["normative_core"]["semantic_state_fields"] != ["imports"]
-        or reduction["normative_core"]["transition_kinds"] != ["ADMIT_IMPORT"]
-    ):
+    if reduction["normative_core"]["semantic_state_fields"] != ["imports"] or reduction[
+        "normative_core"
+    ]["transition_kinds"] != ["ADMIT_IMPORT"]:
         raise SystemExit("normative minimal core is not imports + ADMIT_IMPORT")
     if reduction.get("normative") is not True or reduction.get("status") != (
         "NORMATIVE_CUTOVER_ALPHA3"
@@ -63,9 +55,7 @@ def verify_decomposition() -> None:
 
 def verify_conformance_trace_projection() -> int:
     reduction = json.loads(REDUCTION.read_text())
-    federation_transitions = set(
-        reduction["decomposition"]["federation_profile_transition_kinds"]
-    )
+    federation_transitions = set(reduction["decomposition"]["federation_profile_transition_kinds"])
     seed_transitions = set(reduction["decomposition"]["seed_derived_transition_kinds"])
     count = 0
     success = 0
@@ -80,9 +70,7 @@ def verify_conformance_trace_projection() -> int:
             if kind == "OBSERVE_IMPORT":
                 if result["accepted"] and result["state_changed"]:
                     if len(set(after["imports"]) - set(before["imports"])) != 1:
-                        raise SystemExit(
-                            f"{case['case_id']}: admission projection not append"
-                        )
+                        raise SystemExit(f"{case['case_id']}: admission projection not append")
                     success += 1
                 elif after != before:
                     raise SystemExit(
@@ -92,9 +80,7 @@ def verify_conformance_trace_projection() -> int:
                 if after != before:
                     raise SystemExit(f"{case['case_id']}: {kind} must stutter")
             else:
-                raise SystemExit(
-                    f"{case['case_id']}: unclassified legacy transition {kind}"
-                )
+                raise SystemExit(f"{case['case_id']}: unclassified legacy transition {kind}")
             if not result["accepted"]:
                 break
         count += 1

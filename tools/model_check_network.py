@@ -1,4 +1,4 @@
-from run_tlc import main
+from tools.run_tlc import main
 
 if __name__ == "__main__":
     raise SystemExit(main())

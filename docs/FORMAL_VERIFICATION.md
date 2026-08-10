@@ -55,10 +55,10 @@ LegacyNetworkRefinesMinimalAdmission ==
 ## Reproducibility gates
 
 ```text
-python tools/generate_canon_tla_projection.py --check
-python tools/validate_extension.py
-python tools/run_conformance.py
-python tools/run_tlc.py safety
+python -m tools.generate_canon_tla_projection --check
+python -m tools.validate_extension
+python -m tools.run_conformance
+python -m tools.run_tlc safety
 ```
 
 The three TLAPS proof runners shown in the repository README reproduce the materialized evidence. A proof runner must fail if the current proof source hash, pinned toolchain, theorem set, or recorded obligation count does not match the evidence.

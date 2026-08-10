@@ -18,129 +18,121 @@ def sha(path: Path) -> str:
 
 
 def test_upstream_binding_is_exact() -> None:
-    b=json.loads((ROOT/"upstream/ASET_SEED_BINDING.json").read_text())
-    assert b["seed_release_tag"]=="seed-0.3.0-alpha.3"
-    assert b["seed_release_commit"]=="633c130187b2a2bb42f24cfd66662d475de385d2"
-    assert b["compatibility"]=="STRICT_EXTENSION_NO_WEAKENING"
-    assert b["implementation_precedence"]=="NONE"
+    b = json.loads((ROOT / "upstream/ASET_SEED_BINDING.json").read_text())
+    assert b["seed_release_tag"] == "seed-0.3.0-alpha.3"
+    assert b["seed_release_commit"] == "633c130187b2a2bb42f24cfd66662d475de385d2"
+    assert b["compatibility"] == "STRICT_EXTENSION_NO_WEAKENING"
+    assert b["implementation_precedence"] == "NONE"
 
 
 def test_normative_core_is_one_state_one_transition() -> None:
-    m=json.loads((ROOT/"extension/canonical/source/network-extension-model.json").read_text())
-    assert m["version"]=="0.1.0-alpha.3"
-    assert m["status"]=="MINIMAL_ADMISSION_CORE_ALPHA3_NORMATIVE_CUTOVER"
-    assert m["state_partition"]["semantic_state_fields"]==["imports"]
-    assert m["state_partition"]["evidence_history_fields"]==["history"]
-    assert m["transition_kinds"]==["ADMIT_IMPORT"]
+    m = json.loads((ROOT / "extension/canonical/source/network-extension-model.json").read_text())
+    assert m["version"] == "0.1.0-alpha.3"
+    assert m["status"] == "MINIMAL_ADMISSION_CORE_ALPHA3_NORMATIVE_CUTOVER"
+    assert m["state_partition"]["semantic_state_fields"] == ["imports"]
+    assert m["state_partition"]["evidence_history_fields"] == ["history"]
+    assert m["transition_kinds"] == ["ADMIT_IMPORT"]
     assert "recognitions" not in m["state"]
 
 
 def test_core_conformance_cases_match_minimal_reference() -> None:
-    p=json.loads((ROOT/"extension/canonical/conformance/conformance-profile.json").read_text())
-    assert p["profile_id"]=="ASET-NETWORK-EXTENSION-CONFORMANCE-V2"
-    assert p["case_count"]==4
+    p = json.loads((ROOT / "extension/canonical/conformance/conformance-profile.json").read_text())
+    assert p["profile_id"] == "ASET-NETWORK-EXTENSION-CONFORMANCE-V2"
+    assert p["case_count"] == 4
     for item in p["cases"]:
-        case=json.loads((ROOT/item["path"]).read_text())
-        _,actual=execute_case(case)
-        assert actual==case["expected"],case["case_id"]
+        case = json.loads((ROOT / item["path"]).read_text())
+        _, actual = execute_case(case)
+        assert actual == case["expected"], case["case_id"]
 
 
 def test_admission_is_fail_closed() -> None:
     case = json.loads(
-        (
-            ROOT
-            / "extension/canonical/conformance/cases/positive/NET-POS-001.json"
-        ).read_text()
+        (ROOT / "extension/canonical/conformance/cases/positive/NET-POS-001.json").read_text()
     )
-    state,result=execute_case(case)
-    assert result["semantic_status"]=="UNKNOWN"
-    assert result["enforcement"]=="BLOCKED"
+    state, result = execute_case(case)
+    assert result["semantic_status"] == "UNKNOWN"
+    assert result["enforcement"] == "BLOCKED"
     assert state["imports"]
     assert "recognitions" not in state
 
 
 def test_admission_exact_replay_is_idempotent() -> None:
     case = json.loads(
-        (
-            ROOT
-            / "extension/canonical/conformance/cases/positive/NET-POS-002.json"
-        ).read_text()
+        (ROOT / "extension/canonical/conformance/cases/positive/NET-POS-002.json").read_text()
     )
-    before=json.loads(json.dumps(case["initial_state"]))
-    state,result=execute_case(case)
-    assert result["code"]=="IDEMPOTENT_REPLAY"
+    before = json.loads(json.dumps(case["initial_state"]))
+    state, result = execute_case(case)
+    assert result["code"] == "IDEMPOTENT_REPLAY"
     assert result["state_changed"] is False
-    assert state==before
+    assert state == before
 
 
 def test_admission_conflict_is_rejected() -> None:
     case = json.loads(
-        (
-            ROOT
-            / "extension/canonical/conformance/cases/negative/NET-NEG-001.json"
-        ).read_text()
+        (ROOT / "extension/canonical/conformance/cases/negative/NET-NEG-001.json").read_text()
     )
-    before=json.loads(json.dumps(case["initial_state"]))
-    state,result=execute_case(case)
-    assert result["code"]=="IDENTIFIER_CONFLICT"
+    before = json.loads(json.dumps(case["initial_state"]))
+    state, result = execute_case(case)
+    assert result["code"] == "IDENTIFIER_CONFLICT"
     assert result["accepted"] is False
-    assert state==before
+    assert state == before
 
 
 def test_generated_projection_is_current() -> None:
     r = subprocess.run(
-        [sys.executable, "tools/generate_canon_tla_projection.py", "--check"],
+        [sys.executable, "-m", "tools.generate_canon_tla_projection", "--check"],
         cwd=ROOT,
         text=True,
         capture_output=True,
     )
-    assert r.returncode==0,r.stdout+r.stderr
+    assert r.returncode == 0, r.stdout + r.stderr
     assert "NETWORK_CANON_PROJECTION_CHECK=PASS" in r.stdout
 
 
 def test_formal_core_has_one_variable_and_one_action() -> None:
-    t=(ROOT/"extension/canonical/formal/NetworkExtension.tla").read_text()
+    t = (ROOT / "extension/canonical/formal/NetworkExtension.tla").read_text()
     assert "VARIABLE imports" in t
     assert "VARIABLES" not in t
     assert "AdmitImport(o) ==" in t
-    for legacy in ["Join(c)","GrantRoute", "ResolveAccept", "ResolveDeny", "Withdraw(c)"]:
+    for legacy in ["Join(c)", "GrantRoute", "ResolveAccept", "ResolveDeny", "Withdraw(c)"]:
         assert legacy not in t
 
 
 def test_alpha3_proof_evidence_is_materialized_and_exact() -> None:
-    expected={
-        "canon-refinement-proof.json":3,
-        "seed-refinement-proof.json":35,
-        "legacy-admission-refinement-proof.json":23,
+    expected = {
+        "canon-refinement-proof.json": 3,
+        "seed-refinement-proof.json": 35,
+        "legacy-admission-refinement-proof.json": 23,
     }
-    for name,count in expected.items():
-        e=json.loads((ROOT/"extension/canonical/assurance"/name).read_text())
-        assert e["status"]=="MECHANICALLY_PROVED"
-        assert e["proof_gate"]["verdict"]=="MECHANICALLY_PROVED"
-        assert e["proof_gate"]["obligations_proved"]==count
-        assert e["proof_gate"]["materialization"]=="REPRODUCED_WITH_PINNED_TLAPM"
+    for name, count in expected.items():
+        e = json.loads((ROOT / "extension/canonical/assurance" / name).read_text())
+        assert e["status"] == "MECHANICALLY_PROVED"
+        assert e["proof_gate"]["verdict"] == "MECHANICALLY_PROVED"
+        assert e["proof_gate"]["obligations_proved"] == count
+        assert e["proof_gate"]["materialization"] == "REPRODUCED_WITH_PINNED_TLAPM"
 
-    rel=json.loads((ROOT/"extension/canonical/formal/canon-tla-relation.json").read_text())
-    assert rel["canon_projection"]["status"]=="MECHANICALLY_PROVED"
-    assert rel["canon_projection"]["obligations_proved"]==3
-    assert rel["seed_refinement"]["status"]=="MECHANICALLY_PROVED"
-    assert rel["seed_refinement"]["obligations_proved"]==35
-    assert rel["legacy_alpha2_refinement"]["status"]=="MECHANICALLY_PROVED"
-    assert rel["legacy_alpha2_refinement"]["obligations_proved"]==23
+    rel = json.loads((ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text())
+    assert rel["canon_projection"]["status"] == "MECHANICALLY_PROVED"
+    assert rel["canon_projection"]["obligations_proved"] == 3
+    assert rel["seed_refinement"]["status"] == "MECHANICALLY_PROVED"
+    assert rel["seed_refinement"]["obligations_proved"] == 35
+    assert rel["legacy_alpha2_refinement"]["status"] == "MECHANICALLY_PROVED"
+    assert rel["legacy_alpha2_refinement"]["obligations_proved"] == 23
 
 
 def test_legacy_alpha2_traces_project_to_minimal_core() -> None:
     from tools.verify_minimal_core_reduction import verify_conformance_trace_projection
-    assert verify_conformance_trace_projection()==18
+
+    assert verify_conformance_trace_projection() == 18
 
 
 def test_federation_profile_is_post_cutover_owner() -> None:
-    f=json.loads((ROOT/"extension/canonical/protocol/federation-profile.json").read_text())
-    e=f["extraction_semantics"]
-    assert e["phase"]=="NORMATIVE_PROFILE_AFTER_CORE_CUTOVER"
+    f = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
+    e = f["extraction_semantics"]
+    assert e["phase"] == "NORMATIVE_PROFILE_AFTER_CORE_CUTOVER"
     assert e["normative_core_changed_by_this_slice"] is True
-    assert e["network_admission_state_retained"]==["imports"]
-    assert e["seed_derived_legacy_state_fields"]==["recognitions"]
+    assert e["network_admission_state_retained"] == ["imports"]
+    assert e["seed_derived_legacy_state_fields"] == ["recognitions"]
     assert set(e["profile_owned_legacy_transition_kinds"]) == {
         "FEDERATION_GENESIS",
         "MEMBER_JOIN",
@@ -154,26 +146,25 @@ def test_federation_profile_is_post_cutover_owner() -> None:
 def test_federation_conformance_is_optional_and_legacy_backed() -> None:
     p = json.loads(
         (
-            ROOT
-            / "extension/canonical/conformance/federation-profile-conformance-profile.json"
+            ROOT / "extension/canonical/conformance/federation-profile-conformance-profile.json"
         ).read_text()
     )
     assert p["required_for_core_conformance"] is False
-    assert p["case_count"]==10
+    assert p["case_count"] == 10
     for item in p["cases"]:
         assert "/legacy-alpha2-cases/" in item["path"]
-        case=json.loads((ROOT/item["path"]).read_text())
-        _,actual=execute_legacy_case(case)
-        assert actual==case["expected"]
+        case = json.loads((ROOT / item["path"]).read_text())
+        _, actual = execute_legacy_case(case)
+        assert actual == case["expected"]
 
 
 def test_package_is_alpha3_and_self_consistent() -> None:
-    p=json.loads((ROOT/"extension/canonical/CANON_PACKAGE.json").read_text())
-    declared=p.pop("package_digest")
-    canonical=(json.dumps(p,ensure_ascii=False,indent=2,sort_keys=True)+"\n").encode()
-    assert declared=="sha256:"+hashlib.sha256(canonical).hexdigest()
-    assert p["extension_version"]=="0.1.0-alpha.3"
-    assert p["canon_id"]=="ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
+    p = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text())
+    declared = p.pop("package_digest")
+    canonical = (json.dumps(p, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
+    assert declared == "sha256:" + hashlib.sha256(canonical).hexdigest()
+    assert p["extension_version"] == "0.1.0-alpha.3"
+    assert p["canon_id"] == "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
 
 
 def test_dynamic_profiles_are_seed_bound_without_network_state_or_transitions() -> None:
@@ -204,9 +195,7 @@ def test_dynamic_profiles_are_seed_bound_without_network_state_or_transitions() 
         "scope": "ProfileBinding.seed_scope",
         "state_root": "ProfileBinding.target_state_root",
     }
-    assert profile["digest_profile"]["canonicalization"] == (
-        "RFC8785_JSON_CANONICALIZATION_SCHEME"
-    )
+    assert profile["digest_profile"]["canonicalization"] == ("RFC8785_JSON_CANONICALIZATION_SCHEME")
     assert profile["refinement_semantics"]["may_strengthen_parent"] is True
     assert profile["refinement_semantics"]["may_weaken_parent"] is False
     assert profile["refinement_semantics"]["may_supersede_seed"] is False
@@ -261,9 +250,9 @@ def test_dynamic_profile_is_optional_core_claim() -> None:
 
 def test_dynamic_profile_target_context_domain_is_closed_under_seed_projection() -> None:
     schema = json.loads(
-        (
-            ROOT / "extension/canonical/protocol/schemas/profile-binding.schema.json"
-        ).read_text(encoding="utf-8")
+        (ROOT / "extension/canonical/protocol/schemas/profile-binding.schema.json").read_text(
+            encoding="utf-8"
+        )
     )
     assert schema["properties"]["target_context_id"] == {
         "type": "string",
@@ -283,8 +272,7 @@ def test_dynamic_profile_content_addressing_is_executable() -> None:
 
     profile = json.loads(
         (
-            ROOT
-            / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json"
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json"
         ).read_text(encoding="utf-8")
     )["object"]
     accepted, code = validate_wire_object("PROFILE_DEFINITION", profile)
@@ -302,8 +290,7 @@ def test_dynamic_profile_binding_digest_is_executable() -> None:
 
     binding = json.loads(
         (
-            ROOT
-            / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
         ).read_text(encoding="utf-8")
     )["object"]
     accepted, code = validate_wire_object("PROFILE_BINDING", binding)
@@ -316,8 +303,7 @@ def test_dynamic_profile_allow_does_not_carry_across_state_root_change() -> None
 
     case = json.loads(
         (
-            ROOT
-            / "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json"
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json"
         ).read_text(encoding="utf-8")
     )
     assert execute_profile_case(case) == case["expected"]
@@ -326,9 +312,9 @@ def test_dynamic_profile_allow_does_not_carry_across_state_root_change() -> None
 
 def test_dynamic_profile_refinement_claim_does_not_imply_proof_status() -> None:
     profile = json.loads(
-        (
-            ROOT / "extension/canonical/protocol/dynamic-profile-profile.json"
-        ).read_text(encoding="utf-8")
+        (ROOT / "extension/canonical/protocol/dynamic-profile-profile.json").read_text(
+            encoding="utf-8"
+        )
     )
     assurance = profile["assurance_semantics"]
     assert assurance["base_refinement_claim"] == (
@@ -360,8 +346,7 @@ def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_fo
 
     case = json.loads(
         (
-            ROOT
-            / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
         ).read_text(encoding="utf-8")
     )
     projected = project_seed_binding(case["object"])
@@ -377,13 +362,12 @@ def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_fo
     assert projected["binding_digest"] == expected
 
 
-
-
 def test_federation_profile_definition_is_valid_after_cutover() -> None:
     from tools.dynamic_profile_conformance import validate_wire_object
-    p=ROOT/"extension/canonical/protocol/profiles/federation-profile-definition.json"
-    d=json.loads(p.read_text())
-    assert validate_wire_object("PROFILE_DEFINITION",d)==(True,"PROFILE_DEFINITION_VALID")
+
+    p = ROOT / "extension/canonical/protocol/profiles/federation-profile-definition.json"
+    d = json.loads(p.read_text())
+    assert validate_wire_object("PROFILE_DEFINITION", d) == (True, "PROFILE_DEFINITION_VALID")
     assert d["parent_contract_digest"] == sha(
         ROOT / "extension/canonical/source/network-extension-model.json"
     )
@@ -391,33 +375,33 @@ def test_federation_profile_definition_is_valid_after_cutover() -> None:
 
 def test_full_local_non_tlaps_validation_stack() -> None:
     for cmd in [
-        [sys.executable,"tools/validate_extension.py"],
-        [sys.executable,"tools/verify_minimal_core_reduction.py"],
-        [sys.executable,"tools/run_conformance.py"],
+        [sys.executable, "-m", "tools.validate_extension"],
+        [sys.executable, "-m", "tools.verify_minimal_core_reduction"],
+        [sys.executable, "-m", "tools.run_conformance"],
     ]:
-        r=subprocess.run(cmd,cwd=ROOT,text=True,capture_output=True)
-        assert r.returncode==0,r.stdout+r.stderr
+        r = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
+        assert r.returncode == 0, r.stdout + r.stderr
 
 
 def test_release_metadata_matches_alpha3_minimal_admission() -> None:
-    project=tomllib.loads((ROOT/"pyproject.toml").read_text())["project"]
-    assert project["version"]=="0.1.0a3"
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    assert project["version"] == "0.1.0a3"
     assert project["description"] == (
         "Minimal cross-context evidence admission extension for ASET Seed"
     )
 
 
 def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
-    live=json.loads((ROOT/"extension/canonical/liveness/liveness-profile.json").read_text())
-    assert live["parent_profile"]=="ASET-NETWORK-FEDERATION-PROFILE-V1"
-    assert live["resolution_semantics"]["resolution_owner"]=="PINNED_TARGET_LOCAL_SEED"
-    assert live["resolution_semantics"]["terminal_local_results"]==["ALLOW","BLOCK"]
+    live = json.loads((ROOT / "extension/canonical/liveness/liveness-profile.json").read_text())
+    assert live["parent_profile"] == "ASET-NETWORK-FEDERATION-PROFILE-V1"
+    assert live["resolution_semantics"]["resolution_owner"] == "PINNED_TARGET_LOCAL_SEED"
+    assert live["resolution_semantics"]["terminal_local_results"] == ["ALLOW", "BLOCK"]
     assert live["resolution_semantics"]["legacy_assurance_projection"] == {
         "ACCEPT": "ALLOW",
         "DENY": "BLOCK",
     }
-    a3=next(x for x in live["assumptions"] if x["id"]=="NET-LIVE-A-003")
-    assert a3["name"]=="TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
+    a3 = next(x for x in live["assumptions"] if x["id"] == "NET-LIVE-A-003")
+    assert a3["name"] == "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
 
 
 def test_reduction_metadata_no_longer_calls_normative_core_candidate() -> None:
@@ -425,11 +409,11 @@ def test_reduction_metadata_no_longer_calls_normative_core_candidate() -> None:
         (ROOT / "extension/canonical/assurance/minimal-core-reduction.json").read_text()
     )
     assert "candidate" not in reduction
-    assert reduction["normative_core"]["semantic_state_fields"]==["imports"]
-    assert reduction["normative_core"]["transition_kinds"]==["ADMIT_IMPORT"]
-    fed=json.loads((ROOT/"extension/canonical/protocol/federation-profile.json").read_text())
+    assert reduction["normative_core"]["semantic_state_fields"] == ["imports"]
+    assert reduction["normative_core"]["transition_kinds"] == ["ADMIT_IMPORT"]
+    fed = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
     assert "candidate_network_transition" not in fed["extraction_semantics"]
-    assert fed["extraction_semantics"]["normative_network_transition"]==["ADMIT_IMPORT"]
+    assert fed["extraction_semantics"]["normative_network_transition"] == ["ADMIT_IMPORT"]
 
 
 def test_tlc_append_only_property_is_temporal_harness_only() -> None:
@@ -448,9 +432,7 @@ def test_tlc_append_only_property_is_temporal_harness_only() -> None:
 
 
 def test_tlc_harness_does_not_change_normative_proof_target() -> None:
-    relation = json.loads(
-        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text()
-    )
+    relation = json.loads((ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text())
     assert relation["target_model"]["module"] == "NetworkExtension"
     assert relation["target_model"]["path"] == "extension/canonical/formal/NetworkExtension.tla"
     assert relation["tlc_harness"]["scope"] == "BOUNDED_TEMPORAL_MODEL_CHECKING_ONLY"

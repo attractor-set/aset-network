@@ -73,26 +73,26 @@ The three alpha.3 proof modules have now been rerun with the pinned TLAPM and ar
 Non-TLAPS validation:
 
 ```bash
-python tools/generate_canon_tla_projection.py --check
-python tools/validate_extension.py
-python tools/verify_minimal_core_reduction.py
-python tools/run_conformance.py
+python -m tools.generate_canon_tla_projection --check
+python -m tools.validate_extension
+python -m tools.verify_minimal_core_reduction
+python -m tools.run_conformance
 python -m pytest -q
-python tools/bootstrap_tla.py
-python tools/run_tlc.py safety
+python -m tools.bootstrap_tla
+python -m tools.run_tlc safety
 ```
 
 Local proof gates with the pinned Seed checkout:
 
 ```bash
-python tools/run_canon_refinement_tlaps.py \
+python -m tools.run_canon_refinement_tlaps \
   --tlapm ~/ASET/.tooling/tlapm/bin/tlapm
 
-python tools/run_seed_refinement_tlaps.py \
+python -m tools.run_seed_refinement_tlaps \
   --tlapm ~/ASET/.tooling/tlapm/bin/tlapm \
   --seed-root ~/ASET
 
-python tools/run_legacy_admission_refinement_tlaps.py \
+python -m tools.run_legacy_admission_refinement_tlaps \
   --tlapm ~/ASET/.tooling/tlapm/bin/tlapm
 ```
 

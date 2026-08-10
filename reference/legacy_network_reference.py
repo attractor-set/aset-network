@@ -239,8 +239,7 @@ def apply_transition(
         active_routes = [
             r
             for r in state["routes"].values()
-            if r["status"] == "ACTIVE"
-            and cid in {r["source_context_id"], r["target_context_id"]}
+            if r["status"] == "ACTIVE" and cid in {r["source_context_id"], r["target_context_id"]}
         ]
         if active_routes:
             return state, _result(False, "ACTIVE_ROUTE_DEPENDENCY", False)

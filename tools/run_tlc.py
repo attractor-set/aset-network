@@ -27,13 +27,11 @@ def main() -> int:
     parser.add_argument("model", choices=[*MODELS, "all"], nargs="?", default="all")
     parser.add_argument("--jar", type=Path)
     args = parser.parse_args()
-    jar = (
-        args.jar or Path(os.environ.get("TLA2TOOLS_JAR", DEFAULT_JAR))
-    ).expanduser().resolve()
+    jar = (args.jar or Path(os.environ.get("TLA2TOOLS_JAR", DEFAULT_JAR))).expanduser().resolve()
 
     if not jar.is_file():
         raise SystemExit(
-            f"tla2tools.jar not found: {jar}; run python tools/bootstrap_tla.py "
+            f"tla2tools.jar not found: {jar}; run python -m tools.bootstrap_tla "
             "or set TLA2TOOLS_JAR"
         )
 

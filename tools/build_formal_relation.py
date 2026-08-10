@@ -188,9 +188,7 @@ def main() -> int:
             "obligation counts as normative semantics",
         ],
     }
-    relation["relation_digest"] = "sha256:" + hashlib.sha256(
-        canonical_bytes(relation)
-    ).hexdigest()
+    relation["relation_digest"] = "sha256:" + hashlib.sha256(canonical_bytes(relation)).hexdigest()
     REL.write_bytes(canonical_bytes(relation))
     print(f"FORMAL_RELATION={REL.relative_to(ROOT)}")
     print(f"FORMAL_RELATION_DIGEST={relation['relation_digest']}")

@@ -128,8 +128,7 @@ def seed_projection_shape_valid(projected: dict[str, Any]) -> bool:
         return False
     digest_re = re.compile(r"^sha256:[0-9a-f]{64}$")
     return all(
-        isinstance(projected.get(field), str)
-        and digest_re.fullmatch(projected[field]) is not None
+        isinstance(projected.get(field), str) and digest_re.fullmatch(projected[field]) is not None
         for field in ("state_root", "question_digest", "binding_digest")
     )
 

@@ -45,9 +45,7 @@ def sha256_file(path: Path) -> str:
 def main() -> int:
     DIST.mkdir(parents=True, exist_ok=True)
     files = [
-        path
-        for path in ROOT.rglob("*")
-        if path.is_file() and included(path.relative_to(ROOT))
+        path for path in ROOT.rglob("*") if path.is_file() and included(path.relative_to(ROOT))
     ]
 
     with zipfile.ZipFile(
@@ -58,9 +56,7 @@ def main() -> int:
     ) as archive:
         for path in sorted(
             files,
-            key=lambda item: (
-                Path("ASET-Network-Extension") / item.relative_to(ROOT)
-            ).as_posix(),
+            key=lambda item: (Path("ASET-Network-Extension") / item.relative_to(ROOT)).as_posix(),
         ):
             relative = path.relative_to(ROOT)
             info = zipfile.ZipInfo(

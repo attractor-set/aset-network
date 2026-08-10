@@ -22,9 +22,9 @@ jobs:
           distribution: temurin
           java-version: "21"
       - run: python -m pip install -r requirements-ci.txt
-      - run: python tools/bootstrap_tla.py
-      - run: python tools/validate_extension.py
-      - run: python tools/run_conformance.py
+      - run: python -m tools.bootstrap_tla
+      - run: python -m tools.validate_extension
+      - run: python -m tools.run_conformance
       - run: python -m pytest -q
       - run: ruff check .
       - name: Download pinned TLAPM
@@ -60,7 +60,7 @@ jobs:
       - name: Run full formal release gate
         timeout-minutes: 30
         run: |
-          python tools/run_formal_release_gate.py \
+          python -m tools.run_formal_release_gate \
             --tlapm "$TLAPM_BIN" \
             --seed-root "$SEED_ROOT"
       - name: Verify deterministic INPI deposit generation
@@ -68,7 +68,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          python tools/build_release.py
+          python -m tools.build_release
           checksum="dist/ASET-Network-Extension-Repository-Snapshot.zip.sha256"
           (cd dist && sha256sum --check ASET-Network-Extension-Repository-Snapshot.zip.sha256)
           digest="$(cut -d' ' -f1 "$checksum")"

@@ -10,8 +10,8 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
-from dynamic_profile_conformance import run_profile_conformance, validate_wire_object
-from verify_minimal_core_reduction import (
+from tools.dynamic_profile_conformance import run_profile_conformance, validate_wire_object
+from tools.verify_minimal_core_reduction import (
     verify_conformance_trace_projection,
     verify_decomposition,
     verify_profile_definition,
@@ -69,9 +69,7 @@ def main() -> int:
     if project.get("version") != "0.1.0a3" or project.get("description") != (
         "Minimal cross-context evidence admission extension for ASET Seed"
     ):
-        raise SystemExit(
-            "project metadata does not match alpha.3 minimal admission release"
-        )
+        raise SystemExit("project metadata does not match alpha.3 minimal admission release")
     if package["extension_version"] != "0.1.0-alpha.3" or package["canon_id"] != (
         "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
     ):
@@ -106,9 +104,10 @@ def main() -> int:
     for key, value in EXPECTED_SEED.items():
         if binding.get(key) != value:
             raise SystemExit(f"upstream Seed binding mismatch: {key}")
-    if binding.get("compatibility") != "STRICT_EXTENSION_NO_WEAKENING" or binding.get(
-        "implementation_precedence"
-    ) != "NONE":
+    if (
+        binding.get("compatibility") != "STRICT_EXTENSION_NO_WEAKENING"
+        or binding.get("implementation_precedence") != "NONE"
+    ):
         raise SystemExit("Seed compatibility boundary mismatch")
 
     relation = self_digest(C / "formal/canon-tla-relation.json", "relation_digest")
@@ -126,7 +125,7 @@ def main() -> int:
             raise SystemExit(f"canon projection relation digest mismatch: {key}")
 
     generation = subprocess.run(
-        [sys.executable, str(ROOT / "tools/generate_canon_tla_projection.py"), "--check"],
+        [sys.executable, "-m", "tools.generate_canon_tla_projection", "--check"],
         cwd=ROOT,
         text=True,
         stdout=subprocess.PIPE,
@@ -148,10 +147,7 @@ def main() -> int:
     ]
     for name, evidence in evidence_sets:
         gate = evidence["proof_gate"]
-        if (
-            evidence["status"] != "MECHANICALLY_PROVED"
-            or gate["verdict"] != "MECHANICALLY_PROVED"
-        ):
+        if evidence["status"] != "MECHANICALLY_PROVED" or gate["verdict"] != "MECHANICALLY_PROVED":
             raise SystemExit(f"{name} proof must be mechanically proved")
         if gate["obligations_proved"] != EXPECTED_PROOF_COUNTS[name]:
             raise SystemExit(f"{name} proof obligation count mismatch")
@@ -171,10 +167,8 @@ def main() -> int:
             raise SystemExit(f"legacy proof artifact digest mismatch: {item['path']}")
 
     if (
-        canon["generated_projection"]["profile"]
-        != "ASET-NETWORK-CANON-TLA-PROJECTION-V3"
-        or canon["source_model"]["sha256"]
-        != sha(C / "source/network-extension-model.json")
+        canon["generated_projection"]["profile"] != "ASET-NETWORK-CANON-TLA-PROJECTION-V3"
+        or canon["source_model"]["sha256"] != sha(C / "source/network-extension-model.json")
         or canon["target_model"]["sha256"] != sha(C / "formal/NetworkExtension.tla")
     ):
         raise SystemExit("canon refinement binding mismatch")
@@ -190,26 +184,28 @@ def main() -> int:
     if normative_core.get("semantic_state_fields") != ["imports"] or normative_core.get(
         "transition_kinds"
     ) != ["ADMIT_IMPORT"]:
-        raise SystemExit(
-            "minimal-core reduction metadata still uses non-normative/shadow core"
-        )
+        raise SystemExit("minimal-core reduction metadata still uses non-normative/shadow core")
     verification = reduction["verification"]
-    if verification.get("legacy_tlaps_status") != "MECHANICALLY_PROVED" or verification.get(
-        "legacy_tlaps_obligations_proved"
-    ) != 23:
+    if (
+        verification.get("legacy_tlaps_status") != "MECHANICALLY_PROVED"
+        or verification.get("legacy_tlaps_obligations_proved") != 23
+    ):
         raise SystemExit("minimal-core legacy proof materialization mismatch")
 
-    if relation["canon_projection"].get("status") != "MECHANICALLY_PROVED" or relation[
-        "canon_projection"
-    ].get("obligations_proved") != 3:
+    if (
+        relation["canon_projection"].get("status") != "MECHANICALLY_PROVED"
+        or relation["canon_projection"].get("obligations_proved") != 3
+    ):
         raise SystemExit("formal relation canon proof status/count mismatch")
-    if relation["seed_refinement"].get("status") != "MECHANICALLY_PROVED" or relation[
-        "seed_refinement"
-    ].get("obligations_proved") != 35:
+    if (
+        relation["seed_refinement"].get("status") != "MECHANICALLY_PROVED"
+        or relation["seed_refinement"].get("obligations_proved") != 35
+    ):
         raise SystemExit("formal relation Seed proof status/count mismatch")
-    if relation["legacy_alpha2_refinement"].get("status") != "MECHANICALLY_PROVED" or relation[
-        "legacy_alpha2_refinement"
-    ].get("obligations_proved") != 23:
+    if (
+        relation["legacy_alpha2_refinement"].get("status") != "MECHANICALLY_PROVED"
+        or relation["legacy_alpha2_refinement"].get("obligations_proved") != 23
+    ):
         raise SystemExit("formal relation legacy proof status/count mismatch")
 
     harness = relation.get("tlc_harness", {})
@@ -223,9 +219,7 @@ def main() -> int:
 
     harness_text = (C / "formal/NetworkExtensionTLC.tla").read_text()
     if "ImportsAppendOnlyTemporal == [][ImportsAppendOnly]_vars" not in harness_text:
-        raise SystemExit(
-            "TLC append-only property must temporalize the normative action predicate"
-        )
+        raise SystemExit("TLC append-only property must temporalize the normative action predicate")
     base_config = (C / "formal/NetworkExtension.cfg").read_text()
     harness_config = (C / "formal/NetworkExtensionTLC.cfg").read_text()
     if "PROPERTIES" in base_config or "ImportsAppendOnlyTemporal" not in harness_config:
@@ -238,8 +232,7 @@ def main() -> int:
     if (
         resolution.get("resolution_owner") != "PINNED_TARGET_LOCAL_SEED"
         or resolution.get("terminal_local_results") != ["ALLOW", "BLOCK"]
-        or resolution.get("legacy_assurance_projection")
-        != {"ACCEPT": "ALLOW", "DENY": "BLOCK"}
+        or resolution.get("legacy_assurance_projection") != {"ACCEPT": "ALLOW", "DENY": "BLOCK"}
     ):
         raise SystemExit("liveness terminal-resolution ownership/projection mismatch")
     if not any(
@@ -252,15 +245,14 @@ def main() -> int:
     schema_registry, schemas = registry()
     protocol = json.loads((C / "protocol/protocol-profile.json").read_text())
     actual = {path.name: sha(path) for path in S.glob("*.json")}
-    if protocol["schema_count"] != len(actual) or {
-        item["name"]: item["sha256"] for item in protocol["schemas"]
-    } != actual:
+    if (
+        protocol["schema_count"] != len(actual)
+        or {item["name"]: item["sha256"] for item in protocol["schemas"]} != actual
+    ):
         raise SystemExit("protocol schema catalogue mismatch")
 
     core = json.loads((C / "conformance/conformance-profile.json").read_text())
-    if core["profile_id"] != "ASET-NETWORK-EXTENSION-CONFORMANCE-V2" or core[
-        "case_count"
-    ] != 4:
+    if core["profile_id"] != "ASET-NETWORK-EXTENSION-CONFORMANCE-V2" or core["case_count"] != 4:
         raise SystemExit("core conformance identity/count mismatch")
     validator = Draft202012Validator(
         schemas["conformance-case.schema.json"],
@@ -299,9 +291,7 @@ def main() -> int:
     ok, code = validate_wire_object("PROFILE_DEFINITION", definition)
     if not ok:
         raise SystemExit(f"federation profile definition invalid after cutover: {code}")
-    if definition["parent_contract_digest"] != sha(
-        C / "source/network-extension-model.json"
-    ):
+    if definition["parent_contract_digest"] != sha(C / "source/network-extension-model.json"):
         raise SystemExit("federation profile parent digest mismatch")
 
     print(f"OK: package files={len(package['files'])}")
