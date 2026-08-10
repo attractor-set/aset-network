@@ -438,6 +438,20 @@ def test_release_metadata_matches_alpha3_minimal_admission() -> None:
     )
 
 
+def test_repository_topology_contains_only_direct_relations() -> None:
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    assert project["urls"] == {
+        "SeedSpecification": "https://github.com/attractor-set/ASET",
+        "Repository": "https://github.com/attractor-set/aset-network-extension",
+        "ReferenceImplementation": "https://github.com/attractor-set/aset-network-python-sqlite",
+    }
+    for readme_name in ["README.md", "README.ru.md", "README.pt-BR.md"]:
+        readme = (ROOT / readme_name).read_text(encoding="utf-8")
+        assert "https://github.com/attractor-set/ASET" in readme
+        assert "https://github.com/attractor-set/aset-network-python-sqlite" in readme
+        assert "aset-python-sqlite" not in readme
+
+
 def test_liveness_profile_is_independent_and_seed_owned_at_resolution() -> None:
     live = json.loads((ROOT / "extension/canonical/profiles/liveness/profile.json").read_text())
     assert "parent_profile" not in live

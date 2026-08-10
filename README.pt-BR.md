@@ -4,6 +4,13 @@ Status: **0.1.0-alpha.3 / núcleo mínimo de admissão**
 
 ASET Network Extension define a fronteira mínima e neutra de implementação pela qual evidência externa se torna candidata local para resolução pelo ASET Seed.
 
+## Topologia direta dos repositórios
+
+- Especificação upstream: [ASET](https://github.com/attractor-set/ASET) — pai normativo direto.
+- Implementação de referência downstream: [ASET Network Python SQLite](https://github.com/attractor-set/aset-network-python-sqlite) — implementação de referência não normativa desta extensão.
+
+Somente relações diretas entre repositórios são listadas aqui. Relações transitivas são descobertas por meio de seus repositórios-pai imediatos.
+
 ## Regra central
 
 **Evidence may cross boundaries. Recognition does not.**
