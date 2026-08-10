@@ -2,22 +2,34 @@
   "case_id": "NET-POS-001",
   "expected": {
     "accepted": true,
-    "code": "FEDERATION_CREATED",
-    "enforcement": "NOT_APPLICABLE",
-    "semantic_status": "NOT_APPLICABLE",
+    "code": "IMPORT_ADMITTED",
+    "enforcement": "BLOCKED",
+    "semantic_status": "UNKNOWN",
     "state_changed": true
   },
-  "initial_state": null,
+  "initial_state": {
+    "history": [],
+    "imports": {}
+  },
   "polarity": "positive",
   "steps": [
     {
-      "kind": "FEDERATION_GENESIS",
+      "kind": "ADMIT_IMPORT",
       "payload": {
-        "constitution_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-        "federation_epoch": 0,
-        "federation_id": "fed:1"
+        "import": {
+          "enforcement": "BLOCKED",
+          "evidence_digest": "sha256:5b181a581a374d0510150c19437e4c6dc266a82ee735affc9bb33cec7f656224",
+          "import_id": "imp-001",
+          "seed_scope": [
+            "network/import"
+          ],
+          "semantic_status": "UNKNOWN",
+          "target_context_id": "ctx-A",
+          "target_policy_epoch": 1,
+          "target_state_root": "sha256:5a01052272d925b2ab6c3fb46c1df7cf46ab53886e137d8ef116b5a21d85ab70"
+        }
       },
-      "transition_id": "t:1"
+      "transition_id": "tr-001"
     }
   ]
 }

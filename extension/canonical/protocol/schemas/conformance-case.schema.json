@@ -4,7 +4,10 @@
   "additionalProperties": false,
   "properties": {
     "case_id": {
-      "$ref": "common.schema.json#/$defs/id"
+      "maxLength": 256,
+      "minLength": 3,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/\\-]*$",
+      "type": "string"
     },
     "expected": {
       "additionalProperties": false,
@@ -17,17 +20,14 @@
         },
         "enforcement": {
           "enum": [
-            "NOT_APPLICABLE",
             "BLOCKED",
-            "ALLOW"
+            "NOT_APPLICABLE"
           ]
         },
         "semantic_status": {
           "enum": [
-            "NOT_APPLICABLE",
             "UNKNOWN",
-            "ACCEPT",
-            "DENY"
+            "NOT_APPLICABLE"
           ]
         },
         "state_changed": {
@@ -44,10 +44,7 @@
       "type": "object"
     },
     "initial_state": {
-      "type": [
-        "object",
-        "null"
-      ]
+      "$ref": "network-state.schema.json"
     },
     "polarity": {
       "enum": [

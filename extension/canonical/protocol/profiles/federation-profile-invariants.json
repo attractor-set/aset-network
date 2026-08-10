@@ -1,0 +1,27 @@
+{
+  "document_type": "aset-network-federation-profile-invariants",
+  "invariants": [
+    {
+      "id": "FED-INV-001",
+      "text": "Every active route has two distinct active member Contexts."
+    },
+    {
+      "id": "FED-INV-002",
+      "text": "A member may withdraw only after every route involving it is suspended."
+    },
+    {
+      "id": "FED-INV-003",
+      "text": "Every profile-produced export preserves its exact active-route binding."
+    },
+    {
+      "id": "FED-INV-004",
+      "text": "Federation and metafederation composition imply neither a superior Context nor inherited Authority."
+    },
+    {
+      "id": "FED-INV-005",
+      "text": "No federation-profile transition mutates the minimal Network admission projection."
+    }
+  ],
+  "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
+  "schema_version": 1
+}

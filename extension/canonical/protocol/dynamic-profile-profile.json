@@ -54,7 +54,7 @@
     }
   },
   "document_type": "aset-network-dynamic-profile-profile",
-  "extension_version": "0.1.0-alpha.2",
+  "extension_version": "0.1.0-alpha.3",
   "non_goals": [
     "profile discovery",
     "profile negotiation",

@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = ROOT / "dist/formal-release-gate.json"
 TLAPS_REPORT = ROOT / "dist/network-seed-refinement-proof.json"
 CANON_TLAPS_REPORT = ROOT / "dist/network-canon-refinement-proof.json"
+LEGACY_TLAPS_REPORT = ROOT / "dist/network-legacy-admission-refinement-proof.json"
 
 
 def write_report(path: Path, report: dict[str, object]) -> None:
@@ -69,6 +70,17 @@ def main() -> int:
             ],
         ),
         (
+            "TLAPS_LEGACY_ADMISSION_REFINEMENT",
+            [
+                python,
+                "tools/run_legacy_admission_refinement_tlaps.py",
+                "--tlapm",
+                str(tlapm),
+                "--timeout-seconds",
+                str(args.timeout_seconds),
+            ],
+        ),
+        (
             "TLAPS_SEED_REFINEMENT",
             [
                 python,
@@ -101,6 +113,7 @@ def main() -> int:
             return 1
 
     canon_tlaps_report = json.loads(CANON_TLAPS_REPORT.read_text(encoding="utf-8"))
+    legacy_tlaps_report = json.loads(LEGACY_TLAPS_REPORT.read_text(encoding="utf-8"))
     tlaps_report = json.loads(TLAPS_REPORT.read_text(encoding="utf-8"))
     package = json.loads(
         (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
@@ -119,6 +132,8 @@ def main() -> int:
         "canon_projection_profile": relation["canon_projection"]["profile"],
         "canon_refinement_status": relation["canon_projection"]["status"],
         "canon_refinement_obligations_proved": canon_tlaps_report["obligations_proved"],
+        "legacy_admission_refinement_status": relation["legacy_alpha2_refinement"]["status"],
+        "legacy_admission_refinement_obligations_proved": legacy_tlaps_report["obligations_proved"],
         "seed_refinement_status": relation["seed_refinement"]["status"],
         "seed_refinement_obligations_proved": tlaps_report["obligations_proved"],
         "tlapm_commit": tlaps_report["tlapm_commit"],

@@ -28,13 +28,13 @@
   "claim_semantics": {
     "assumptions_must_be_declared": true,
     "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
-    "core_conformance_profile": "ASET-NETWORK-EXTENSION-CONFORMANCE-V1",
+    "core_conformance_profile": "ASET-NETWORK-FEDERATION-PROFILE-CONFORMANCE-V1",
     "guarantees_apply_only_while_required_assumptions_hold": true,
     "required_for_core_conformance": false
   },
   "document_type": "aset-network-extension-liveness-profile",
   "extension_id": "ASET-NETWORK-EXTENSION",
-  "extension_version": "0.1.0-alpha.2",
+  "extension_version": "0.1.0-alpha.3",
   "guarantees": [
     {
       "id": "NET-LIVE-G-001",
@@ -68,6 +68,7 @@
     }
   ],
   "normative": true,
+  "parent_profile": "ASET-NETWORK-FEDERATION-PROFILE-V1",
   "profile_id": "ASET-NETWORK-LIVENESS-V1",
   "resolution_semantics": {
     "eventual_accept_required": false,
@@ -79,5 +80,5 @@
     "unconditional_transport_guarantee": false
   },
   "schema_version": 1,
-  "scope_rule": "Liveness constrains progress only under declared assumptions; it never requires ACCEPT, global agreement, or authority transfer."
+  "scope_rule": "Liveness is an optional Federation Profile capability; it is not part of the minimal admission core and never requires ACCEPT, global agreement, or authority transfer."
 }

@@ -1,0 +1,150 @@
+{
+  "case_count": 10,
+  "cases": [
+    {
+      "case_id": "FED-NEG-001",
+      "expected": {
+        "accepted": false,
+        "code": "ROUTE_MEMBER_UNKNOWN",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": false
+      },
+      "legacy_case_id": "NET-NEG-001",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-001.json",
+      "polarity": "negative",
+      "sha256": "sha256:b0d8c131af202ed259c8bffca835179f7ad95fae9e9cb409314de2934a920849"
+    },
+    {
+      "case_id": "FED-NEG-002",
+      "expected": {
+        "accepted": false,
+        "code": "SELF_ROUTE_FORBIDDEN",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": false
+      },
+      "legacy_case_id": "NET-NEG-002",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-002.json",
+      "polarity": "negative",
+      "sha256": "sha256:388b898a1e4998fd6a09fe6cff9190ea9735a17c86d5b781389062fe579a72f6"
+    },
+    {
+      "case_id": "FED-NEG-003",
+      "expected": {
+        "accepted": false,
+        "code": "ROUTE_SUSPENDED",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": false
+      },
+      "legacy_case_id": "NET-NEG-003",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-003.json",
+      "polarity": "negative",
+      "sha256": "sha256:5a39454402d6c15600461434e2f9a39044537a0f958c8de492ecacbfe3433d31"
+    },
+    {
+      "case_id": "FED-NEG-004",
+      "expected": {
+        "accepted": false,
+        "code": "ROUTE_BINDING_MISMATCH",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": false
+      },
+      "legacy_case_id": "NET-NEG-004",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-004.json",
+      "polarity": "negative",
+      "sha256": "sha256:a1eb82181230b491fea2b7968b2a7ff82c7c941f12cebac579e7806255cd9091"
+    },
+    {
+      "case_id": "FED-NEG-010",
+      "expected": {
+        "accepted": false,
+        "code": "ACTIVE_ROUTE_DEPENDENCY",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": false
+      },
+      "legacy_case_id": "NET-NEG-010",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-010.json",
+      "polarity": "negative",
+      "sha256": "sha256:6585924c1dba29a2209bf589d03c1c573f98f77c026c3d9be0760b3f97acbf31"
+    },
+    {
+      "case_id": "FED-POS-001",
+      "expected": {
+        "accepted": true,
+        "code": "FEDERATION_CREATED",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": true
+      },
+      "legacy_case_id": "NET-POS-001",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-001.json",
+      "polarity": "positive",
+      "sha256": "sha256:0f9951c7f4fea4f48f121581dc5ebfab3453c63c8097b9993576a4eb9eaae78b"
+    },
+    {
+      "case_id": "FED-POS-002",
+      "expected": {
+        "accepted": true,
+        "code": "MEMBER_JOINED",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": true
+      },
+      "legacy_case_id": "NET-POS-002",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-002.json",
+      "polarity": "positive",
+      "sha256": "sha256:cac830db68339c6fd2d42adb511ad43d154ef6092adee8589d629ba7ddb4121d"
+    },
+    {
+      "case_id": "FED-POS-003",
+      "expected": {
+        "accepted": true,
+        "code": "ROUTE_GRANTED",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": true
+      },
+      "legacy_case_id": "NET-POS-003",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-003.json",
+      "polarity": "positive",
+      "sha256": "sha256:bfed9949716fcabb3619c980afcc0a5c8c2b5c0740d448ededd4279b6a589b52"
+    },
+    {
+      "case_id": "FED-POS-004",
+      "expected": {
+        "accepted": true,
+        "code": "ARTIFACT_EXPORTED",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": true
+      },
+      "legacy_case_id": "NET-POS-004",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-004.json",
+      "polarity": "positive",
+      "sha256": "sha256:d22728c55d8622b513b98c6bf0be4c535e6bf55939d11d850bf22d95b5f6fe4f"
+    },
+    {
+      "case_id": "FED-POS-008",
+      "expected": {
+        "accepted": true,
+        "code": "MEMBER_WITHDRAWN",
+        "enforcement": "NOT_APPLICABLE",
+        "semantic_status": "NOT_APPLICABLE",
+        "state_changed": true
+      },
+      "legacy_case_id": "NET-POS-008",
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-008.json",
+      "polarity": "positive",
+      "sha256": "sha256:48147e71e825ca410f51b88827e5ef4e10f9bb5b70e7218a42230dbeeb5831a0"
+    }
+  ],
+  "document_type": "aset-network-federation-profile-conformance",
+  "parent_profile": "ASET-NETWORK-FEDERATION-PROFILE-V1",
+  "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-CONFORMANCE-V1",
+  "required_for_core_conformance": false,
+  "schema_version": 1
+}

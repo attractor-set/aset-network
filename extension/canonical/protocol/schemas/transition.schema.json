@@ -4,22 +4,25 @@
   "additionalProperties": false,
   "properties": {
     "kind": {
-      "enum": [
-        "FEDERATION_GENESIS",
-        "MEMBER_JOIN",
-        "ROUTE_GRANT",
-        "EXPORT_ARTIFACT",
-        "OBSERVE_IMPORT",
-        "RECORD_RECOGNITION",
-        "SUSPEND_ROUTE",
-        "MEMBER_WITHDRAW"
-      ]
+      "const": "ADMIT_IMPORT"
     },
     "payload": {
+      "additionalProperties": false,
+      "properties": {
+        "import": {
+          "$ref": "import-observation.schema.json"
+        }
+      },
+      "required": [
+        "import"
+      ],
       "type": "object"
     },
     "transition_id": {
-      "$ref": "common.schema.json#/$defs/id"
+      "maxLength": 256,
+      "minLength": 3,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/\\-]*$",
+      "type": "string"
     }
   },
   "required": [

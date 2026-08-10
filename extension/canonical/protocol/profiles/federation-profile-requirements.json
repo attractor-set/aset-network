@@ -1,0 +1,27 @@
+{
+  "document_type": "aset-network-federation-profile-requirements",
+  "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
+  "requirements": [
+    {
+      "id": "FED-REQ-001",
+      "text": "Federation membership, ancestry and routing MUST NOT create Resolution Authority in another Context."
+    },
+    {
+      "id": "FED-REQ-002",
+      "text": "An exported artifact MUST preserve the exact source Context, target Context, scope and source policy generation of the active route under which the export is produced."
+    },
+    {
+      "id": "FED-REQ-003",
+      "text": "Member withdrawal MUST remain blocked while an active route involving that member exists."
+    },
+    {
+      "id": "FED-REQ-004",
+      "text": "Federation-profile transitions MUST be observational stutter with respect to the minimal Network admission state."
+    },
+    {
+      "id": "FED-REQ-005",
+      "text": "Activation of this profile MUST use the Seed-bound dynamic-profile mechanism; possession, verification or remote recognition of the profile MUST NOT activate it locally."
+    }
+  ],
+  "schema_version": 1
+}
