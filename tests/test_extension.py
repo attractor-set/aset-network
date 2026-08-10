@@ -89,6 +89,39 @@ def test_generated_projection_is_current() -> None:
     assert "NETWORK_CANON_PROJECTION_CHECK=PASS" in r.stdout
 
 
+def test_generated_relation_and_package_are_current() -> None:
+    for module, marker in [
+        ("tools.build_formal_relation", "FORMAL_RELATION_CHECK=PASS"),
+        ("tools.build_canon_package", "CANON_PACKAGE_CHECK=PASS"),
+    ]:
+        result = subprocess.run(
+            [sys.executable, "-m", module, "--check"],
+            cwd=ROOT,
+            text=True,
+            capture_output=True,
+        )
+        assert result.returncode == 0, result.stdout + result.stderr
+        assert marker in result.stdout
+
+
+def test_ci_enforces_exact_tree_and_pinned_seed_refinement() -> None:
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert "ruff format --check ." in workflow
+    assert "git diff --exit-code -- ." in workflow
+    assert "git diff --cached --exit-code -- ." in workflow
+    assert "python -m tools.build_release --verify-determinism" in workflow
+    assert 'seed_commit="633c130187b2a2bb42f24cfd66662d475de385d2"' in workflow
+    assert '--seed-root "$SEED_ROOT"' in workflow
+
+
+def test_formal_gate_checks_generated_artifacts_without_rewriting_them() -> None:
+    source = (ROOT / "tools/run_formal_release_gate.py").read_text(encoding="utf-8")
+    assert '"tools.build_formal_relation", "--check"' in source
+    assert '"tools.build_canon_package", "--check"' in source
+    assert '"ruff", "format", "--check", "."' in source
+    assert '"tools.run_seed_refinement_tlaps"' in source
+
+
 def test_formal_core_has_one_variable_and_one_action() -> None:
     t = (ROOT / "extension/canonical/formal/NetworkExtension.tla").read_text()
     assert "VARIABLE imports" in t
