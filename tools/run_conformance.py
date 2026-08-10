@@ -23,7 +23,7 @@ def run_manifest(path, executor, label):
         for case_id, expected, actual in failures:
             print(f"FAIL {label} {case_id}: expected={expected} actual={actual}")
         return False, len(profile["cases"])
-    print(f'OK: {len(profile["cases"])} {label} conformance cases')
+    print(f"OK: {len(profile['cases'])} {label} conformance cases")
     return True, len(profile["cases"])
 
 

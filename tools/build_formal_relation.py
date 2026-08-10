@@ -86,8 +86,7 @@ def main() -> int:
             "proof_sha256": sha(F / "NetworkExtensionSeedRefinementProofs.tla"),
             "upstream_module": "SeedResolution",
             "upstream_sha256": (
-                "sha256:1c0ebb27ed52da289f0981dcb11b61b6"
-                "a7fc5c4a030ba434ae0b1d53b286b926"
+                "sha256:1c0ebb27ed52da289f0981dcb11b61b6a7fc5c4a030ba434ae0b1d53b286b926"
             ),
             "mapping": {
                 "resolution_ids": "ObservationUniverse",

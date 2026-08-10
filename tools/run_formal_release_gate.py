@@ -110,9 +110,7 @@ def main() -> int:
         (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
     )
     relation = json.loads(
-        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text(encoding="utf-8")
     )
     report = {
         "document_type": "aset-network-formal-release-gate-report",
@@ -133,18 +131,9 @@ def main() -> int:
     write_report(output, report)
     print(f"FORMAL_RELEASE_CANON_PACKAGE_DIGEST={package['package_digest']}")
     print(f"FORMAL_RELEASE_RELATION_DIGEST={relation['relation_digest']}")
-    print(
-        "FORMAL_RELEASE_CANON_REFINEMENT_STATUS="
-        f"{relation['canon_projection']['status']}"
-    )
-    print(
-        "FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS="
-        f"{canon_tlaps_report['obligations_proved']}"
-    )
-    print(
-        "FORMAL_RELEASE_SEED_REFINEMENT_OBLIGATIONS="
-        f"{tlaps_report['obligations_proved']}"
-    )
+    print(f"FORMAL_RELEASE_CANON_REFINEMENT_STATUS={relation['canon_projection']['status']}")
+    print(f"FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS={canon_tlaps_report['obligations_proved']}")
+    print(f"FORMAL_RELEASE_SEED_REFINEMENT_OBLIGATIONS={tlaps_report['obligations_proved']}")
     print("FORMAL_RELEASE_GATE=PASS")
     return 0
 

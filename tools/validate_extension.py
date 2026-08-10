@@ -152,9 +152,10 @@ def main() -> int:
     for key, value in EXPECTED_SEED.items():
         if binding.get(key) != value:
             raise SystemExit(f"upstream Seed binding mismatch: {key}")
-    if binding.get("compatibility") != "STRICT_EXTENSION_NO_WEAKENING" or binding.get(
-        "implementation_precedence"
-    ) != "NONE":
+    if (
+        binding.get("compatibility") != "STRICT_EXTENSION_NO_WEAKENING"
+        or binding.get("implementation_precedence") != "NONE"
+    ):
         raise SystemExit("Seed compatibility boundary mismatch")
 
     relation = self_digest(C / "formal/canon-tla-relation.json", "relation_digest")
@@ -217,13 +218,15 @@ def main() -> int:
     ):
         raise SystemExit("canon refinement materialization mismatch")
 
-    if relation["canon_projection"].get("status") != "MECHANICALLY_PROVED" or relation[
-        "canon_projection"
-    ].get("obligations_proved") != 3:
+    if (
+        relation["canon_projection"].get("status") != "MECHANICALLY_PROVED"
+        or relation["canon_projection"].get("obligations_proved") != 3
+    ):
         raise SystemExit("formal relation canon proof status/count mismatch")
-    if relation["seed_refinement"].get("status") != "MECHANICALLY_PROVED" or relation[
-        "seed_refinement"
-    ].get("obligations_proved") != 35:
+    if (
+        relation["seed_refinement"].get("status") != "MECHANICALLY_PROVED"
+        or relation["seed_refinement"].get("obligations_proved") != 35
+    ):
         raise SystemExit("formal relation Seed proof status/count mismatch")
     if "legacy_alpha2_refinement" in relation:
         raise SystemExit("historical Network refinement must not remain in current relation")
@@ -265,9 +268,10 @@ def main() -> int:
     schema_registry, schemas = registry()
     protocol = json.loads((C / "protocol/protocol-profile.json").read_text())
     actual = {path.name: sha(path) for path in S.glob("*.json")}
-    if protocol["schema_count"] != len(actual) or {
-        item["name"]: item["sha256"] for item in protocol["schemas"]
-    } != actual:
+    if (
+        protocol["schema_count"] != len(actual)
+        or {item["name"]: item["sha256"] for item in protocol["schemas"]} != actual
+    ):
         raise SystemExit("protocol schema catalogue mismatch")
     if any(item.get("owner") == "LEGACY_ONLY_SEED_DERIVED" for item in protocol["schemas"]):
         raise SystemExit("legacy-only wire schema remains in current protocol")
@@ -284,8 +288,7 @@ def main() -> int:
         errors = list(core_validator.iter_errors(case))
         if errors:
             raise SystemExit(
-                f"core conformance schema invalid: {item['case_id']}: "
-                f"{errors[0].message}"
+                f"core conformance schema invalid: {item['case_id']}: {errors[0].message}"
             )
         if item["sha256"] != sha(path):
             raise SystemExit(f"core conformance digest mismatch: {item['case_id']}")
