@@ -48,11 +48,25 @@ def main() -> int:
     python = sys.executable
     stages = [
         ("DIFF_CHECK", ["git", "diff", "--check"]),
+        ("TRACKED_WORKTREE_CLEAN", ["git", "diff", "--quiet", "HEAD", "--"]),
+        (
+            "TRACKED_INDEX_CLEAN",
+            ["git", "diff", "--cached", "--quiet", "HEAD", "--"],
+        ),
+        ("PYTHON_FORMAT", ["ruff", "format", "--check", "."]),
+        ("PYTHON_LINT", ["ruff", "check", "."]),
         (
             "CANON_PROJECTION_CHECK",
             [python, "-m", "tools.generate_canon_tla_projection", "--check"],
         ),
-        ("BUILD_CANON_PACKAGE", [python, "-m", "tools.build_canon_package"]),
+        (
+            "FORMAL_RELATION_CHECK",
+            [python, "-m", "tools.build_formal_relation", "--check"],
+        ),
+        (
+            "CANON_PACKAGE_CHECK",
+            [python, "-m", "tools.build_canon_package", "--check"],
+        ),
         ("VALIDATE", [python, "-m", "tools.validate_extension"]),
         ("CONFORMANCE", [python, "-m", "tools.run_conformance"]),
         ("TESTS", [python, "-m", "pytest", "-q"]),
@@ -82,6 +96,14 @@ def main() -> int:
                 "--timeout-seconds",
                 str(args.timeout_seconds),
             ],
+        ),
+        (
+            "TRACKED_WORKTREE_UNCHANGED",
+            ["git", "diff", "--quiet", "HEAD", "--"],
+        ),
+        (
+            "TRACKED_INDEX_UNCHANGED",
+            ["git", "diff", "--cached", "--quiet", "HEAD", "--"],
         ),
     ]
 

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -20,7 +21,7 @@ def canonical_bytes(value: object) -> bytes:
     return (json.dumps(value, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
 
 
-def main() -> int:
+def build_relation() -> dict[str, object]:
     binding = json.loads(BIND.read_text())
     canon_evidence = json.loads((C / "assurance/canon-refinement-proof.json").read_text())
     seed_evidence = json.loads((C / "assurance/seed-refinement-proof.json").read_text())
@@ -179,9 +180,27 @@ def main() -> int:
         ],
     }
     relation["relation_digest"] = "sha256:" + hashlib.sha256(canonical_bytes(relation)).hexdigest()
-    REL.write_bytes(canonical_bytes(relation))
+    return relation
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args(argv)
+
+    relation = build_relation()
+    rendered = canonical_bytes(relation)
     print(f"FORMAL_RELATION={REL.relative_to(ROOT)}")
     print(f"FORMAL_RELATION_DIGEST={relation['relation_digest']}")
+
+    if args.check:
+        if not REL.is_file() or REL.read_bytes() != rendered:
+            print("FORMAL_RELATION_CHECK=FAIL")
+            return 1
+        print("FORMAL_RELATION_CHECK=PASS")
+        return 0
+
+    REL.write_bytes(rendered)
     print("FORMAL_RELATION_BUILD=PASS")
     return 0
 

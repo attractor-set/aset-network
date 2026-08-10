@@ -26,6 +26,7 @@ jobs:
       - run: python -m tools.validate_extension
       - run: python -m tools.run_conformance
       - run: python -m pytest -q
+      - run: ruff format --check .
       - run: ruff check .
       - name: Download pinned TLAPM
         shell: bash
@@ -63,12 +64,19 @@ jobs:
           python -m tools.run_formal_release_gate \
             --tlapm "$TLAPM_BIN" \
             --seed-root "$SEED_ROOT"
+      - name: Verify exact committed tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code -- .
+          git diff --cached --exit-code -- .
+          test -z "$(git status --porcelain --untracked-files=all)"
       - name: Verify deterministic INPI deposit generation
         id: inpi_deposit
         shell: bash
         run: |
           set -euo pipefail
-          python -m tools.build_release
+          python -m tools.build_release --verify-determinism
           checksum="dist/ASET-Network-Extension-Repository-Snapshot.zip.sha256"
           (cd dist && sha256sum --check ASET-Network-Extension-Repository-Snapshot.zip.sha256)
           digest="$(cut -d' ' -f1 "$checksum")"

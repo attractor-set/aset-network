@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import argparse
 import hashlib
 import json
 from pathlib import Path
@@ -35,8 +36,7 @@ def included_in_canon(path: Path) -> bool:
     return True
 
 
-def main() -> int:
-    build_formal_relation()
+def build_package() -> dict[str, object]:
     paths = [
         path for path in sorted(CANON.rglob("*")) if path.is_file() and included_in_canon(path)
     ]
@@ -44,7 +44,7 @@ def main() -> int:
     files = [
         {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)} for path in sorted(paths)
     ]
-    package = {
+    package: dict[str, object] = {
         "document_type": "aset-extension-canon-package",
         "schema_version": 1,
         "extension_id": "ASET-NETWORK-EXTENSION",
@@ -56,9 +56,37 @@ def main() -> int:
         "files": files,
     }
     package["package_digest"] = "sha256:" + hashlib.sha256(canonical_bytes(package)).hexdigest()
-    PACKAGE.write_bytes(canonical_bytes(package))
+    return package
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--check", action="store_true")
+    args = parser.parse_args(argv)
+
+    relation_status = build_formal_relation(["--check"] if args.check else [])
+    if relation_status != 0:
+        print("CANON_PACKAGE_CHECK=FAIL" if args.check else "CANON_PACKAGE_BUILD=FAIL")
+        return relation_status
+
+    package = build_package()
+    rendered = canonical_bytes(package)
+    files = package["files"]
+    assert isinstance(files, list)
+
+    if args.check:
+        if not PACKAGE.is_file() or PACKAGE.read_bytes() != rendered:
+            print("CANON_PACKAGE_CHECK=FAIL")
+            return 1
+        print(f"OK: package files={len(files)}")
+        print(f"OK: package digest={package['package_digest']}")
+        print("CANON_PACKAGE_CHECK=PASS")
+        return 0
+
+    PACKAGE.write_bytes(rendered)
     print(f"OK: wrote {PACKAGE.relative_to(ROOT)} with {len(files)} files")
     print(f"OK: package digest={package['package_digest']}")
+    print("CANON_PACKAGE_BUILD=PASS")
     return 0
 
 
