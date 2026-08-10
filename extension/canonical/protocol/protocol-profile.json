@@ -3,8 +3,11 @@
   "extension_version": "0.1.0-alpha.2",
   "implementation_precedence": "NONE",
   "normative": true,
+  "optional_profiles": [
+    "ASET-NETWORK-DYNAMIC-PROFILES-V1"
+  ],
   "profile_id": "ASET-NETWORK-EXTENSION-WIRE-V1",
-  "schema_count": 9,
+  "schema_count": 11,
   "schema_version": 1,
   "schemas": [
     {
@@ -42,6 +45,18 @@
       "name": "member-descriptor.schema.json",
       "path": "extension/canonical/protocol/schemas/member-descriptor.schema.json",
       "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
+    },
+    {
+      "id": "https://spec.aset.example/network/0.1/schemas/profile-binding.schema.json",
+      "name": "profile-binding.schema.json",
+      "path": "extension/canonical/protocol/schemas/profile-binding.schema.json",
+      "sha256": "sha256:697f1f3ad0e30b08407fd5c824ea3ba68c6f323695a0cfb541fc0a57351b45b2"
+    },
+    {
+      "id": "https://spec.aset.example/network/0.1/schemas/profile-definition.schema.json",
+      "name": "profile-definition.schema.json",
+      "path": "extension/canonical/protocol/schemas/profile-definition.schema.json",
+      "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
     },
     {
       "id": "https://spec.aset.example/network/0.1/schemas/recognition-receipt.schema.json",

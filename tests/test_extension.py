@@ -527,3 +527,86 @@ def test_ci_publishes_inpi_deposit_sha256_like_seed() -> None:
     assert "ASET-Network-Extension-Repository-Snapshot.zip.sha256" in workflow
     assert "actions/upload-artifact@v4" in workflow
     assert "aset-network-extension-inpi-deposit-${{ github.sha }}" in workflow
+
+
+def test_dynamic_profiles_are_seed_bound_without_network_state_or_transitions() -> None:
+    profile = json.loads(
+        (ROOT / "extension/canonical/protocol/dynamic-profile-profile.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert profile["profile_id"] == "ASET-NETWORK-DYNAMIC-PROFILES-V1"
+    assert profile["normative"] is True
+    assert profile["claim_semantics"] == {
+        "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
+        "normative_when_claimed": True,
+        "required_for_core_conformance": False,
+    }
+    assert profile["core_boundary"]["network_state_fields_added"] == []
+    assert profile["core_boundary"]["network_transition_kinds_added"] == []
+    assert profile["core_boundary"]["network_owned_activation_state"] is False
+    assert profile["activation_semantics"]["rule"] == (
+        "TARGET_LOCAL_SEED_ALLOW_ON_PROJECTED_EXACT_PROFILE_BINDING"
+    )
+    assert profile["activation_semantics"]["active_profile_registry_is_normative_state"] is False
+    assert profile["activation_semantics"]["seed_binding_projection"] == {
+        "binding_digest": "Seed canonical ResolutionBinding digest over the projected fields",
+        "context_id": "ProfileBinding.target_context_id",
+        "policy_epoch": "ProfileBinding.target_policy_epoch",
+        "question_digest": "ProfileBinding.profile_digest",
+        "scope": "ProfileBinding.seed_scope",
+        "state_root": "ProfileBinding.target_state_root",
+    }
+    assert profile["digest_profile"]["canonicalization"] == (
+        "RFC8785_JSON_CANONICALIZATION_SCHEME"
+    )
+    assert profile["refinement_semantics"]["may_strengthen_parent"] is True
+    assert profile["refinement_semantics"]["may_weaken_parent"] is False
+    assert profile["refinement_semantics"]["may_supersede_seed"] is False
+
+
+def test_dynamic_profile_wire_objects_are_exact_and_have_no_activation_field() -> None:
+    schema_dir = ROOT / "extension/canonical/protocol/schemas"
+    definition = json.loads((schema_dir / "profile-definition.schema.json").read_text())
+    binding = json.loads((schema_dir / "profile-binding.schema.json").read_text())
+
+    assert definition["additionalProperties"] is False
+    assert set(definition["required"]) == {
+        "profile_id",
+        "profile_version",
+        "parent_contract_digest",
+        "scope_digest",
+        "requirements_digest",
+        "invariants_digest",
+        "profile_digest",
+    }
+    assert "activation" not in definition["properties"]
+    assert "status" not in definition["properties"]
+
+    assert binding["additionalProperties"] is False
+    assert set(binding["required"]) == {
+        "binding_digest",
+        "profile_digest",
+        "target_context_id",
+        "target_state_root",
+        "target_policy_epoch",
+        "seed_scope",
+    }
+    assert "active" not in binding["properties"]
+    assert "semantic_status" not in binding["properties"]
+    assert "enforcement" not in binding["properties"]
+    assert "resolution_id" not in binding["properties"]
+    assert "question_digest" not in binding["properties"]
+
+
+def test_dynamic_profile_is_optional_core_claim() -> None:
+    core = json.loads(
+        (ROOT / "extension/canonical/conformance/conformance-profile.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    claims = {item["profile_id"]: item for item in core["optional_claim_profiles"]}
+    claim = claims["ASET-NETWORK-DYNAMIC-PROFILES-V1"]
+    assert claim["required_for_core_conformance"] is False
+    assert claim["normative_when_claimed"] is True
+    assert claim["activation_authority"] == "TARGET_LOCAL_SEED_ONLY"

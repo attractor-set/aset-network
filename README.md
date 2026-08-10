@@ -50,6 +50,12 @@ TLC generic deadlock checking is disabled for the finite assurance configuration
 
 The main safety/liveness TLC state deliberately excludes the append-only execution history. Full history sequences distinguish every ordering of otherwise equivalent actions and caused factorial state-space growth without strengthening the network safety or liveness predicates. `NetworkHistory.tla` now checks `NET-INV-010` independently in a small bounded trace model (`HistoryPrefixPreserved` and `AcceptedTransitionAppendsExactlyOne`).
 
+## Optional dynamic profiles
+
+`ASET-NETWORK-DYNAMIC-PROFILES-V1` adds a Seed-style profile boundary without adding Network state or transitions. Profile definitions are immutable content-addressed evidence; exact profile bindings project directly to Seed `ResolutionBinding` and become applicable only through target-local Seed `ALLOW`. Verification, availability, remote recognition and observation never activate a profile by themselves. The profile deliberately defines no runtime plugin lifecycle, precedence system or universal composition algebra.
+
+See `extension/canonical/protocol/dynamic-profile-profile.json` and the `profile-definition.schema.json` / `profile-binding.schema.json` wire schemas.
+
 ## Deliberately outside this alpha
 
 Transport, peer discovery, consensus, storage, durability, key custody, cryptographic providers, homomorphic encryption, partition reconciliation and unconditional availability guarantees are implementation or later-profile responsibilities.

@@ -312,6 +312,69 @@ def main() -> int:
     if live_claim.get("normative_when_claimed") is not True:
         raise SystemExit("claimed liveness profile must remain normative")
 
+    dynamic_claim = optional_profiles.get("ASET-NETWORK-DYNAMIC-PROFILES-V1")
+    if dynamic_claim is None:
+        raise SystemExit("core conformance does not expose the optional dynamic-profile claim")
+    if dynamic_claim.get("required_for_core_conformance") is not False:
+        raise SystemExit("core conformance incorrectly requires dynamic profiles")
+    if dynamic_claim.get("normative_when_claimed") is not True:
+        raise SystemExit("claimed dynamic-profile surface must remain normative")
+    if dynamic_claim.get("activation_authority") != "TARGET_LOCAL_SEED_ONLY":
+        raise SystemExit("dynamic-profile activation authority must remain target-local Seed")
+
+    dynamic_profile = json.loads(
+        (CANON / "protocol/dynamic-profile-profile.json").read_text(encoding="utf-8")
+    )
+    if dynamic_profile.get("profile_id") != "ASET-NETWORK-DYNAMIC-PROFILES-V1":
+        raise SystemExit("dynamic-profile identity mismatch")
+    if dynamic_profile.get("normative") is not True:
+        raise SystemExit("dynamic-profile surface must be normative when claimed")
+    dynamic_core = dynamic_profile.get("core_boundary", {})
+    if dynamic_core.get("network_state_fields_added") != []:
+        raise SystemExit("dynamic profiles must not add Network semantic state")
+    if dynamic_core.get("network_transition_kinds_added") != []:
+        raise SystemExit("dynamic profiles must not add Network transitions")
+    if dynamic_core.get("network_owned_activation_state") is not False:
+        raise SystemExit("dynamic profile activation must not be Network-owned state")
+    activation = dynamic_profile.get("activation_semantics", {})
+    if activation.get("rule") != "TARGET_LOCAL_SEED_ALLOW_ON_PROJECTED_EXACT_PROFILE_BINDING":
+        raise SystemExit("dynamic profile activation rule mismatch")
+    for field in (
+        "availability_implies_activation",
+        "verification_implies_activation",
+        "remote_recognition_implies_activation",
+        "network_observation_implies_activation",
+        "active_profile_registry_is_normative_state",
+    ):
+        if activation.get(field) is not False:
+            raise SystemExit(f"dynamic profile fail-closed boundary mismatch: {field}")
+    projection = activation.get("seed_binding_projection", {})
+    expected_projection = {
+        "context_id": "ProfileBinding.target_context_id",
+        "state_root": "ProfileBinding.target_state_root",
+        "question_digest": "ProfileBinding.profile_digest",
+        "policy_epoch": "ProfileBinding.target_policy_epoch",
+        "scope": "ProfileBinding.seed_scope",
+        "binding_digest": "Seed canonical ResolutionBinding digest over the projected fields",
+    }
+    if projection != expected_projection:
+        raise SystemExit("dynamic profile Seed binding projection mismatch")
+    if not activation.get("resolution_id_rule", "").startswith("A fresh Seed resolution_id"):
+        raise SystemExit("dynamic profile activation must require a fresh Seed resolution_id")
+    digest_profile = dynamic_profile.get("digest_profile", {})
+    if digest_profile.get("canonicalization") != "RFC8785_JSON_CANONICALIZATION_SCHEME":
+        raise SystemExit("dynamic profile canonicalization mismatch")
+    if digest_profile.get("hash") != "SHA-256":
+        raise SystemExit("dynamic profile digest hash mismatch")
+
+    refinement = dynamic_profile.get("refinement_semantics", {})
+    if refinement.get("may_strengthen_parent") is not True:
+        raise SystemExit("dynamic profiles must be allowed to strengthen parent semantics")
+    if refinement.get("may_weaken_parent") is not False:
+        raise SystemExit("dynamic profiles must not weaken parent semantics")
+    if refinement.get("may_supersede_seed") is not False:
+        raise SystemExit("dynamic profiles must not supersede Seed")
+
     surfaces = relation.get("projection_surfaces", {})
     semantic_surface = surfaces.get("semantic_state", {})
     if semantic_surface.get("formal_model") != "NetworkExtension":
@@ -355,6 +418,7 @@ def main() -> int:
     print("OK: canon-to-TLA relation exact")
     print("OK: semantic state / evidence history partition exact")
     print("OK: optional conditional liveness claim exact")
+    print("OK: dynamic profiles add no Network state or transitions")
     print("OK: liveness profile exact")
     print("OK: standalone Network canon projection exact")
     print("OK: Network canon refinement mechanically proved")

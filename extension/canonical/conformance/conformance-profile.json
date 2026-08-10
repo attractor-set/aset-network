@@ -245,6 +245,12 @@
       "normative_when_claimed": true,
       "profile_id": "ASET-NETWORK-LIVENESS-V1",
       "required_for_core_conformance": false
+    },
+    {
+      "activation_authority": "TARGET_LOCAL_SEED_ONLY",
+      "normative_when_claimed": true,
+      "profile_id": "ASET-NETWORK-DYNAMIC-PROFILES-V1",
+      "required_for_core_conformance": false
     }
   ],
   "positive_count": 8,

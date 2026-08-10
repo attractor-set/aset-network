@@ -17,6 +17,21 @@ Each member is an independent Context with its own Constitution, Authority, cano
 A metafederation is a graph or composition of federations. It does not imply a root Context, a global Constitution or inherited Resolution Authority. Cross-federation recognition repeats the same local pipeline at every sovereign boundary.
 
 
+## Dynamic profiles without a second decision algebra
+
+`ASET-NETWORK-DYNAMIC-PROFILES-V1` is an optional normative profile surface. It does not extend the Network semantic state and does not add Network transition kinds. A `ProfileDefinition` is immutable, content-addressed external evidence. A `ProfileBinding` immutably binds one exact profile digest to one target Context, target state root, target policy epoch and Seed scope. It contains no resolution identifier or activation status.
+
+Profile availability, transport, cryptographic verification, remote recognition and network observation do **not** activate a profile. For activation, the binding is projected directly into a Seed `ResolutionBinding`: target Context → `context_id`, target state root → `state_root`, profile digest → `question_digest`, target policy epoch → `policy_epoch`, and declared Seed scope → `scope`. A fresh Seed `resolution_id` is then used. Applicability is derived only when that exact target-local Seed resolution evaluates `ALLOW`. There is therefore no normative `active_profiles` registry and no second profile decision algebra. A changed definition has a different digest and requires a new exact binding; an earlier `ALLOW` does not carry forward.
+
+Profiles may strengthen the parent contract but may not weaken it or supersede Seed. The Network core deliberately defines no universal profile dependency resolver, precedence system, composition algebra, negotiation protocol or runtime plugin lifecycle. A composed profile is responsible for its own constraints and refinement evidence.
+
+This keeps profile dynamism in immutable evidence plus local recognition rather than in mutable Network semantics:
+
+```text
+ProfileDefinition --digest--> ProfileBinding --projection--> Seed ResolutionBinding
+                                                         UNKNOWN / ALLOW / BLOCK
+```
+
 ## Formal assurance boundary
 
 The normative source is the machine-readable Network Extension canon. The TLA+ modules are assurance projections bound by `extension/canonical/formal/canon-tla-relation.json`.

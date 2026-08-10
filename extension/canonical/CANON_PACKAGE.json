@@ -94,7 +94,7 @@
     },
     {
       "path": "extension/canonical/conformance/conformance-profile.json",
-      "sha256": "sha256:0d46f6a7eb0aedcc034ace08a80fc53c2a9b8bb40b98e677405ab4944a397237"
+      "sha256": "sha256:fa7fbcaf71c6cbac2547b4201f9804f79f0673d035c3bf8b3db03a92440ae0db"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonProjection.tla",
@@ -145,8 +145,12 @@
       "sha256": "sha256:890d36df457794c706a2e1f4165fd4e583fa6ed765a2d6135256118a4a3c81c0"
     },
     {
+      "path": "extension/canonical/protocol/dynamic-profile-profile.json",
+      "sha256": "sha256:803ad41d8a071badc67f07bf4c983e643501aba66dc8d63f51f064fa5ea54c69"
+    },
+    {
       "path": "extension/canonical/protocol/protocol-profile.json",
-      "sha256": "sha256:50a3f88e3074421512b1120c384dd96231b174596c5eead3298615b1503eb64d"
+      "sha256": "sha256:08aee15ddae806478f54bea6697c8ad352d102458489df0e3f4d76b1ea847e5c"
     },
     {
       "path": "extension/canonical/protocol/schemas/common.schema.json",
@@ -173,6 +177,14 @@
       "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
     },
     {
+      "path": "extension/canonical/protocol/schemas/profile-binding.schema.json",
+      "sha256": "sha256:697f1f3ad0e30b08407fd5c824ea3ba68c6f323695a0cfb541fc0a57351b45b2"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/profile-definition.schema.json",
+      "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
+    },
+    {
       "path": "extension/canonical/protocol/schemas/recognition-receipt.schema.json",
       "sha256": "sha256:97158bfcafa419cdedb9edc53b028a8144db47836b5f8d7016912a7e1e56e0fe"
     },
@@ -195,7 +207,7 @@
   ],
   "implementation_precedence": "NONE",
   "normative_source": "extension/canonical/source/network-extension-model.json",
-  "package_digest": "sha256:64d718812cea7768f21b288fc525298516d9150ecd790016ffb6513bfe68c1c1",
+  "package_digest": "sha256:9d81a6448577a625618db93e551f065604d43abf8eb53703083f55d1fbcc5b37",
   "schema_version": 1,
   "upstream_binding": "upstream/ASET_SEED_BINDING.json"
 }
