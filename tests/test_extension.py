@@ -7,8 +7,8 @@ import sys
 import tomllib
 from pathlib import Path
 
-from reference.network_reference import apply_transition, execute_case
 from reference.legacy_network_reference import execute_case as execute_legacy_case
+from reference.network_reference import execute_case
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -46,7 +46,12 @@ def test_core_conformance_cases_match_minimal_reference() -> None:
 
 
 def test_admission_is_fail_closed() -> None:
-    case=json.loads((ROOT/"extension/canonical/conformance/cases/positive/NET-POS-001.json").read_text())
+    case = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/cases/positive/NET-POS-001.json"
+        ).read_text()
+    )
     state,result=execute_case(case)
     assert result["semantic_status"]=="UNKNOWN"
     assert result["enforcement"]=="BLOCKED"
@@ -55,7 +60,12 @@ def test_admission_is_fail_closed() -> None:
 
 
 def test_admission_exact_replay_is_idempotent() -> None:
-    case=json.loads((ROOT/"extension/canonical/conformance/cases/positive/NET-POS-002.json").read_text())
+    case = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/cases/positive/NET-POS-002.json"
+        ).read_text()
+    )
     before=json.loads(json.dumps(case["initial_state"]))
     state,result=execute_case(case)
     assert result["code"]=="IDEMPOTENT_REPLAY"
@@ -64,7 +74,12 @@ def test_admission_exact_replay_is_idempotent() -> None:
 
 
 def test_admission_conflict_is_rejected() -> None:
-    case=json.loads((ROOT/"extension/canonical/conformance/cases/negative/NET-NEG-001.json").read_text())
+    case = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/cases/negative/NET-NEG-001.json"
+        ).read_text()
+    )
     before=json.loads(json.dumps(case["initial_state"]))
     state,result=execute_case(case)
     assert result["code"]=="IDENTIFIER_CONFLICT"
@@ -73,7 +88,12 @@ def test_admission_conflict_is_rejected() -> None:
 
 
 def test_generated_projection_is_current() -> None:
-    r=subprocess.run([sys.executable,"tools/generate_canon_tla_projection.py","--check"],cwd=ROOT,text=True,capture_output=True)
+    r = subprocess.run(
+        [sys.executable, "tools/generate_canon_tla_projection.py", "--check"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
     assert r.returncode==0,r.stdout+r.stderr
     assert "NETWORK_CANON_PROJECTION_CHECK=PASS" in r.stdout
 
@@ -121,11 +141,23 @@ def test_federation_profile_is_post_cutover_owner() -> None:
     assert e["normative_core_changed_by_this_slice"] is True
     assert e["network_admission_state_retained"]==["imports"]
     assert e["seed_derived_legacy_state_fields"]==["recognitions"]
-    assert set(e["profile_owned_legacy_transition_kinds"])=={"FEDERATION_GENESIS","MEMBER_JOIN","ROUTE_GRANT","EXPORT_ARTIFACT","SUSPEND_ROUTE","MEMBER_WITHDRAW"}
+    assert set(e["profile_owned_legacy_transition_kinds"]) == {
+        "FEDERATION_GENESIS",
+        "MEMBER_JOIN",
+        "ROUTE_GRANT",
+        "EXPORT_ARTIFACT",
+        "SUSPEND_ROUTE",
+        "MEMBER_WITHDRAW",
+    }
 
 
 def test_federation_conformance_is_optional_and_legacy_backed() -> None:
-    p=json.loads((ROOT/"extension/canonical/conformance/federation-profile-conformance-profile.json").read_text())
+    p = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/federation-profile-conformance-profile.json"
+        ).read_text()
+    )
     assert p["required_for_core_conformance"] is False
     assert p["case_count"]==10
     for item in p["cases"]:
@@ -352,7 +384,9 @@ def test_federation_profile_definition_is_valid_after_cutover() -> None:
     p=ROOT/"extension/canonical/protocol/profiles/federation-profile-definition.json"
     d=json.loads(p.read_text())
     assert validate_wire_object("PROFILE_DEFINITION",d)==(True,"PROFILE_DEFINITION_VALID")
-    assert d["parent_contract_digest"]==sha(ROOT/"extension/canonical/source/network-extension-model.json")
+    assert d["parent_contract_digest"] == sha(
+        ROOT / "extension/canonical/source/network-extension-model.json"
+    )
 
 
 def test_full_local_non_tlaps_validation_stack() -> None:
@@ -368,7 +402,9 @@ def test_full_local_non_tlaps_validation_stack() -> None:
 def test_release_metadata_matches_alpha3_minimal_admission() -> None:
     project=tomllib.loads((ROOT/"pyproject.toml").read_text())["project"]
     assert project["version"]=="0.1.0a3"
-    assert project["description"]=="Minimal cross-context evidence admission extension for ASET Seed"
+    assert project["description"] == (
+        "Minimal cross-context evidence admission extension for ASET Seed"
+    )
 
 
 def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
@@ -376,13 +412,18 @@ def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
     assert live["parent_profile"]=="ASET-NETWORK-FEDERATION-PROFILE-V1"
     assert live["resolution_semantics"]["resolution_owner"]=="PINNED_TARGET_LOCAL_SEED"
     assert live["resolution_semantics"]["terminal_local_results"]==["ALLOW","BLOCK"]
-    assert live["resolution_semantics"]["legacy_assurance_projection"]=={"ACCEPT":"ALLOW","DENY":"BLOCK"}
+    assert live["resolution_semantics"]["legacy_assurance_projection"] == {
+        "ACCEPT": "ALLOW",
+        "DENY": "BLOCK",
+    }
     a3=next(x for x in live["assumptions"] if x["id"]=="NET-LIVE-A-003")
     assert a3["name"]=="TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
 
 
 def test_reduction_metadata_no_longer_calls_normative_core_candidate() -> None:
-    reduction=json.loads((ROOT/"extension/canonical/assurance/minimal-core-reduction.json").read_text())
+    reduction = json.loads(
+        (ROOT / "extension/canonical/assurance/minimal-core-reduction.json").read_text()
+    )
     assert "candidate" not in reduction
     assert reduction["normative_core"]["semantic_state_fields"]==["imports"]
     assert reduction["normative_core"]["transition_kinds"]==["ADMIT_IMPORT"]
@@ -397,13 +438,13 @@ def test_tlc_append_only_property_is_temporal_harness_only() -> None:
     harness = (formal / "NetworkExtensionTLC.tla").read_text()
     base_cfg = (formal / "NetworkExtension.cfg").read_text()
     harness_cfg = (formal / "NetworkExtensionTLC.cfg").read_text()
-    runner = (ROOT / "tools/run_tlc.py").read_text()
+    from tools.run_tlc import MODELS
 
     assert "ImportsAppendOnly == imports \\subseteq imports'" in normative
     assert "ImportsAppendOnlyTemporal == [][ImportsAppendOnly]_vars" in harness
     assert "PROPERTIES" not in base_cfg
     assert "ImportsAppendOnlyTemporal" in harness_cfg
-    assert "'safety':('NetworkExtensionTLC.tla','NetworkExtensionTLC.cfg')" in runner
+    assert MODELS["safety"] == ("NetworkExtensionTLC.tla", "NetworkExtensionTLC.cfg")
 
 
 def test_tlc_harness_does_not_change_normative_proof_target() -> None:
