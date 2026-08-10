@@ -13,9 +13,10 @@
       "tla_fairness": "WF_vars(Observe(e))"
     },
     {
+      "assurance_projection": "Legacy Resolve(e) represents target-local Seed resolution only for bounded liveness assurance.",
       "id": "NET-LIVE-A-003",
-      "name": "EVENTUAL_LOCAL_RESOLUTION",
-      "text": "If a target-local import remains eligible for resolution, local resolution is not postponed forever.",
+      "name": "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION",
+      "text": "If target-local Seed resolution for an admitted import remains enabled, that local Seed decision is not postponed forever. This is an external composition assumption, not a Network-owned transition.",
       "tla_fairness": "WF_vars(Resolve(e))"
     },
     {
@@ -28,13 +29,13 @@
   "claim_semantics": {
     "assumptions_must_be_declared": true,
     "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
-    "core_conformance_profile": "ASET-NETWORK-EXTENSION-CONFORMANCE-V1",
+    "core_conformance_profile": "ASET-NETWORK-FEDERATION-PROFILE-CONFORMANCE-V1",
     "guarantees_apply_only_while_required_assumptions_hold": true,
     "required_for_core_conformance": false
   },
   "document_type": "aset-network-extension-liveness-profile",
   "extension_id": "ASET-NETWORK-EXTENSION",
-  "extension_version": "0.1.0-alpha.2",
+  "extension_version": "0.1.0-alpha.3",
   "guarantees": [
     {
       "id": "NET-LIVE-G-001",
@@ -57,27 +58,34 @@
     },
     {
       "id": "NET-LIVE-G-003",
-      "name": "EVENTUALLY_LOCALLY_RESOLVED",
+      "name": "EVENTUALLY_TARGET_LOCAL_SEED_RESOLVED",
       "requires": [
         "NET-LIVE-A-001",
         "NET-LIVE-A-002",
         "NET-LIVE-A-003",
         "NET-LIVE-A-004"
       ],
+      "text": "Under the declared target-local Seed progress assumption, an admitted import eventually reaches a target-local Seed terminal result.",
       "tla_property": "EventuallyResolved"
     }
   ],
   "normative": true,
+  "parent_profile": "ASET-NETWORK-FEDERATION-PROFILE-V1",
   "profile_id": "ASET-NETWORK-LIVENESS-V1",
   "resolution_semantics": {
-    "eventual_accept_required": false,
+    "eventual_allow_required": false,
     "global_agreement_required": false,
+    "legacy_assurance_projection": {
+      "ACCEPT": "ALLOW",
+      "DENY": "BLOCK"
+    },
+    "resolution_owner": "PINNED_TARGET_LOCAL_SEED",
     "terminal_local_results": [
-      "ACCEPT",
-      "DENY"
+      "ALLOW",
+      "BLOCK"
     ],
     "unconditional_transport_guarantee": false
   },
   "schema_version": 1,
-  "scope_rule": "Liveness constrains progress only under declared assumptions; it never requires ACCEPT, global agreement, or authority transfer."
+  "scope_rule": "Liveness is an optional Federation Profile composition claim. Delivery and observation remain Network/Federation concerns; terminal resolution remains owned by the pinned target-local Seed. The legacy Resolve/ACCEPT/DENY model is used only as an assurance projection and does not create Network-owned recognition semantics."
 }

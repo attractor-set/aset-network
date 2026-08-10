@@ -4,9 +4,10 @@ import hashlib
 import json
 import subprocess
 import sys
-import zipfile
+import tomllib
 from pathlib import Path
 
+from reference.legacy_network_reference import execute_case as execute_legacy_case
 from reference.network_reference import execute_case
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -17,513 +18,445 @@ def sha(path: Path) -> str:
 
 
 def test_upstream_binding_is_exact() -> None:
-    binding = json.loads((ROOT / "upstream/ASET_SEED_BINDING.json").read_text(encoding="utf-8"))
-    assert binding["canon_id"] == "ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1"
-    assert binding["canon_version"] == "0.3.0-alpha.1"
-    assert binding["seed_release_tag"] == "seed-0.3.0-alpha.3"
-    assert binding["seed_release_commit"] == "633c130187b2a2bb42f24cfd66662d475de385d2"
-    assert (
-        binding["compatibility_standard"]
-        == "ASET-SEED-COMPATIBILITY-STANDARD@seed-0.3.0-alpha.3"
-    )
-    assert binding["compatibility_standard_profile"] == "ASET-SEED-COMPATIBILITY-STANDARD-V1"
-    assert binding["compatibility"] == "STRICT_EXTENSION_NO_WEAKENING"
-    assert binding["implementation_precedence"] == "NONE"
+    b = json.loads((ROOT / "upstream/ASET_SEED_BINDING.json").read_text())
+    assert b["seed_release_tag"] == "seed-0.3.0-alpha.3"
+    assert b["seed_release_commit"] == "633c130187b2a2bb42f24cfd66662d475de385d2"
+    assert b["compatibility"] == "STRICT_EXTENSION_NO_WEAKENING"
+    assert b["implementation_precedence"] == "NONE"
 
 
-def test_model_preserves_seed_boundary() -> None:
-    model = json.loads(
-        (ROOT / "extension/canonical/source/network-extension-model.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    texts = " ".join(item["text"] for item in model["invariants"])
-    assert "target-local Seed" in texts
-    assert "may not weaken" in texts
-    assert "superior Context" in texts
-    assert model["canonicality"]["formal_relation"] == "MACHINE_CHECKABLE_ASSURANCE_BINDING"
-    assert model["formal_assurance"]["seed_refinement_proof_evidence"] == (
-        "extension/canonical/assurance/seed-refinement-proof.json"
-    )
-    assert model["formal_assurance"]["seed_refinement_proof_runner"] == (
-        "tools/run_seed_refinement_tlaps.py"
-    )
+def test_normative_core_is_one_state_one_transition() -> None:
+    m = json.loads((ROOT / "extension/canonical/source/network-extension-model.json").read_text())
+    assert m["version"] == "0.1.0-alpha.3"
+    assert m["status"] == "MINIMAL_ADMISSION_CORE_ALPHA3_NORMATIVE_CUTOVER"
+    assert m["state_partition"]["semantic_state_fields"] == ["imports"]
+    assert m["state_partition"]["evidence_history_fields"] == ["history"]
+    assert m["transition_kinds"] == ["ADMIT_IMPORT"]
+    assert "recognitions" not in m["state"]
 
 
-def test_all_conformance_cases_match_reference_observables() -> None:
-    for path in sorted((ROOT / "extension/canonical/conformance/cases").rglob("*.json")):
-        case = json.loads(path.read_text(encoding="utf-8"))
+def test_core_conformance_cases_match_minimal_reference() -> None:
+    p = json.loads((ROOT / "extension/canonical/conformance/conformance-profile.json").read_text())
+    assert p["profile_id"] == "ASET-NETWORK-EXTENSION-CONFORMANCE-V2"
+    assert p["case_count"] == 4
+    for item in p["cases"]:
+        case = json.loads((ROOT / item["path"]).read_text())
         _, actual = execute_case(case)
         assert actual == case["expected"], case["case_id"]
 
 
-def test_canon_package_integrity() -> None:
-    package = json.loads(
-        (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
-    )
-    declared = package.pop("package_digest")
-    canonical = (json.dumps(package, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
-    assert declared == "sha256:" + hashlib.sha256(canonical).hexdigest()
-    package["package_digest"] = declared
-    assert package["canon_id"] == "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA2"
-    assert any(item["path"] == "upstream/ASET_SEED_BINDING.json" for item in package["files"])
-    for item in package["files"]:
-        path = ROOT / item["path"]
-        actual = "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
-        assert actual == item["sha256"], item["path"]
-
-
-def test_import_is_never_accepted_by_observation_alone() -> None:
+def test_admission_is_fail_closed() -> None:
     case = json.loads(
+        (ROOT / "extension/canonical/conformance/cases/positive/NET-POS-001.json").read_text()
+    )
+    state, result = execute_case(case)
+    assert result["semantic_status"] == "UNKNOWN"
+    assert result["enforcement"] == "BLOCKED"
+    assert state["imports"]
+    assert "recognitions" not in state
+
+
+def test_admission_exact_replay_is_idempotent() -> None:
+    case = json.loads(
+        (ROOT / "extension/canonical/conformance/cases/positive/NET-POS-002.json").read_text()
+    )
+    before = json.loads(json.dumps(case["initial_state"]))
+    state, result = execute_case(case)
+    assert result["code"] == "IDEMPOTENT_REPLAY"
+    assert result["state_changed"] is False
+    assert state == before
+
+
+def test_admission_conflict_is_rejected() -> None:
+    case = json.loads(
+        (ROOT / "extension/canonical/conformance/cases/negative/NET-NEG-001.json").read_text()
+    )
+    before = json.loads(json.dumps(case["initial_state"]))
+    state, result = execute_case(case)
+    assert result["code"] == "IDENTIFIER_CONFLICT"
+    assert result["accepted"] is False
+    assert state == before
+
+
+def test_generated_projection_is_current() -> None:
+    r = subprocess.run(
+        [sys.executable, "-m", "tools.generate_canon_tla_projection", "--check"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+    )
+    assert r.returncode == 0, r.stdout + r.stderr
+    assert "NETWORK_CANON_PROJECTION_CHECK=PASS" in r.stdout
+
+
+def test_formal_core_has_one_variable_and_one_action() -> None:
+    t = (ROOT / "extension/canonical/formal/NetworkExtension.tla").read_text()
+    assert "VARIABLE imports" in t
+    assert "VARIABLES" not in t
+    assert "AdmitImport(o) ==" in t
+    for legacy in ["Join(c)", "GrantRoute", "ResolveAccept", "ResolveDeny", "Withdraw(c)"]:
+        assert legacy not in t
+
+
+def test_alpha3_proof_evidence_is_materialized_and_exact() -> None:
+    expected = {
+        "canon-refinement-proof.json": 3,
+        "seed-refinement-proof.json": 35,
+        "legacy-admission-refinement-proof.json": 23,
+    }
+    for name, count in expected.items():
+        e = json.loads((ROOT / "extension/canonical/assurance" / name).read_text())
+        assert e["status"] == "MECHANICALLY_PROVED"
+        assert e["proof_gate"]["verdict"] == "MECHANICALLY_PROVED"
+        assert e["proof_gate"]["obligations_proved"] == count
+        assert e["proof_gate"]["materialization"] == "REPRODUCED_WITH_PINNED_TLAPM"
+
+    rel = json.loads((ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text())
+    assert rel["canon_projection"]["status"] == "MECHANICALLY_PROVED"
+    assert rel["canon_projection"]["obligations_proved"] == 3
+    assert rel["seed_refinement"]["status"] == "MECHANICALLY_PROVED"
+    assert rel["seed_refinement"]["obligations_proved"] == 35
+    assert rel["legacy_alpha2_refinement"]["status"] == "MECHANICALLY_PROVED"
+    assert rel["legacy_alpha2_refinement"]["obligations_proved"] == 23
+
+
+def test_legacy_alpha2_traces_project_to_minimal_core() -> None:
+    from tools.verify_minimal_core_reduction import verify_conformance_trace_projection
+
+    assert verify_conformance_trace_projection() == 18
+
+
+def test_federation_profile_is_post_cutover_owner() -> None:
+    f = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
+    e = f["extraction_semantics"]
+    assert e["phase"] == "NORMATIVE_PROFILE_AFTER_CORE_CUTOVER"
+    assert e["normative_core_changed_by_this_slice"] is True
+    assert e["network_admission_state_retained"] == ["imports"]
+    assert e["seed_derived_legacy_state_fields"] == ["recognitions"]
+    assert set(e["profile_owned_legacy_transition_kinds"]) == {
+        "FEDERATION_GENESIS",
+        "MEMBER_JOIN",
+        "ROUTE_GRANT",
+        "EXPORT_ARTIFACT",
+        "SUSPEND_ROUTE",
+        "MEMBER_WITHDRAW",
+    }
+
+
+def test_federation_conformance_is_optional_and_legacy_backed() -> None:
+    p = json.loads(
         (
-            ROOT
-            / "extension/canonical/conformance/cases/positive/NET-POS-005.json"
-        ).read_text(encoding="utf-8")
+            ROOT / "extension/canonical/conformance/federation-profile-conformance-profile.json"
+        ).read_text()
     )
-    state, actual = execute_case(case)
-    assert actual["semantic_status"] == "UNKNOWN"
-    assert actual["enforcement"] == "BLOCKED"
-    assert state is not None and not state["recognitions"]
+    assert p["required_for_core_conformance"] is False
+    assert p["case_count"] == 10
+    for item in p["cases"]:
+        assert "/legacy-alpha2-cases/" in item["path"]
+        case = json.loads((ROOT / item["path"]).read_text())
+        _, actual = execute_legacy_case(case)
+        assert actual == case["expected"]
 
 
-def test_formal_relation_covers_all_network_invariants() -> None:
-    model = json.loads(
-        (ROOT / "extension/canonical/source/network-extension-model.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    relation = json.loads(
-        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text(encoding="utf-8")
-    )
-    assert {item["id"] for item in model["invariants"]} == {
-        item["id"] for item in relation["invariant_coverage"]
-    }
-    assert relation["normative_precedence"] == "MACHINE_READABLE_CANON"
-    assert (
-        relation["seed_projection"]["exact_seed_tlaps_refinement"]
-        == "MECHANICALLY_PROVED"
-    )
+def test_package_is_alpha3_and_self_consistent() -> None:
+    p = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text())
+    declared = p.pop("package_digest")
+    canonical = (json.dumps(p, ensure_ascii=False, indent=2, sort_keys=True) + "\n").encode()
+    assert declared == "sha256:" + hashlib.sha256(canonical).hexdigest()
+    assert p["extension_version"] == "0.1.0-alpha.3"
+    assert p["canon_id"] == "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
 
 
-def test_liveness_is_conditional_and_does_not_require_accept() -> None:
+def test_dynamic_profiles_are_seed_bound_without_network_state_or_transitions() -> None:
     profile = json.loads(
-        (ROOT / "extension/canonical/liveness/liveness-profile.json").read_text(encoding="utf-8")
+        (ROOT / "extension/canonical/protocol/dynamic-profile-profile.json").read_text(
+            encoding="utf-8"
+        )
     )
-    assert profile["profile_id"] == "ASET-NETWORK-LIVENESS-V1"
+    assert profile["profile_id"] == "ASET-NETWORK-DYNAMIC-PROFILES-V1"
     assert profile["normative"] is True
-    assert {item["name"] for item in profile["guarantees"]} == {
-        "EVENTUALLY_DELIVERED",
-        "EVENTUALLY_OBSERVED",
-        "EVENTUALLY_LOCALLY_RESOLVED",
+    assert profile["claim_semantics"] == {
+        "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
+        "normative_when_claimed": True,
+        "required_for_core_conformance": False,
     }
-    assert "never requires ACCEPT" in profile["scope_rule"]
-
-
-def test_tlc_runner_replaces_python_cartesian_model() -> None:
-    wrapper = (ROOT / "tools/model_check_network.py").read_text(encoding="utf-8")
-    runner = (ROOT / "tools/run_tlc.py").read_text(encoding="utf-8")
-    assert "from run_tlc import main" in wrapper
-    assert "tlc2.TLC" in runner
-    assert "NetworkHistory.cfg" in runner
-    assert "NetworkExtensionLiveness.cfg" in runner
-
-
-def test_tlc_deadlock_policy_distinguishes_quiescence_from_stuck_work() -> None:
-    formal = ROOT / "extension/canonical/formal"
-    safety_cfg = (formal / "NetworkExtension.cfg").read_text(encoding="utf-8")
-    liveness_cfg = (formal / "NetworkExtensionLiveness.cfg").read_text(encoding="utf-8")
-    model = (formal / "NetworkExtension.tla").read_text(encoding="utf-8")
-
-    assert "CHECK_DEADLOCK FALSE" in safety_cfg
-    assert "CHECK_DEADLOCK FALSE" in liveness_cfg
-    assert "NoUnexpectedSafetyDeadlock" in safety_cfg
-    assert "NoPendingProgressDeadlock" in liveness_cfg
-    assert "SafetyTerminal ==" in model
-    assert "ENABLED NetworkAction" in model
-    assert "PendingProgress ==" in model
-    assert "ENABLED ProgressAction" in model
-
-
-def test_main_tlc_state_excludes_execution_history() -> None:
-    formal = ROOT / "extension/canonical/formal"
-    model = (formal / "NetworkExtension.tla").read_text(encoding="utf-8")
-
-    vars_block = model.split("vars ==", 1)[1].split("Init ==", 1)[0]
-    assert "history" not in vars_block
-    assert "Append(history" not in model
-    assert "NetworkHistory" in model
-
-
-def test_history_trace_is_separate_bounded_tlc_model() -> None:
-    formal = ROOT / "extension/canonical/formal"
-    model = (formal / "NetworkHistory.tla").read_text(encoding="utf-8")
-    config = (formal / "NetworkHistory.cfg").read_text(encoding="utf-8")
-    relation = json.loads((formal / "canon-tla-relation.json").read_text(encoding="utf-8"))
-
-    assert "HistoryPrefixPreserved" in model
-    assert "AcceptedTransitionAppendsExactlyOne" in model
-    assert "HistoryDigests = {D1, D2, D3, D4}" in config
-    assert relation["history_model"]["scope"] == "NET-INV-010_TRACE_PROJECTION"
-    coverage = {item["id"]: item for item in relation["invariant_coverage"]}
-    assert coverage["NET-INV-010"]["status"] == "TLC_TRACE_PROPERTY"
-
-
-def test_canon_package_excludes_tlc_runtime_metadata() -> None:
-    builder = (ROOT / "tools/build_canon_package.py").read_text(encoding="utf-8")
-    assert 'CANON_SUFFIXES = {".json", ".tla", ".cfg"}' in builder
-    assert 'relative.parts[0] == "formal" and len(relative.parts) != 2' in builder
-    assert "included_in_canon(path)" in builder
-
-
-def test_tlc_runtime_metadata_is_outside_normative_canon() -> None:
-    runner = (ROOT / "tools/run_tlc.py").read_text(encoding="utf-8")
-    assert 'TLC_METADATA_ROOT = ROOT / ".tooling/tlc"' in runner
-    assert '"-metadir"' in runner
-    assert "shutil.rmtree(metadir)" in runner
-
-
-def test_canon_separates_semantic_state_from_evidence_history() -> None:
-    model = json.loads(
-        (ROOT / "extension/canonical/source/network-extension-model.json").read_text(
-            encoding="utf-8"
-        )
+    assert profile["core_boundary"]["network_state_fields_added"] == []
+    assert profile["core_boundary"]["network_transition_kinds_added"] == []
+    assert profile["core_boundary"]["network_owned_activation_state"] is False
+    assert profile["activation_semantics"]["rule"] == (
+        "TARGET_LOCAL_SEED_ALLOW_ON_PROJECTED_EXACT_PROFILE_BINDING"
     )
-    partition = model["state_partition"]
-    semantic = set(partition["semantic_state_fields"])
-    evidence = set(partition["evidence_history_fields"])
-    assert semantic | evidence == set(model["state"])
-    assert not semantic & evidence
-    assert evidence == {"history"}
-    assert partition["evidence_history_role"] == "NORMATIVE_APPEND_ONLY_EVIDENCE_TRACE"
-    assert "MUST NOT itself confer Authority" in partition["transition_enabling_rule"]
-    inv10 = next(item for item in model["invariants"] if item["id"] == "NET-INV-010")
-    assert "canonical evidence history" in inv10["text"]
-    assert "does not itself confer Authority" in inv10["text"]
+    assert profile["activation_semantics"]["active_profile_registry_is_normative_state"] is False
+    assert profile["activation_semantics"]["seed_binding_projection"] == {
+        "binding_digest": "Seed canonical ResolutionBinding digest over the projected fields",
+        "context_id": "ProfileBinding.target_context_id",
+        "policy_epoch": "ProfileBinding.target_policy_epoch",
+        "question_digest": "ProfileBinding.profile_digest",
+        "scope": "ProfileBinding.seed_scope",
+        "state_root": "ProfileBinding.target_state_root",
+    }
+    assert profile["digest_profile"]["canonicalization"] == ("RFC8785_JSON_CANONICALIZATION_SCHEME")
+    assert profile["refinement_semantics"]["may_strengthen_parent"] is True
+    assert profile["refinement_semantics"]["may_weaken_parent"] is False
+    assert profile["refinement_semantics"]["may_supersede_seed"] is False
 
 
-def test_liveness_is_optional_normative_claim_not_core_requirement() -> None:
-    live = json.loads(
-        (ROOT / "extension/canonical/liveness/liveness-profile.json").read_text(
-            encoding="utf-8"
-        )
-    )
+def test_dynamic_profile_wire_objects_are_exact_and_have_no_activation_field() -> None:
+    schema_dir = ROOT / "extension/canonical/protocol/schemas"
+    definition = json.loads((schema_dir / "profile-definition.schema.json").read_text())
+    binding = json.loads((schema_dir / "profile-binding.schema.json").read_text())
+
+    assert definition["additionalProperties"] is False
+    assert set(definition["required"]) == {
+        "profile_id",
+        "profile_version",
+        "parent_contract_digest",
+        "scope_digest",
+        "requirements_digest",
+        "invariants_digest",
+        "profile_digest",
+    }
+    assert "activation" not in definition["properties"]
+    assert "status" not in definition["properties"]
+
+    assert binding["additionalProperties"] is False
+    assert set(binding["required"]) == {
+        "binding_digest",
+        "profile_digest",
+        "target_context_id",
+        "target_state_root",
+        "target_policy_epoch",
+        "seed_scope",
+    }
+    assert "active" not in binding["properties"]
+    assert "semantic_status" not in binding["properties"]
+    assert "enforcement" not in binding["properties"]
+    assert "resolution_id" not in binding["properties"]
+    assert "question_digest" not in binding["properties"]
+
+
+def test_dynamic_profile_is_optional_core_claim() -> None:
     core = json.loads(
         (ROOT / "extension/canonical/conformance/conformance-profile.json").read_text(
             encoding="utf-8"
         )
     )
-    claim = live["claim_semantics"]
-    assert claim["claim_type"] == "OPTIONAL_CAPABILITY_CLAIM"
+    claims = {item["profile_id"]: item for item in core["optional_claim_profiles"]}
+    claim = claims["ASET-NETWORK-DYNAMIC-PROFILES-V1"]
     assert claim["required_for_core_conformance"] is False
-    assert claim["assumptions_must_be_declared"] is True
-    assert live["resolution_semantics"]["terminal_local_results"] == ["ACCEPT", "DENY"]
-    assert live["resolution_semantics"]["eventual_accept_required"] is False
-    optional = {item["profile_id"]: item for item in core["optional_claim_profiles"]}
-    assert optional["ASET-NETWORK-LIVENESS-V1"]["required_for_core_conformance"] is False
-    assert optional["ASET-NETWORK-LIVENESS-V1"]["normative_when_claimed"] is True
+    assert claim["normative_when_claimed"] is True
+    assert claim["activation_authority"] == "TARGET_LOCAL_SEED_ONLY"
 
 
-def test_formal_relation_exposes_three_canon_projection_surfaces() -> None:
-    relation = json.loads(
-        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text(
+def test_dynamic_profile_target_context_domain_is_closed_under_seed_projection() -> None:
+    schema = json.loads(
+        (ROOT / "extension/canonical/protocol/schemas/profile-binding.schema.json").read_text(
             encoding="utf-8"
         )
     )
-    surfaces = relation["projection_surfaces"]
-    assert surfaces["semantic_state"]["formal_model"] == "NetworkExtension"
-    assert (
-        surfaces["semantic_state"]["canon_selector"]
-        == "/state_partition/semantic_state_fields"
-    )
-    assert surfaces["evidence_history"]["formal_model"] == "NetworkHistory"
-    assert (
-        surfaces["evidence_history"]["canon_selector"]
-        == "/state_partition/evidence_history_fields"
-    )
-    assert surfaces["conditional_liveness"]["scope"] == "ASET-NETWORK-LIVENESS-V1"
-    assert relation["liveness_model"]["required_for_core_conformance"] is False
+    assert schema["properties"]["target_context_id"] == {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 256,
+        "pattern": r"^[A-Za-z0-9][A-Za-z0-9._:/\-]*$",
+    }
+    assert schema["properties"]["target_policy_epoch"] == {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991,
+    }
 
 
-def test_seed_refinement_bridge_is_mechanically_proved_without_vendoring_seed() -> None:
-    formal = ROOT / "extension/canonical/formal"
-    relation = json.loads((formal / "canon-tla-relation.json").read_text(encoding="utf-8"))
-    refinement = relation["seed_refinement"]
+def test_dynamic_profile_content_addressing_is_executable() -> None:
+    from tools.dynamic_profile_conformance import content_digest, validate_wire_object
 
-    assert refinement["mapping_module"] == "NetworkExtensionSeedRefinement"
-    assert refinement["proof_module"] == "NetworkExtensionSeedRefinementProofs"
-    assert refinement["upstream_module"] == "SeedResolution"
-    assert refinement["upstream_materialization"] == "EXTERNAL_PINNED_SEED_SOURCE_NOT_VENDORED"
-    assert refinement["status"] == "MECHANICALLY_PROVED"
-    assert relation["seed_projection"]["exact_seed_tlaps_refinement"] == "MECHANICALLY_PROVED"
-    assert refinement["obligations_proved"] == 261
-    assert refinement["obligation_count_semantics"] == (
-        "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT"
-    )
-    assert refinement["upstream_sha256"] == (
-        "sha256:1c0ebb27ed52da289f0981dcb11b61b6a7fc5c4a030ba434ae0b1d53b286b926"
-    )
-    assert not (formal / "SeedResolution.tla").exists()
-
-
-def test_seed_refinement_proof_evidence_binds_exact_artifacts() -> None:
-    formal = ROOT / "extension/canonical/formal"
-    evidence_path = ROOT / "extension/canonical/assurance/seed-refinement-proof.json"
-    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
-
-    assert evidence["status"] == "MECHANICALLY_PROVED"
-    assert evidence["scope"] == "PINNED_SEED_REFINEMENT"
-    assert evidence["proof_gate"]["verdict"] == "PASS"
-    assert evidence["proof_gate"]["obligations_proved"] == 261
-    assert evidence["proof_gate"]["obligation_count_semantics"] == (
-        "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT"
-    )
-    assert evidence["tlapm"]["commit"] == (
-        "4600b24c6d95a25ff081ad37b63b2a01c29d43a5"
-    )
-    assert evidence["upstream_seed"]["release_commit"] == (
-        "633c130187b2a2bb42f24cfd66662d475de385d2"
-    )
-    assert evidence["upstream_seed"]["sha256"] == (
-        "sha256:1c0ebb27ed52da289f0981dcb11b61b6a7fc5c4a030ba434ae0b1d53b286b926"
-    )
-    for key, filename in (
-        ("mapping", "NetworkExtensionSeedRefinement.tla"),
-        ("proof", "NetworkExtensionSeedRefinementProofs.tla"),
-    ):
-        artifact = evidence["network_artifacts"][key]
-        assert artifact["path"] == f"extension/canonical/formal/{filename}"
-        assert artifact["sha256"] == sha(formal / filename)
-
-
-def test_seed_refinement_limit_records_proved_abstraction_boundary() -> None:
-    limitations = json.loads(
-        (ROOT / "extension/canonical/assurance/limitations.json").read_text(encoding="utf-8")
-    )
-    item = next(entry for entry in limitations["limitations"] if entry["id"] == "NET-LIMIT-005")
-    assert item["status"] == "PINNED_ABSTRACTION_REFINEMENT_PROVED"
-    assert "mechanically proved by TLAPS" in item["description"]
-
-
-def test_seed_refinement_mapping_has_exact_network_to_seed_action_roles() -> None:
-    model = (
-        ROOT / "extension/canonical/formal/NetworkExtensionSeedRefinement.tla"
-    ).read_text(encoding="utf-8")
-
-    assert "Seed == INSTANCE SeedResolution" in model
-    assert "ResolutionIds <- ExportUniverse" in model
-    assert "Bindings <- BridgeBindings" in model
-    assert "BridgeBinding(e) == <<e.target, e.artifact>>" in model
-    assert "Authorities <- Contexts" in model
-    assert "BridgeObserveAsSeedRegister" in model
-    assert "BridgeAcceptAsSeedSubmit" in model
-    assert "BridgeDenyAsSeedSubmit" in model
-    assert 'Seed!SubmitResolution(e, BridgeBinding(e), e.target, "ALLOW")' in model
-    assert 'Seed!SubmitResolution(e, BridgeBinding(e), e.target, "BLOCK")' in model
-    assert "NetworkOnlyAction" in model
-
-
-def test_seed_refinement_proof_declares_behavioral_and_evaluator_theorems() -> None:
-    proof = (
-        ROOT / "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla"
-    ).read_text(encoding="utf-8")
-
-    assert "THEOREM NetworkSafetyRefinesSeedResolution ==" in proof
-    assert "THEOREM NetworkEvaluatorMatchesSeedResolution ==" in proof
-    assert "ObserveRefinesSeedRegisterRequest" in proof
-    assert "ResolveAcceptRefinesSeedSubmitAllow" in proof
-    assert "ResolveDenyRefinesSeedSubmitBlock" in proof
-    assert "NetworkOnlyActionsStutterAtSeedBoundary" in proof
-
-
-def test_seed_refinement_tlaps_runner_pins_upstream_and_tlapm() -> None:
-    runner = (ROOT / "tools/run_seed_refinement_tlaps.py").read_text(encoding="utf-8")
-    assert 'EXPECTED_TLAPM_VERSION = "4600b24"' in runner
-    assert 'EXPECTED_SEED_RELEASE_COMMIT = "633c130187b2a2bb42f24cfd66662d475de385d2"' in runner
-    assert "1c0ebb27ed52da289f0981dcb11b61b6" in runner
-    assert '"-I",' in runner
-    assert "NETWORK_SEED_TLAPS_VERDICT" in runner
-    assert "seed-refinement-proof.json" in runner
-    assert "recorded_obligations" in runner
-
-
-def test_formal_release_gate_requires_all_formal_stages() -> None:
-    gate = (ROOT / "tools/run_formal_release_gate.py").read_text(encoding="utf-8")
-    for marker in (
-        "DIFF_CHECK",
-        "BUILD_CANON_PACKAGE",
-        "VALIDATE",
-        "CONFORMANCE",
-        "TESTS",
-        "TLC",
-        "TLAPS_SEED_REFINEMENT",
-        "FORMAL_RELEASE_GATE=PASS",
-    ):
-        assert marker in gate
-
-
-
-def test_network_canon_projection_is_standalone_generated_from_exact_model() -> None:
-    formal = ROOT / "extension/canonical/formal"
-    model = ROOT / "extension/canonical/source/network-extension-model.json"
-    projection = (formal / "NetworkCanonProjection.tla").read_text(encoding="utf-8")
-    assert "GENERATED FILE. DO NOT EDIT." in projection
-    assert "ASET-NETWORK-CANON-TLA-PROJECTION-V2" in projection
-    assert sha(model) in projection
-    assert "EXTENDS NetworkExtension" not in projection
-    assert "INSTANCE NetworkExtension" not in projection
-    assert "CanonSafetySpec == CanonInit /\\ [][CanonNetworkAction]_CanonVars" in projection
-
-
-def test_network_canon_projection_generator_exact_check_passes() -> None:
-    result = subprocess.run(
-        [sys.executable, "tools/generate_canon_tla_projection.py", "--check"],
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=False,
-    )
-    assert result.returncode == 0, result.stdout
-    assert "NETWORK_CANON_PROJECTION_CHECK=PASS" in result.stdout
-
-
-def test_network_canon_refinement_relation_binds_exact_source_and_target() -> None:
-    relation_path = ROOT / "extension/canonical/assurance/canon-tla-refinement.json"
-    relation = json.loads(relation_path.read_text(encoding="utf-8"))
-    assert relation["relation_type"] == (
-        "STANDALONE_GENERATED_PROJECTION_WITH_BEHAVIORAL_EQUIVALENCE_PROOF"
-    )
-    assert relation["generated_projection"]["profile"] == (
-        "ASET-NETWORK-CANON-TLA-PROJECTION-V2"
-    )
-    assert relation["source_model"]["sha256"] == sha(
-        ROOT / relation["source_model"]["path"]
-    )
-    assert relation["target_model"]["sha256"] == sha(
-        ROOT / relation["target_model"]["path"]
-    )
-    assert relation["proof"]["final_theorem"] == (
-        "NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection"
-    )
-    assert relation["status"] == "MECHANICALLY_PROVED"
-    assert relation["proof_evidence"]["status"] == "MECHANICALLY_PROVED"
-    assert relation["proof_evidence"]["obligations_proved"] == 3
-
-
-def test_network_canon_refinement_proof_evidence_is_exact() -> None:
-    evidence = json.loads(
+    profile = json.loads(
         (
-            ROOT / "extension/canonical/assurance/canon-refinement-proof.json"
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json"
+        ).read_text(encoding="utf-8")
+    )["object"]
+    accepted, code = validate_wire_object("PROFILE_DEFINITION", profile)
+    assert (accepted, code) == (True, "PROFILE_DEFINITION_VALID")
+    assert profile["profile_digest"] == content_digest(profile, "profile_digest")
+
+    mutated = dict(profile)
+    mutated["profile_version"] = "v2"
+    accepted, code = validate_wire_object("PROFILE_DEFINITION", mutated)
+    assert (accepted, code) == (False, "PROFILE_DIGEST_MISMATCH")
+
+
+def test_dynamic_profile_binding_digest_is_executable() -> None:
+    from tools.dynamic_profile_conformance import content_digest, validate_wire_object
+
+    binding = json.loads(
+        (
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+        ).read_text(encoding="utf-8")
+    )["object"]
+    accepted, code = validate_wire_object("PROFILE_BINDING", binding)
+    assert (accepted, code) == (True, "PROFILE_BINDING_VALID")
+    assert binding["binding_digest"] == content_digest(binding, "binding_digest")
+
+
+def test_dynamic_profile_allow_does_not_carry_across_state_root_change() -> None:
+    from tools.dynamic_profile_conformance import execute_case as execute_profile_case
+
+    case = json.loads(
+        (
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json"
         ).read_text(encoding="utf-8")
     )
-    assert evidence["status"] == "MECHANICALLY_PROVED"
-    assert evidence["projection_profile"] == "ASET-NETWORK-CANON-TLA-PROJECTION-V2"
-    assert evidence["proof_gate"]["verdict"] == "PASS"
-    assert evidence["proof_gate"]["obligations_proved"] == 3
-    assert evidence["proof_gate"]["obligation_count_semantics"] == (
-        "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT"
+    assert execute_profile_case(case) == case["expected"]
+    assert case["expected"] == {"accepted": False, "code": "SEED_BINDING_MISMATCH"}
+
+
+def test_dynamic_profile_refinement_claim_does_not_imply_proof_status() -> None:
+    profile = json.loads(
+        (ROOT / "extension/canonical/protocol/dynamic-profile-profile.json").read_text(
+            encoding="utf-8"
+        )
     )
-    assert evidence["tlapm"]["commit"] == (
-        "4600b24c6d95a25ff081ad37b63b2a01c29d43a5"
+    assurance = profile["assurance_semantics"]
+    assert assurance["base_refinement_claim"] == (
+        "NORMATIVE_NO_WEAKENING_OBLIGATION_NOT_PROOF_STATUS"
     )
-    for artifact in evidence["network_artifacts"].values():
-        assert artifact["sha256"] == sha(ROOT / artifact["path"])
+    assert assurance["refinement_evidence_digest_optional"] is True
+    assert assurance["presence_means"] == "BINDS_AN_EXTERNAL_EVIDENCE_ARTIFACT_ONLY"
+    assert "MUST NOT claim MECHANICALLY_PROVED" in assurance["mechanically_proved_status_rule"]
 
 
-def test_network_canon_refinement_proof_is_seed_style_explicit_instance() -> None:
-    proof = (
-        ROOT / "extension/canonical/formal/NetworkCanonRefinementProofs.tla"
-    ).read_text(encoding="utf-8")
-    assert "EXTENDS NetworkExtension, TLAPS" in proof
-    assert "Canon == INSTANCE NetworkCanonProjection" in proof
-    assert "THEOREM NetworkCanonCoreAlgebraEquivalent ==" in proof
-    assert "THEOREM NetworkCoreSafetyPredicatesEquivalentToCanonProjection ==" in proof
-    assert "THEOREM NetworkExtensionSafetyBehaviorallyEquivalentToCanonProjection ==" in proof
+def test_dynamic_profile_optional_conformance_cases_are_exact() -> None:
+    from tools.dynamic_profile_conformance import run_profile_conformance
 
-
-def test_formal_release_gate_requires_canon_projection_and_canon_tlaps() -> None:
-    gate = (ROOT / "tools/run_formal_release_gate.py").read_text(encoding="utf-8")
-    assert "CANON_PROJECTION_CHECK" in gate
-    assert "TLAPS_CANON_REFINEMENT" in gate
-    assert "run_canon_refinement_tlaps.py" in gate
-    assert "FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS" in gate
-    assert "FORMAL_RELEASE_CANON_REFINEMENT_STATUS" in gate
-
-
-def test_inpi_deposit_snapshot_matches_seed_deterministic_pattern() -> None:
-    builder = ROOT / "tools/build_release.py"
-    archive = ROOT / "dist/ASET-Network-Extension-Repository-Snapshot.zip"
-    checksum = archive.with_suffix(archive.suffix + ".sha256")
-
-    first = subprocess.run(
-        [sys.executable, str(builder)],
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=False,
+    profile = json.loads(
+        (
+            ROOT / "extension/canonical/conformance/dynamic-profile-conformance-profile.json"
+        ).read_text(encoding="utf-8")
     )
-    assert first.returncode == 0, first.stdout
-    first_digest = hashlib.sha256(archive.read_bytes()).hexdigest()
+    assert profile["claims_profile"] == "ASET-NETWORK-DYNAMIC-PROFILES-V1"
+    assert profile["required_for_core_conformance"] is False
+    assert profile["case_count"] == 8
+    assert profile["positive_count"] == 3
+    assert profile["negative_count"] == 5
+    assert run_profile_conformance() == []
 
-    second = subprocess.run(
-        [sys.executable, str(builder)],
-        cwd=ROOT,
-        text=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.STDOUT,
-        check=False,
+
+def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_form() -> None:
+    from tools.dynamic_profile_conformance import project_seed_binding
+
+    case = json.loads(
+        (
+            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+        ).read_text(encoding="utf-8")
     )
-    assert second.returncode == 0, second.stdout
-    second_digest = hashlib.sha256(archive.read_bytes()).hexdigest()
-    assert second_digest == first_digest
-
-    declared_digest, declared_name = checksum.read_text(encoding="utf-8").strip().split()
-    assert declared_digest == second_digest
-    assert declared_name == archive.name
-
-    with zipfile.ZipFile(archive) as bundle:
-        names = bundle.namelist()
-        assert names
-        assert all(name.startswith("ASET-Network-Extension/") for name in names)
-        assert all(info.date_time == (1980, 1, 1, 0, 0, 0) for info in bundle.infolist())
-        banned = {
-            ".git",
-            ".venv",
-            "__pycache__",
-            ".pytest_cache",
-            ".ruff_cache",
-            ".tlacache",
-            ".tooling",
-            "states",
-            "dist",
-            "build",
-        }
-        assert all(not (set(Path(name).parts) & banned) for name in names)
+    projected = project_seed_binding(case["object"])
+    payload = {key: value for key, value in projected.items() if key != "binding_digest"}
+    canonical = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    expected = "sha256:" + hashlib.sha256(canonical).hexdigest()
+    assert projected["binding_digest"] == expected
 
 
-def test_ci_runs_full_formal_gate_with_pinned_seed_and_tlapm() -> None:
-    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    assert "tlapm-1.6.0-pre-x86_64-linux-gnu.tar.gz" in workflow
-    assert "bfa5e5350ac1ec7202feecad0a4a71a5bb58c16a49660448b35b6f371ba9e2f5" in workflow
-    assert 'test "$("$tlapm_bin" --version)" = "4600b24"' in workflow
-    assert "633c130187b2a2bb42f24cfd66662d475de385d2" in workflow
-    assert "python tools/run_formal_release_gate.py" in workflow
-    assert '--tlapm "$TLAPM_BIN"' in workflow
-    assert '--seed-root "$SEED_ROOT"' in workflow
-    assert "dist/formal-release-gate.json" in workflow
-    assert "dist/network-canon-refinement-proof.json" in workflow
-    assert "dist/network-seed-refinement-proof.json" in workflow
+def test_federation_profile_definition_is_valid_after_cutover() -> None:
+    from tools.dynamic_profile_conformance import validate_wire_object
+
+    p = ROOT / "extension/canonical/protocol/profiles/federation-profile-definition.json"
+    d = json.loads(p.read_text())
+    assert validate_wire_object("PROFILE_DEFINITION", d) == (True, "PROFILE_DEFINITION_VALID")
+    assert d["parent_contract_digest"] == sha(
+        ROOT / "extension/canonical/source/network-extension-model.json"
+    )
 
 
-def test_ci_publishes_inpi_deposit_sha256_like_seed() -> None:
-    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    builder = (ROOT / "tools/build_release.py").read_text(encoding="utf-8")
-    assert "python tools/build_release.py" in workflow
-    assert "INPI_DEPOSIT_SHA256=%s" in workflow
-    assert "REGULATOR_SNAPSHOT_SHA256" not in workflow
-    assert 'print(f"INPI_DEPOSIT_SHA256={digest}")' in builder
-    assert 'print("INPI_DEPOSIT=PASS")' in builder
-    assert "ASET-Network-Extension-Repository-Snapshot.zip.sha256" in workflow
-    assert "actions/upload-artifact@v4" in workflow
-    assert "aset-network-extension-inpi-deposit-${{ github.sha }}" in workflow
+def test_full_local_non_tlaps_validation_stack() -> None:
+    for cmd in [
+        [sys.executable, "-m", "tools.validate_extension"],
+        [sys.executable, "-m", "tools.verify_minimal_core_reduction"],
+        [sys.executable, "-m", "tools.run_conformance"],
+    ]:
+        r = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
+        assert r.returncode == 0, r.stdout + r.stderr
+
+
+def test_release_metadata_matches_alpha3_minimal_admission() -> None:
+    project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    assert project["version"] == "0.1.0a3"
+    assert project["description"] == (
+        "Minimal cross-context evidence admission extension for ASET Seed"
+    )
+
+
+def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
+    live = json.loads((ROOT / "extension/canonical/liveness/liveness-profile.json").read_text())
+    assert live["parent_profile"] == "ASET-NETWORK-FEDERATION-PROFILE-V1"
+    assert live["resolution_semantics"]["resolution_owner"] == "PINNED_TARGET_LOCAL_SEED"
+    assert live["resolution_semantics"]["terminal_local_results"] == ["ALLOW", "BLOCK"]
+    assert live["resolution_semantics"]["legacy_assurance_projection"] == {
+        "ACCEPT": "ALLOW",
+        "DENY": "BLOCK",
+    }
+    a3 = next(x for x in live["assumptions"] if x["id"] == "NET-LIVE-A-003")
+    assert a3["name"] == "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
+
+
+def test_reduction_metadata_no_longer_calls_normative_core_candidate() -> None:
+    reduction = json.loads(
+        (ROOT / "extension/canonical/assurance/minimal-core-reduction.json").read_text()
+    )
+    assert "candidate" not in reduction
+    assert reduction["normative_core"]["semantic_state_fields"] == ["imports"]
+    assert reduction["normative_core"]["transition_kinds"] == ["ADMIT_IMPORT"]
+    fed = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
+    assert "candidate_network_transition" not in fed["extraction_semantics"]
+    assert fed["extraction_semantics"]["normative_network_transition"] == ["ADMIT_IMPORT"]
+
+
+def test_tlc_append_only_property_is_temporal_harness_only() -> None:
+    formal = ROOT / "extension/canonical/formal"
+    normative = (formal / "NetworkExtension.tla").read_text()
+    harness = (formal / "NetworkExtensionTLC.tla").read_text()
+    base_cfg = (formal / "NetworkExtension.cfg").read_text()
+    harness_cfg = (formal / "NetworkExtensionTLC.cfg").read_text()
+    from tools.run_tlc import MODELS
+
+    assert "ImportsAppendOnly == imports \\subseteq imports'" in normative
+    assert "ImportsAppendOnlyTemporal == [][ImportsAppendOnly]_vars" in harness
+    assert "PROPERTIES" not in base_cfg
+    assert "ImportsAppendOnlyTemporal" in harness_cfg
+    assert MODELS["safety"] == ("NetworkExtensionTLC.tla", "NetworkExtensionTLC.cfg")
+
+
+def test_tlc_harness_does_not_change_normative_proof_target() -> None:
+    relation = json.loads((ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text())
+    assert relation["target_model"]["module"] == "NetworkExtension"
+    assert relation["target_model"]["path"] == "extension/canonical/formal/NetworkExtension.tla"
+    assert relation["tlc_harness"]["scope"] == "BOUNDED_TEMPORAL_MODEL_CHECKING_ONLY"
+    assert relation["tlc_harness"]["properties"] == ["ImportsAppendOnlyTemporal"]
+
+
+def test_rights_baseline_captures_alpha3_release_and_full_proof_chain() -> None:
+    from tools.build_rights_baseline import ARTIFACTS
+
+    artifacts = set(ARTIFACTS)
+    required = {
+        "pyproject.toml",
+        "extension/canonical/CANON_PACKAGE.json",
+        "extension/canonical/source/network-extension-model.json",
+        "extension/canonical/formal/canon-tla-relation.json",
+        "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+        "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
+        "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
+        "extension/canonical/formal/NetworkLegacyAlpha2.tla",
+        "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
+        "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
+        "extension/canonical/assurance/canon-refinement-proof.json",
+        "extension/canonical/assurance/seed-refinement-proof.json",
+        "extension/canonical/assurance/legacy-admission-refinement-proof.json",
+        "upstream/ASET_SEED_BINDING.json",
+    }
+    assert required <= artifacts

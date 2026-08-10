@@ -4,7 +4,6 @@
     "formal_projection": "ASSURANCE_PROJECTION",
     "formal_relation": "MACHINE_CHECKABLE_ASSURANCE_BINDING",
     "implementation_precedence": "NONE",
-    "liveness_profile": "NORMATIVE_CONDITIONAL_PROGRESS_PROFILE",
     "machine_readable_model": "NORMATIVE_CANON",
     "protocol_schemas": "NORMATIVE_WIRE_PROFILE",
     "reference_implementation": "NON_NORMATIVE"
@@ -20,13 +19,13 @@
     "canon_tla_relation": "extension/canonical/formal/canon-tla-relation.json",
     "history_config": "extension/canonical/formal/NetworkHistory.cfg",
     "history_module": "extension/canonical/formal/NetworkHistory.tla",
-    "liveness_config": "extension/canonical/formal/NetworkExtensionLiveness.cfg",
-    "liveness_profile": "extension/canonical/liveness/liveness-profile.json",
+    "legacy_admission_refinement_module": "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
+    "legacy_admission_refinement_proof_module": "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
+    "legacy_alpha2_module": "extension/canonical/formal/NetworkLegacyAlpha2.tla",
     "model_checker": "TLC",
     "network_module": "extension/canonical/formal/NetworkExtension.tla",
     "normative_precedence": "MACHINE_READABLE_CANON",
     "projection_surfaces": {
-      "conditional_liveness": "extension/canonical/liveness/liveness-profile.json",
       "evidence_history_trace": "extension/canonical/formal/NetworkHistory.tla",
       "semantic_state_canon_projection": "extension/canonical/formal/NetworkCanonProjection.tla",
       "semantic_state_safety": "extension/canonical/formal/NetworkExtension.tla"
@@ -41,66 +40,41 @@
   "invariants": [
     {
       "id": "NET-INV-001",
-      "text": "Membership, ancestry and routing do not create Resolution Authority in another Context."
+      "text": "Admission of foreign evidence transfers no Resolution Authority and authorizes no effect."
     },
     {
       "id": "NET-INV-002",
-      "text": "An export alone never changes target-local state and never authorizes an effect."
+      "text": "Every admitted import is exactly bound to a target-local Seed binding and begins fail-closed as UNKNOWN with enforcement BLOCKED."
     },
     {
       "id": "NET-INV-003",
-      "text": "Every accepted import observation begins as Seed semantic status UNKNOWN with enforcement BLOCKED."
+      "text": "The Network core owns no terminal recognition state; terminal ALLOW or BLOCK remains exclusively target-local Seed state."
     },
     {
       "id": "NET-INV-004",
-      "text": "Recognition requires an exact target-local Seed resolution binding and a terminal ACCEPT or DENY."
+      "text": "Every accepted admission appends exactly one immutable evidence-history digest; history itself confers no Authority."
     },
     {
       "id": "NET-INV-005",
-      "text": "Target enforcement is ALLOW only for target-local ACCEPT; UNKNOWN and DENY remain BLOCKED."
+      "text": "An exact admission replay is idempotent and conflicting reuse of an ImportID is rejected."
     },
     {
       "id": "NET-INV-006",
-      "text": "Route, export, import and recognition preserve exact source, target, scope and policy-epoch bindings."
-    },
-    {
-      "id": "NET-INV-007",
-      "text": "Every active route has two distinct active member Contexts."
-    },
-    {
-      "id": "NET-INV-008",
-      "text": "A member may withdraw only after every route involving it is suspended."
-    },
-    {
-      "id": "NET-INV-009",
-      "text": "Federation and metafederation composition does not imply a superior Context or inherited Authority."
-    },
-    {
-      "id": "NET-INV-010",
-      "text": "Every accepted canonical network transition appends exactly one digest to the canonical evidence history; previously committed history entries are immutable. The evidence history does not itself confer Authority or alter transition eligibility except where an explicit normative rule refers to a prior transition."
-    },
-    {
-      "id": "NET-INV-011",
-      "text": "An exact replay is idempotent; a conflicting reuse of an identifier is rejected."
-    },
-    {
-      "id": "NET-INV-012",
-      "text": "This extension may strengthen but may not weaken the pinned ASET Seed invariants."
+      "text": "The Network core may strengthen but may not weaken or supersede pinned Seed semantics."
     }
   ],
   "normative_scope": {
     "defines": [
-      "federation identity and epoch",
-      "explicit Context membership",
-      "bounded route grants between active Contexts",
-      "content-addressed export envelopes",
-      "target-local import observations",
-      "binding of imported artifacts to target-local ASET Seed resolution cycles",
-      "local recognition receipts",
-      "route suspension and bounded withdrawal",
-      "conditional liveness under explicit fairness and environment assumptions"
+      "target-local admission of foreign evidence",
+      "exact projection of an admitted import to a target-local Seed ResolutionBinding",
+      "fail-closed admission state",
+      "append-only admission evidence history"
     ],
     "does_not_define": [
+      "federation identity or membership",
+      "routes",
+      "source export lifecycle",
+      "terminal recognition",
       "transport",
       "peer discovery",
       "consensus",
@@ -108,8 +82,7 @@
       "durability",
       "cryptographic provider",
       "key custody",
-      "homomorphic encryption",
-      "partition reconciliation",
+      "profile negotiation",
       "execution of accepted effects",
       "unconditional availability"
     ]
@@ -117,65 +90,51 @@
   "principles": [
     {
       "id": "NET-PR-001",
-      "text": "Each Context retains its own Constitution, Authority, canonical state and local recognition of Outcome."
+      "text": "Foreign evidence may cross a Context boundary; recognition does not."
     },
     {
       "id": "NET-PR-002",
-      "text": "Federation membership and Context ancestry create no Authority inheritance."
+      "text": "Admission registers target-local evidence; it is not authorization."
     },
     {
       "id": "NET-PR-003",
-      "text": "A cross-context export is evidence presented to the target Context, not a decision binding the target Context."
+      "text": "Only an exact target-local Seed resolution may create terminal recognition."
     },
     {
       "id": "NET-PR-004",
-      "text": "A federation or metafederation is a composition relation and never a superior Context by implication."
+      "text": "Federation, routing and transport are optional profiles over the minimal admission core."
     }
   ],
   "requirements": [
     {
       "id": "NET-REQ-001",
-      "text": "Implementations MUST expose deterministic observable results for every conformance case."
+      "text": "Implementations MUST expose deterministic observable results for every core conformance case."
     },
     {
       "id": "NET-REQ-002",
-      "text": "Implementations MUST reject cross-context effects not backed by target-local ACCEPT."
+      "text": "Implementations MUST treat ImportObservation as immutable content-addressed evidence and MUST reject conflicting ImportID reuse."
     },
     {
       "id": "NET-REQ-003",
-      "text": "Implementations MUST bind all route and recognition operations to exact Context IDs, scope digests and policy epochs."
+      "text": "Every admitted ImportObservation MUST project exactly to a target-local Seed ResolutionBinding and MUST begin UNKNOWN/BLOCKED."
     },
     {
       "id": "NET-REQ-004",
-      "text": "Implementations MUST retain provenance linking recognition to export, import observation and Seed resolution."
+      "text": "Implementations MUST NOT represent terminal recognition as Network-owned canonical state."
     },
     {
       "id": "NET-REQ-005",
-      "text": "Implementations MUST publish operational security and durability guarantees separately."
+      "text": "Implementations MUST preserve provenance to the admitted evidence digest and MUST publish operational security and durability guarantees separately."
     },
     {
       "id": "NET-REQ-006",
-      "text": "Implementations claiming ASET-NETWORK-LIVENESS-V1 MUST declare which liveness assumptions they satisfy and MUST NOT present conditional progress as an unconditional transport guarantee."
-    },
-    {
-      "id": "NET-REQ-007",
-      "text": "Formal assurance MUST preserve the distinction between target-local resolution progress and the substantive result ACCEPT or DENY."
-    },
-    {
-      "id": "NET-REQ-008",
-      "text": "Core ASET Network Extension conformance MUST NOT require an ASET-NETWORK-LIVENESS-V1 claim. An implementation making that optional claim MUST declare the assumptions it relies on and the guarantees it claims under those assumptions."
+      "text": "Core conformance MUST NOT require federation, routing, transport, liveness or dynamic-profile activation claims."
     }
   ],
   "schema_version": 1,
   "state": {
-    "exports": "ExportID -> content-addressed envelope",
-    "federation_epoch": "monotone integer",
-    "federation_id": "immutable identifier",
-    "history": "canonical append-only accepted-transition evidence digest sequence",
-    "imports": "ImportID -> target-local UNKNOWN/BLOCKED observation",
-    "members": "ContextID -> member descriptor",
-    "recognitions": "RecognitionID -> target-local terminal Seed result receipt",
-    "routes": "RouteID -> exact source/target/scope/epoch grant"
+    "history": "canonical append-only accepted-admission evidence digest sequence",
+    "imports": "ImportID -> exact target-local UNKNOWN/BLOCKED ImportObservation"
   },
   "state_partition": {
     "evidence_history_fields": [
@@ -183,27 +142,14 @@
     ],
     "evidence_history_role": "NORMATIVE_APPEND_ONLY_EVIDENCE_TRACE",
     "semantic_state_fields": [
-      "federation_id",
-      "federation_epoch",
-      "members",
-      "routes",
-      "exports",
-      "imports",
-      "recognitions"
+      "imports"
     ],
-    "transition_enabling_rule": "Evidence history MUST NOT itself confer Authority or alter transition eligibility unless an explicit normative rule refers to a prior transition."
+    "transition_enabling_rule": "Evidence history MUST NOT itself confer Authority or alter admission eligibility."
   },
-  "status": "FEDERATION_RECOGNITION_CORE_ALPHA2_FORMAL_FOUNDATION",
+  "status": "MINIMAL_ADMISSION_CORE_ALPHA3_NORMATIVE_CUTOVER",
   "transition_kinds": [
-    "FEDERATION_GENESIS",
-    "MEMBER_JOIN",
-    "ROUTE_GRANT",
-    "EXPORT_ARTIFACT",
-    "OBSERVE_IMPORT",
-    "RECORD_RECOGNITION",
-    "SUSPEND_ROUTE",
-    "MEMBER_WITHDRAW"
+    "ADMIT_IMPORT"
   ],
   "upstream_binding_ref": "upstream/ASET_SEED_BINDING.json",
-  "version": "0.1.0-alpha.2"
+  "version": "0.1.0-alpha.3"
 }

@@ -1,81 +1,99 @@
 # ASET Network Extension
 
-Status: **0.1.0-alpha.2 / federation recognition core**
+Status: **0.1.0-alpha.3 / minimal admission core normative cutover**
 
-ASET Network Extension defines a minimal, implementation-neutral federation layer over ASET Seed. It specifies how independent Contexts exchange content-addressed artifacts without transferring sovereignty or creating a superior Context.
+ASET Network Extension is the minimal implementation-neutral boundary by which foreign evidence becomes a target-local candidate for ASET Seed resolution.
 
 ## Core rule
 
-A remote export is evidence, not authority.
+**Evidence may cross boundaries. Recognition does not.**
 
-Cross-context recognition follows this sequence:
+The universal Network core now owns exactly one semantic state structure and one mutation:
 
 ```text
-source export -> target import observation -> target-local Seed resolution -> local recognition receipt
+foreign evidence -> ADMIT_IMPORT -> target-local UNKNOWN/BLOCKED import -> Seed
 ```
 
-Federation membership, ancestry, routing and source-side acceptance never authorize an effect in the target Context. Until the target-local Seed cycle returns `ACCEPT`, enforcement remains `BLOCKED`.
+`imports` is the only Network semantic-state field. `ADMIT_IMPORT` is the only Network transition kind. Admission never authorizes an effect and never creates terminal recognition. `ALLOW` / `BLOCK` remain exclusively target-local Seed semantics.
+
+Federation membership, routing, source export lifecycle and conditional liveness are optional profile concerns, not Network-core semantics. Any terminal-resolution liveness claim is explicitly target-local Seed-owned.
 
 ## Upstream binding
 
 - Seed release: `seed-0.3.0-alpha.3`
 - Seed commit: `633c130187b2a2bb42f24cfd66662d475de385d2`
 - Seed canon: `ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1`
-- Seed canon version: `0.3.0-alpha.1`
 - Seed canon package digest: `sha256:c5d48a418466ea7a60fccb7161adbd5ad568174bbc9a28fc03fd7e6e77955d31`
-- Seed Compatibility Standard: `ASET-SEED-COMPATIBILITY-STANDARD@seed-0.3.0-alpha.3`
-- Compatibility profile: `ASET-SEED-COMPATIBILITY-STANDARD-V1`
-- Seed conformance kit: `sha256:5ecf9b93377a062b8772b4b4b44b4d76a0997d8ba98e8711e717456abbe583db`
+- Compatibility Standard: `ASET-SEED-COMPATIBILITY-STANDARD@seed-0.3.0-alpha.3`
 
-The pinned descriptor is stored at `upstream/ASET_SEED_BINDING.json`. This extension may strengthen Seed obligations but may not weaken them.
+The exact descriptor is `upstream/ASET_SEED_BINDING.json`. Network may strengthen Seed constraints but may not weaken or supersede them.
 
-## Normative package
+## Normative surfaces
 
-- `extension/canonical/source/network-extension-model.json`
-- `extension/canonical/protocol/`
-- `extension/canonical/conformance/`
-- `extension/canonical/CANON_PACKAGE.json`
+- `extension/canonical/source/network-extension-model.json` — minimal admission canon.
+- `extension/canonical/protocol/` — core wire objects plus optional profile surfaces.
+- `extension/canonical/conformance/cases/` — four alpha.3 core cases.
+- `extension/canonical/CANON_PACKAGE.json` — complete canon package.
 
-The Python code under `reference/` is non-normative and exists only as an executable conformance oracle.
+The Python implementations under `reference/` are non-normative conformance oracles.
 
-## Formal assurance
+## Federation Profile
 
-The machine-readable canon remains normative. `NetworkExtension.tla` is an assurance projection checked with real TLC, not a replacement specification. `NetworkExtensionSeedProjection.tla` exposes the per-Context fail-closed projection toward the pinned Seed resolution algebra. `NetworkExtensionSeedRefinement.tla` and `NetworkExtensionSeedRefinementProofs.tla` define the exact bridge to the pinned upstream `SeedResolution.tla`; the upstream module is loaded externally and digest-verified rather than vendored. That refinement is mechanically proved for the pinned bridge and Seed source: `extension/canonical/assurance/seed-refinement-proof.json` records the exact artifacts, TLAPM identity, final theorems and the observed 261/261 proof-obligation result. The obligation count is evidence for this exact proof artifact, not a semantic contract.
+`ASET-NETWORK-FEDERATION-PROFILE-V1` now owns the former alpha.2 federation lifecycle:
 
-The machine-readable canon explicitly separates the semantic network state from the canonical evidence history. Both remain normative: semantic state determines the network-state projection, while history is an append-only evidence trace. History does not itself confer Authority or alter transition eligibility unless a normative rule explicitly refers to a prior transition.
+```text
+FEDERATION_GENESIS
+MEMBER_JOIN
+ROUTE_GRANT
+EXPORT_ARTIFACT
+SUSPEND_ROUTE
+MEMBER_WITHDRAW
+```
 
-`ASET-NETWORK-LIVENESS-V1` is an optional normative capability claim, not a requirement for core `ASET-NETWORK-EXTENSION-CONFORMANCE-V1`. When claimed, it adds conditional progress guarantees under explicit fairness/environment assumptions. It requires eventual local resolution (`ACCEPT` **or** `DENY`), never eventual acceptance or global agreement.
+Legacy `RECORD_RECOGNITION` is **not** transferred to the profile; terminal recognition is Seed-owned. The old 18 alpha.2 traces are retained under `legacy-alpha2-cases/` as regression evidence, and the federation-owned subset is exposed through an optional 10-case Federation Profile conformance surface.
 
-TLC generic deadlock checking is disabled for the finite assurance configurations because intentional quiescent/model-exhausted states have no enabled domain action. Safety retains `NoUnexpectedSafetyDeadlock`, liveness checks `NoPendingProgressDeadlock` plus the temporal progress properties, and the bounded history projection checks `NoUnexpectedHistoryDeadlock`; disabling the generic check therefore does not turn stuck work into accepted behavior.
+## Dynamic profiles
 
-The main safety/liveness TLC state deliberately excludes the append-only execution history. Full history sequences distinguish every ordering of otherwise equivalent actions and caused factorial state-space growth without strengthening the network safety or liveness predicates. `NetworkHistory.tla` now checks `NET-INV-010` independently in a small bounded trace model (`HistoryPrefixPreserved` and `AcceptedTransitionAppendsExactlyOne`).
+`ASET-NETWORK-DYNAMIC-PROFILES-V1` adds no Network state and no Network transitions. `ProfileDefinition` and `ProfileBinding` are immutable content-addressed evidence. Applicability is derived only from target-local Seed `ALLOW` on the exact projected binding. Availability, verification or remote recognition never activates a profile.
 
-## Deliberately outside this alpha
+## Formal assurance state
 
-Transport, peer discovery, consensus, storage, durability, key custody, cryptographic providers, homomorphic encryption, partition reconciliation and unconditional availability guarantees are implementation or later-profile responsibilities.
+The alpha.3 machine canon and generated `NetworkCanonProjection.tla` are new artifacts. Therefore the alpha.2 `MECHANICALLY_PROVED` evidence is deliberately **not reused**.
+
+This cutover ships fresh proof sources for:
+
+1. alpha.3 canon -> `NetworkExtension.tla` behavioral equivalence;
+2. minimal Network -> pinned `SeedResolution.tla` refinement;
+3. legacy alpha.2 Network -> alpha.3 minimal admission refinement.
+
+The three alpha.3 proof modules have now been rerun with the pinned TLAPM and are materialized as `MECHANICALLY_PROVED`: canon equivalence `3/3`, minimal Network -> Seed `35/35`, and legacy alpha.2 -> minimal admission `23/23`. TLC and conformance remain separate assurance surfaces and are not substitutes for TLAPS.
 
 ## Validation
 
+Non-TLAPS validation:
+
 ```bash
-python -m pip install -r requirements-ci.txt
-python tools/bootstrap_tla.py
-python tools/validate_extension.py
-python tools/model_check_network.py
-python tools/run_seed_refinement_tlaps.py \
-  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm \
-  --seed-root ~/ASET
-python tools/run_formal_release_gate.py \
-  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm \
-  --seed-root ~/ASET
+python -m tools.generate_canon_tla_projection --check
+python -m tools.validate_extension
+python -m tools.verify_minimal_core_reduction
+python -m tools.run_conformance
 python -m pytest -q
-ruff check .
+python -m tools.bootstrap_tla
+python -m tools.run_tlc safety
 ```
 
-## Repository relation
+Local proof gates with the pinned Seed checkout:
 
-- Upstream Seed: [ASET](https://github.com/attractor-set/ASET).
-- This normative extension: [aset-network-extension](https://github.com/attractor-set/aset-network-extension).
-- Seed reference implementation: [aset-python-sqlite](https://github.com/attractor-set/aset-python-sqlite).
-- Network reference implementation: [aset-network-python-sqlite](https://github.com/attractor-set/aset-network-python-sqlite) — a non-normative implementation of this extension that composes `aset-python-sqlite` as its Seed layer.
+```bash
+python -m tools.run_canon_refinement_tlaps \
+  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm
+
+python -m tools.run_seed_refinement_tlaps \
+  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm \
+  --seed-root ~/ASET
+
+python -m tools.run_legacy_admission_refinement_tlaps \
+  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm
+```
 
 Apache-2.0 licensed. No implementation has semantic precedence over the machine-readable canon.

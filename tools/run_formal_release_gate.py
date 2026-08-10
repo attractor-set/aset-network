@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = ROOT / "dist/formal-release-gate.json"
 TLAPS_REPORT = ROOT / "dist/network-seed-refinement-proof.json"
 CANON_TLAPS_REPORT = ROOT / "dist/network-canon-refinement-proof.json"
+LEGACY_TLAPS_REPORT = ROOT / "dist/network-legacy-admission-refinement-proof.json"
 
 
 def write_report(path: Path, report: dict[str, object]) -> None:
@@ -50,18 +51,31 @@ def main() -> int:
         ("DIFF_CHECK", ["git", "diff", "--check"]),
         (
             "CANON_PROJECTION_CHECK",
-            [python, "tools/generate_canon_tla_projection.py", "--check"],
+            [python, "-m", "tools.generate_canon_tla_projection", "--check"],
         ),
-        ("BUILD_CANON_PACKAGE", [python, "tools/build_canon_package.py"]),
-        ("VALIDATE", [python, "tools/validate_extension.py"]),
-        ("CONFORMANCE", [python, "tools/run_conformance.py"]),
+        ("BUILD_CANON_PACKAGE", [python, "-m", "tools.build_canon_package"]),
+        ("VALIDATE", [python, "-m", "tools.validate_extension"]),
+        ("CONFORMANCE", [python, "-m", "tools.run_conformance"]),
         ("TESTS", [python, "-m", "pytest", "-q"]),
-        ("TLC", [python, "tools/model_check_network.py"]),
+        ("TLC", [python, "-m", "tools.model_check_network"]),
         (
             "TLAPS_CANON_REFINEMENT",
             [
                 python,
-                "tools/run_canon_refinement_tlaps.py",
+                "-m",
+                "tools.run_canon_refinement_tlaps",
+                "--tlapm",
+                str(tlapm),
+                "--timeout-seconds",
+                str(args.timeout_seconds),
+            ],
+        ),
+        (
+            "TLAPS_LEGACY_ADMISSION_REFINEMENT",
+            [
+                python,
+                "-m",
+                "tools.run_legacy_admission_refinement_tlaps",
                 "--tlapm",
                 str(tlapm),
                 "--timeout-seconds",
@@ -72,7 +86,8 @@ def main() -> int:
             "TLAPS_SEED_REFINEMENT",
             [
                 python,
-                "tools/run_seed_refinement_tlaps.py",
+                "-m",
+                "tools.run_seed_refinement_tlaps",
                 "--tlapm",
                 str(tlapm),
                 "--seed-root",
@@ -101,14 +116,13 @@ def main() -> int:
             return 1
 
     canon_tlaps_report = json.loads(CANON_TLAPS_REPORT.read_text(encoding="utf-8"))
+    legacy_tlaps_report = json.loads(LEGACY_TLAPS_REPORT.read_text(encoding="utf-8"))
     tlaps_report = json.loads(TLAPS_REPORT.read_text(encoding="utf-8"))
     package = json.loads(
         (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
     )
     relation = json.loads(
-        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text(encoding="utf-8")
     )
     report = {
         "document_type": "aset-network-formal-release-gate-report",
@@ -119,6 +133,8 @@ def main() -> int:
         "canon_projection_profile": relation["canon_projection"]["profile"],
         "canon_refinement_status": relation["canon_projection"]["status"],
         "canon_refinement_obligations_proved": canon_tlaps_report["obligations_proved"],
+        "legacy_admission_refinement_status": relation["legacy_alpha2_refinement"]["status"],
+        "legacy_admission_refinement_obligations_proved": legacy_tlaps_report["obligations_proved"],
         "seed_refinement_status": relation["seed_refinement"]["status"],
         "seed_refinement_obligations_proved": tlaps_report["obligations_proved"],
         "tlapm_commit": tlaps_report["tlapm_commit"],
@@ -129,18 +145,9 @@ def main() -> int:
     write_report(output, report)
     print(f"FORMAL_RELEASE_CANON_PACKAGE_DIGEST={package['package_digest']}")
     print(f"FORMAL_RELEASE_RELATION_DIGEST={relation['relation_digest']}")
-    print(
-        "FORMAL_RELEASE_CANON_REFINEMENT_STATUS="
-        f"{relation['canon_projection']['status']}"
-    )
-    print(
-        "FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS="
-        f"{canon_tlaps_report['obligations_proved']}"
-    )
-    print(
-        "FORMAL_RELEASE_SEED_REFINEMENT_OBLIGATIONS="
-        f"{tlaps_report['obligations_proved']}"
-    )
+    print(f"FORMAL_RELEASE_CANON_REFINEMENT_STATUS={relation['canon_projection']['status']}")
+    print(f"FORMAL_RELEASE_CANON_REFINEMENT_OBLIGATIONS={canon_tlaps_report['obligations_proved']}")
+    print(f"FORMAL_RELEASE_SEED_REFINEMENT_OBLIGATIONS={tlaps_report['obligations_proved']}")
     print("FORMAL_RELEASE_GATE=PASS")
     return 0
 

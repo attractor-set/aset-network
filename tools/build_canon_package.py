@@ -4,7 +4,7 @@ import hashlib
 import json
 from pathlib import Path
 
-from build_formal_relation import main as build_formal_relation
+from tools.build_formal_relation import main as build_formal_relation
 
 ROOT = Path(__file__).resolve().parents[1]
 CANON = ROOT / "extension/canonical"
@@ -38,21 +38,18 @@ def included_in_canon(path: Path) -> bool:
 def main() -> int:
     build_formal_relation()
     paths = [
-        path
-        for path in sorted(CANON.rglob("*"))
-        if path.is_file() and included_in_canon(path)
+        path for path in sorted(CANON.rglob("*")) if path.is_file() and included_in_canon(path)
     ]
     paths.append(UPSTREAM_BINDING)
     files = [
-        {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)}
-        for path in sorted(paths)
+        {"path": path.relative_to(ROOT).as_posix(), "sha256": sha(path)} for path in sorted(paths)
     ]
     package = {
         "document_type": "aset-extension-canon-package",
         "schema_version": 1,
         "extension_id": "ASET-NETWORK-EXTENSION",
-        "extension_version": "0.1.0-alpha.2",
-        "canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA2",
+        "extension_version": "0.1.0-alpha.3",
+        "canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3",
         "normative_source": "extension/canonical/source/network-extension-model.json",
         "upstream_binding": "upstream/ASET_SEED_BINDING.json",
         "implementation_precedence": "NONE",

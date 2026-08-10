@@ -1,29 +1,45 @@
 from __future__ import annotations
 
 import json
-import sys
 from pathlib import Path
 
+from reference.legacy_network_reference import execute_case as execute_legacy
+from reference.network_reference import execute_case as execute_core
+from tools.dynamic_profile_conformance import run_profile_conformance
+
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
 
-from reference.network_reference import execute_case  # noqa: E402
+C = ROOT / "extension/canonical/conformance"
 
 
-def main() -> int:
+def run_manifest(path, executor, label):
+    p = json.loads(path.read_text())
     failures = []
-    paths = sorted((ROOT / "extension/canonical/conformance/cases").rglob("*.json"))
-    for path in paths:
-        case = json.loads(path.read_text(encoding="utf-8"))
-        _, actual = execute_case(case)
+    for item in p["cases"]:
+        case = json.loads((ROOT / item["path"]).read_text())
+        _, actual = executor(case)
         if actual != case["expected"]:
             failures.append((case["case_id"], case["expected"], actual))
     if failures:
-        for case_id, expected, actual in failures:
-            print(f"FAIL: {case_id}\n expected={expected}\n actual={actual}")
-        return 1
-    print(f"OK: {len(paths)} conformance cases")
-    return 0
+        for cid, e, a in failures:
+            print(f"FAIL {label} {cid}: expected={e} actual={a}")
+        return False, len(p["cases"])
+    print(f"OK: {len(p['cases'])} {label} conformance cases")
+    return True, len(p["cases"])
+
+
+def main():
+    ok1, _ = run_manifest(C / "conformance-profile.json", execute_core, "core")
+    dyn = run_profile_conformance()
+    ok2 = not dyn
+    for cid, e, a in dyn:
+        print(f"FAIL dynamic-profile {cid}: expected={e} actual={a}")
+    if ok2:
+        print("OK: dynamic-profile conformance cases")
+    ok3, _ = run_manifest(
+        C / "federation-profile-conformance-profile.json", execute_legacy, "federation-profile"
+    )
+    return 0 if ok1 and ok2 and ok3 else 1
 
 
 if __name__ == "__main__":

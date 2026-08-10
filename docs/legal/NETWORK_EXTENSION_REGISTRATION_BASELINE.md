@@ -17,27 +17,32 @@ Required before producing the baseline:
 - conformance tests pass;
 - TLC safety passes;
 - TLC history passes;
-- TLC conditional liveness passes;
+- TLC conditional Federation Profile liveness passes when that optional claim is included;
 - canon -> Network TLAPS refinement/equivalence gate passes;
-- Network -> pinned Seed TLAPS refinement gate passes.
+- Network -> pinned Seed TLAPS refinement gate passes;
+- legacy alpha.2 -> minimal Network TLAPS refinement gate passes.
 
-For `0.1.0-alpha.2`, the expected assurance shape is:
+For `0.1.0-alpha.3`, the expected assurance shape is:
 
 ```text
-Network machine-readable canon
+Network machine-readable alpha.3 canon
         |
         v
 NetworkCanonProjection.tla
-        | TLAPS
+        | TLAPS 3/3
         v
-NetworkExtension.tla
-        | TLC safety/history/liveness
-        v
-NetworkExtensionSeedRefinement.tla
-        | TLAPS
+minimal NetworkExtension.tla
+        | TLAPS 35/35
         v
 pinned SeedResolution.tla
+
+legacy alpha.2 Network
+        | TLAPS 23/23
+        v
+minimal NetworkExtension.tla
 ```
+
+TLC safety/history and optional Federation Profile liveness are separate bounded assurance surfaces and do not replace TLAPS.
 
 ## 2. Frozen identity record
 
@@ -62,6 +67,8 @@ NETWORK_CANON_REFINEMENT_STATUS=MECHANICALLY_PROVED
 NETWORK_CANON_REFINEMENT_OBLIGATIONS=
 NETWORK_SEED_REFINEMENT_STATUS=MECHANICALLY_PROVED
 NETWORK_SEED_REFINEMENT_OBLIGATIONS=
+NETWORK_LEGACY_ADMISSION_REFINEMENT_STATUS=MECHANICALLY_PROVED
+NETWORK_LEGACY_ADMISSION_REFINEMENT_OBLIGATIONS=
 
 PINNED_SEED_RELEASE_COMMIT=
 PINNED_SEED_RESOLUTION_SHA256=
@@ -101,9 +108,10 @@ canon. They are evidence/projections of the frozen work.
 A concise filing description may state:
 
 > ASET Network Extension is a separately versioned normative extension in the ASET
-> specification family. It defines cross-Context federation semantics while
-> preserving Context-local Authority and the pinned ASET Seed resolution boundary.
-> The deposited release includes a machine-readable normative canon and formal
+> specification family. Its universal core defines only target-local admission of
+> foreign evidence; federation lifecycle is an optional Seed-bound profile and
+> terminal recognition remains target-local Seed-owned. The deposited release
+> includes a machine-readable normative canon and formal
 > assurance artifacts that mechanically relate the generated canon projection to
 > the handwritten Network behavioral model and the Network model to the pinned
 > Seed formal model.

@@ -20,6 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 ARTIFACTS = (
     "LICENSE",
+    "pyproject.toml",
     "extension/canonical/CANON_PACKAGE.json",
     "extension/canonical/source/network-extension-model.json",
     "extension/canonical/formal/canon-tla-relation.json",
@@ -28,8 +29,12 @@ ARTIFACTS = (
     "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
     "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
     "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
+    "extension/canonical/formal/NetworkLegacyAlpha2.tla",
+    "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
+    "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
     "extension/canonical/assurance/canon-refinement-proof.json",
     "extension/canonical/assurance/seed-refinement-proof.json",
+    "extension/canonical/assurance/legacy-admission-refinement-proof.json",
     "upstream/ASET_SEED_BINDING.json",
 )
 

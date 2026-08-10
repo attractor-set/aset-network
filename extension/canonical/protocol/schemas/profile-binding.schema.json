@@ -1,0 +1,48 @@
+{
+  "$id": "https://spec.aset.example/network/0.1/schemas/profile-binding.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "An immutable exact target-local binding of one profile digest. It contains no activation state and no resolution identifier. target_context_id is deliberately constrained to the intersection of the Network Context-id domain and pinned Seed identifier domain so the declared projection is total. target_state_root is the exact Seed state_root for this activation binding; the Network profile defines no ambient lifetime beyond that exact binding. A fresh Seed ResolutionRequest is constructed from the declared projection; applicability is derived only from its target-local Seed result.",
+  "properties": {
+    "binding_digest": {
+      "$ref": "common.schema.json#/$defs/digest"
+    },
+    "profile_digest": {
+      "$ref": "common.schema.json#/$defs/digest"
+    },
+    "seed_scope": {
+      "items": {
+        "maxLength": 300,
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "target_context_id": {
+      "maxLength": 256,
+      "minLength": 3,
+      "pattern": "^[A-Za-z0-9][A-Za-z0-9._:/\\-]*$",
+      "type": "string"
+    },
+    "target_policy_epoch": {
+      "maximum": 9007199254740991,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "target_state_root": {
+      "$ref": "common.schema.json#/$defs/digest"
+    }
+  },
+  "required": [
+    "binding_digest",
+    "profile_digest",
+    "target_context_id",
+    "target_state_root",
+    "target_policy_epoch",
+    "seed_scope"
+  ],
+  "title": "ASET exact local profile binding",
+  "type": "object"
+}

@@ -1,132 +1,208 @@
 {
-  "canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA2",
+  "canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3",
   "document_type": "aset-extension-canon-package",
   "extension_id": "ASET-NETWORK-EXTENSION",
-  "extension_version": "0.1.0-alpha.2",
+  "extension_version": "0.1.0-alpha.3",
   "files": [
     {
       "path": "extension/canonical/assurance/canon-refinement-proof.json",
-      "sha256": "sha256:5de933e77861fbb94f488b66958f382838ec287dd3396290ea2d849cc8750352"
+      "sha256": "sha256:676ca929891854e568733afb1dd58bc5d1390bf62dbe16db6f79743b5e7bbbac"
     },
     {
       "path": "extension/canonical/assurance/canon-tla-refinement.json",
-      "sha256": "sha256:64ffbdcdb836ab8dc11095667728cf65276d56682760cca8b04e48f97081588e"
+      "sha256": "sha256:161557ec56d0d04abc5cd347c85b519b5ecfb037fd30fc786bcdf9142779e384"
+    },
+    {
+      "path": "extension/canonical/assurance/legacy-admission-refinement-proof.json",
+      "sha256": "sha256:c7f4da89e64df5270fac807c8cea57ccc4f0c5660d93fa307bc10895e14033db"
     },
     {
       "path": "extension/canonical/assurance/limitations.json",
-      "sha256": "sha256:b4e83ea352494eea568314e5f2a5e050372faf5e8a29c1bbbdb2a8e9117be440"
+      "sha256": "sha256:360b5ac994675306e3b4b9dfde940e20d804a5a898379fd961a443693243f60d"
+    },
+    {
+      "path": "extension/canonical/assurance/minimal-core-reduction.json",
+      "sha256": "sha256:e33ff40cb1a6d7b426fd01c5a7bc4bdf063e823c32cc367d7fd198a4b60c1a39"
     },
     {
       "path": "extension/canonical/assurance/seed-refinement-proof.json",
-      "sha256": "sha256:c381a981c1c3c912196122e37438b860aecebe2d519aa5e2060800d25a1044d5"
+      "sha256": "sha256:5aced6df273b5de488feac134b0e400723ea01bec41874b3d7620b8335a63a30"
     },
     {
       "path": "extension/canonical/conformance/cases/negative/NET-NEG-001.json",
-      "sha256": "sha256:b0d8c131af202ed259c8bffca835179f7ad95fae9e9cb409314de2934a920849"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-002.json",
-      "sha256": "sha256:388b898a1e4998fd6a09fe6cff9190ea9735a17c86d5b781389062fe579a72f6"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-003.json",
-      "sha256": "sha256:5a39454402d6c15600461434e2f9a39044537a0f958c8de492ecacbfe3433d31"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-004.json",
-      "sha256": "sha256:a1eb82181230b491fea2b7968b2a7ff82c7c941f12cebac579e7806255cd9091"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-005.json",
-      "sha256": "sha256:e40c58dc7f98d5f86c2b7e331b1d08a0e3505afea513a65e9b6570d46e318ea7"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-006.json",
-      "sha256": "sha256:37bf8592944b0a180211c7e7e36d9347c8d4204e442c3e1b0f36ded9efaf1b4c"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-007.json",
-      "sha256": "sha256:935efad7bbe12a871c5e8f9b2e7215ddaa4d2322198ad39f39074eb4c179d23a"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-008.json",
-      "sha256": "sha256:cb54d5f5d594998fdeb807cabe15a41896942063e3b06c97c84b5a058a379f0a"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-009.json",
-      "sha256": "sha256:cbb4df54292b5a1d96f2567e65ea96f8b799ca4b7aed8a627f48c16ae8a5864f"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/negative/NET-NEG-010.json",
-      "sha256": "sha256:6585924c1dba29a2209bf589d03c1c573f98f77c026c3d9be0760b3f97acbf31"
+      "sha256": "sha256:1298cdb4a21b30427b1120b59bd8d62d986f8bb4f0ecb2190e651a332b86fa33"
     },
     {
       "path": "extension/canonical/conformance/cases/positive/NET-POS-001.json",
-      "sha256": "sha256:0f9951c7f4fea4f48f121581dc5ebfab3453c63c8097b9993576a4eb9eaae78b"
+      "sha256": "sha256:0542d7313303c119bfe35bf855c7048f52076952fb2521a34617d44e35f5b1aa"
     },
     {
       "path": "extension/canonical/conformance/cases/positive/NET-POS-002.json",
-      "sha256": "sha256:cac830db68339c6fd2d42adb511ad43d154ef6092adee8589d629ba7ddb4121d"
+      "sha256": "sha256:75bf0edcb07353c26fa272682e8827403eca8e3af3135c65f59d59edd8de9aa3"
     },
     {
       "path": "extension/canonical/conformance/cases/positive/NET-POS-003.json",
-      "sha256": "sha256:bfed9949716fcabb3619c980afcc0a5c8c2b5c0740d448ededd4279b6a589b52"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/positive/NET-POS-004.json",
-      "sha256": "sha256:d22728c55d8622b513b98c6bf0be4c535e6bf55939d11d850bf22d95b5f6fe4f"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/positive/NET-POS-005.json",
-      "sha256": "sha256:7be2c254a9ee5266c191ae65c839bc94d928f056da2387739d1131646d2b2391"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/positive/NET-POS-006.json",
-      "sha256": "sha256:2eb4cd43abe1122db3d6d36b39ba488a807b597e9f6327acdc7e4e18993d579a"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/positive/NET-POS-007.json",
-      "sha256": "sha256:6f321ea1be5517a68ebe120a3cde45c953d82ee42a93f34b6d8abb29fbc7ec27"
-    },
-    {
-      "path": "extension/canonical/conformance/cases/positive/NET-POS-008.json",
-      "sha256": "sha256:48147e71e825ca410f51b88827e5ef4e10f9bb5b70e7218a42230dbeeb5831a0"
+      "sha256": "sha256:5fa6eb70dd7a6abf27f23fe9d5e25a8f41fc6744f23dd6a0c2d2446bb9e4295d"
     },
     {
       "path": "extension/canonical/conformance/conformance-profile.json",
-      "sha256": "sha256:0d46f6a7eb0aedcc034ace08a80fc53c2a9b8bb40b98e677405ab4944a397237"
+      "sha256": "sha256:aed75101c4a95a6f929226c6df058142bf8e676a2b64086b228d2fd155b5eab7"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-001.json",
+      "sha256": "sha256:0fe9314c7096e486c8606e8bf8b55e2f47f433d9df8bd1c8e9d9f7cd7fc86853"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-002.json",
+      "sha256": "sha256:c96a40985e7f1e18593c802828c6666def7c4db1c6bb19cb378e51853be36a5a"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-003.json",
+      "sha256": "sha256:00349bad13039a3fdd4994927c4604c47d47ec106eb5b8c9e8b366cb9af1926b"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json",
+      "sha256": "sha256:5d68328fc5fa7b3acd6222b68187dddfbedc4dfd388012b9cf1af0d99755980f"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-005.json",
+      "sha256": "sha256:98e0864ccb83b7f2256188988cc64b5276ac2870af08c40583d68859251a4187"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json",
+      "sha256": "sha256:373143920a44225817bcf8e7315c9f6506b284ef32dec2e6c46c8a7c996de006"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json",
+      "sha256": "sha256:69f15952e87694912719545dbe230ec74601088f5cdebf71dc50bd295cd3e545"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-003.json",
+      "sha256": "sha256:1522980c2b154cdb60970268dadf072db99865ea5febb54c79982eba40bbb664"
+    },
+    {
+      "path": "extension/canonical/conformance/dynamic-profile-conformance-profile.json",
+      "sha256": "sha256:3352d5f9429a6dbed9f2122cde67420e6df99b2a49302f71e8b198741c2eb5e3"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-conformance-profile.json",
+      "sha256": "sha256:8008befd40b2224c33d59d0c9feea827e98b0031f72f588805c55bd2f0966900"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-001.json",
+      "sha256": "sha256:b0d8c131af202ed259c8bffca835179f7ad95fae9e9cb409314de2934a920849"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-002.json",
+      "sha256": "sha256:388b898a1e4998fd6a09fe6cff9190ea9735a17c86d5b781389062fe579a72f6"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-003.json",
+      "sha256": "sha256:5a39454402d6c15600461434e2f9a39044537a0f958c8de492ecacbfe3433d31"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-004.json",
+      "sha256": "sha256:a1eb82181230b491fea2b7968b2a7ff82c7c941f12cebac579e7806255cd9091"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-005.json",
+      "sha256": "sha256:e40c58dc7f98d5f86c2b7e331b1d08a0e3505afea513a65e9b6570d46e318ea7"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-006.json",
+      "sha256": "sha256:37bf8592944b0a180211c7e7e36d9347c8d4204e442c3e1b0f36ded9efaf1b4c"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-007.json",
+      "sha256": "sha256:935efad7bbe12a871c5e8f9b2e7215ddaa4d2322198ad39f39074eb4c179d23a"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-008.json",
+      "sha256": "sha256:cb54d5f5d594998fdeb807cabe15a41896942063e3b06c97c84b5a058a379f0a"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-009.json",
+      "sha256": "sha256:cbb4df54292b5a1d96f2567e65ea96f8b799ca4b7aed8a627f48c16ae8a5864f"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-010.json",
+      "sha256": "sha256:6585924c1dba29a2209bf589d03c1c573f98f77c026c3d9be0760b3f97acbf31"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-001.json",
+      "sha256": "sha256:0f9951c7f4fea4f48f121581dc5ebfab3453c63c8097b9993576a4eb9eaae78b"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-002.json",
+      "sha256": "sha256:cac830db68339c6fd2d42adb511ad43d154ef6092adee8589d629ba7ddb4121d"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-003.json",
+      "sha256": "sha256:bfed9949716fcabb3619c980afcc0a5c8c2b5c0740d448ededd4279b6a589b52"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-004.json",
+      "sha256": "sha256:d22728c55d8622b513b98c6bf0be4c535e6bf55939d11d850bf22d95b5f6fe4f"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-005.json",
+      "sha256": "sha256:7be2c254a9ee5266c191ae65c839bc94d928f056da2387739d1131646d2b2391"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-006.json",
+      "sha256": "sha256:2eb4cd43abe1122db3d6d36b39ba488a807b597e9f6327acdc7e4e18993d579a"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-007.json",
+      "sha256": "sha256:6f321ea1be5517a68ebe120a3cde45c953d82ee42a93f34b6d8abb29fbc7ec27"
+    },
+    {
+      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-008.json",
+      "sha256": "sha256:48147e71e825ca410f51b88827e5ef4e10f9bb5b70e7218a42230dbeeb5831a0"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkAdmissionCore.cfg",
+      "sha256": "sha256:69f0465f0ce0cfd0f2e253fc001d825d4abef625250bdb950fd9e9235f821c9c"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkAdmissionCore.tla",
+      "sha256": "sha256:4ff0f392104234b1b75a66584361e59a9215861b011a7700423248a795d933c2"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonProjection.tla",
-      "sha256": "sha256:6921f9b35e394e033759771032c3852654020623922a0cff7c075ae6552511ea"
+      "sha256": "sha256:659814e4749790d74bfa6dd871e4f8a20f024759c92928b7d794b8a87f9eba51"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
-      "sha256": "sha256:54f426f03658ab4efa6b20d1fb52c25f72b62b7dca9985a9f704ea2d1070b2fe"
+      "sha256": "sha256:e33d67043fe498059a47c36ba355cada5882403020e9457a8e475c772a333f9f"
     },
     {
       "path": "extension/canonical/formal/NetworkExtension.cfg",
-      "sha256": "sha256:3ddd779e5636fa573e3983fa4ed9359302cd66802c040df6b102ae40a9765718"
+      "sha256": "sha256:2df6ff47534df5fe77fc793cb0f91d84cb310e1c626d7a0c6f535e7497c4bb34"
     },
     {
       "path": "extension/canonical/formal/NetworkExtension.tla",
-      "sha256": "sha256:42d66d614137a55f1c0771931c781bd7cb328aadb4c5446e5102f921aff81978"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkExtensionLiveness.cfg",
-      "sha256": "sha256:caa8e32e6e8bea75ef1ed83434e261e45e6375a3248a2d920e0498df8d00ddb3"
+      "sha256": "sha256:ac09e7b12a182236f0f3da402ee50552fc89d525891f510dad2142fc1ff57521"
     },
     {
       "path": "extension/canonical/formal/NetworkExtensionSeedProjection.tla",
-      "sha256": "sha256:4c6de2a5a676aeeac7412ccbf26552c2b60827b58d4c3e5fc33b701308d9675c"
+      "sha256": "sha256:673756cf507754f694c61df64dffe55c1c96d5ac21bf1edc928f19bd1760fe24"
     },
     {
       "path": "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
-      "sha256": "sha256:e009ea452dbec8355af0f3029089f0d12d7276a36c30ea783551f6799a8e7348"
+      "sha256": "sha256:d02d4ddc4715a3d6749225d896dc984ab510b9e28986b46461956785dfe51c7e"
     },
     {
       "path": "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
-      "sha256": "sha256:c5392cea3c6cea2e30f00959d178f83f2c2c668cd1dbea6bd687fcd366bd6e6d"
+      "sha256": "sha256:319dcd3e78d2ffeda43528287d9963bc46f656b0983bcddf43e32bf72e320a42"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkExtensionTLC.cfg",
+      "sha256": "sha256:69f0465f0ce0cfd0f2e253fc001d825d4abef625250bdb950fd9e9235f821c9c"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkExtensionTLC.tla",
+      "sha256": "sha256:2ec8b55fbf12e257ffd5660443efc5fd59ed52b7df6d8078a3c466a18f5aaa1f"
     },
     {
       "path": "extension/canonical/formal/NetworkHistory.cfg",
@@ -137,16 +213,60 @@
       "sha256": "sha256:3fc47fc3b5fe049d90448260a7d427835c39871df4855fb6ca3f5dc793f59286"
     },
     {
+      "path": "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
+      "sha256": "sha256:40b5e16304f2075297170d3a6704368278753b1658f8595897861896b428b098"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
+      "sha256": "sha256:29505c7164647961a1276ce3380a33f554946805e7533a8b353b5a04b60783bd"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkLegacyAlpha2.cfg",
+      "sha256": "sha256:3ddd779e5636fa573e3983fa4ed9359302cd66802c040df6b102ae40a9765718"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkLegacyAlpha2.tla",
+      "sha256": "sha256:19d04d22b52bb18a2e893c26f7b894ba578a48385f978a44c12da632fe371d61"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkLegacyAlpha2Liveness.cfg",
+      "sha256": "sha256:caa8e32e6e8bea75ef1ed83434e261e45e6375a3248a2d920e0498df8d00ddb3"
+    },
+    {
       "path": "extension/canonical/formal/canon-tla-relation.json",
-      "sha256": "sha256:4a63c0e94192f7c3370cd4f88604264347c980a860c948c77e5c00150374c5bb"
+      "sha256": "sha256:cd82dca0069648426f18591a3a125f78051a6e062d34761f97747e6d1aa0a3f7"
     },
     {
       "path": "extension/canonical/liveness/liveness-profile.json",
-      "sha256": "sha256:890d36df457794c706a2e1f4165fd4e583fa6ed765a2d6135256118a4a3c81c0"
+      "sha256": "sha256:3882a863dd0ed56875690dfb500245045283da888a053627b4d254b9184f3819"
+    },
+    {
+      "path": "extension/canonical/protocol/dynamic-profile-profile.json",
+      "sha256": "sha256:3351675e80549390d89c18f18bf59a20df5d8122875ff552d99ebafd546b7c45"
+    },
+    {
+      "path": "extension/canonical/protocol/federation-profile.json",
+      "sha256": "sha256:77ddb63160ef6ae638708c85fd2e104bd11f03fb25fd8768fceb2b975adb57ab"
+    },
+    {
+      "path": "extension/canonical/protocol/profiles/federation-profile-definition.json",
+      "sha256": "sha256:9d5a711aac6e31318d3eac5294b95f7267c6a34612917e5666d8d911a0fffea1"
+    },
+    {
+      "path": "extension/canonical/protocol/profiles/federation-profile-invariants.json",
+      "sha256": "sha256:cc08858254cc47c60bd8287bd927db17bcc44f05e40a5e82075e1c2359587fb6"
+    },
+    {
+      "path": "extension/canonical/protocol/profiles/federation-profile-requirements.json",
+      "sha256": "sha256:c03ae9ccddb066c83c8d35929e259c1c917d302597768179ac0cb944c27f0a3c"
+    },
+    {
+      "path": "extension/canonical/protocol/profiles/federation-profile-scope.json",
+      "sha256": "sha256:4824a98c0771fa4a0f456573bad59c10ba27742313841430bbe49f652d99fb64"
     },
     {
       "path": "extension/canonical/protocol/protocol-profile.json",
-      "sha256": "sha256:50a3f88e3074421512b1120c384dd96231b174596c5eead3298615b1503eb64d"
+      "sha256": "sha256:12a50da19df57962e8821a154c80795813164abf88dc4ed60cd4674fb139be33"
     },
     {
       "path": "extension/canonical/protocol/schemas/common.schema.json",
@@ -154,7 +274,7 @@
     },
     {
       "path": "extension/canonical/protocol/schemas/conformance-case.schema.json",
-      "sha256": "sha256:5eb2d50526f5c857393e4e00d651dd74d130d1c1bf116c5013d29320d5c14b94"
+      "sha256": "sha256:e81c2fba6dd54361699665f6ea83c6bdebf45930fab5b3248f74611c783e4729"
     },
     {
       "path": "extension/canonical/protocol/schemas/export-envelope.schema.json",
@@ -165,12 +285,28 @@
       "sha256": "sha256:314ba2906954dfb7064630ef03ddaaa29764e6c5eb5d34c0c47b329253b4255a"
     },
     {
+      "path": "extension/canonical/protocol/schemas/federation-transition.schema.json",
+      "sha256": "sha256:3fc3d9b9835cbd581f425d8f8f210c04efbb5aa3b5eac009640a7de646d49d74"
+    },
+    {
       "path": "extension/canonical/protocol/schemas/import-observation.schema.json",
-      "sha256": "sha256:6b59557f0d0b47630754719411db260473f7449b9dd65d1c2e861f3136510804"
+      "sha256": "sha256:83b5f72f3f16138eb15484bc3ecf4bbec8354ad72bbf0bc1f974a9510e4b8d9c"
     },
     {
       "path": "extension/canonical/protocol/schemas/member-descriptor.schema.json",
       "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/network-state.schema.json",
+      "sha256": "sha256:f5fcd82f24bfc9ea000192da4039c4edee23cdd44d6ba5844a8109371cf8392b"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/profile-binding.schema.json",
+      "sha256": "sha256:5b5bfa6b04d2a5fb0eb3c87f53030326167046ad6183b7a69240ae5c6f953de1"
+    },
+    {
+      "path": "extension/canonical/protocol/schemas/profile-definition.schema.json",
+      "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
     },
     {
       "path": "extension/canonical/protocol/schemas/recognition-receipt.schema.json",
@@ -182,11 +318,11 @@
     },
     {
       "path": "extension/canonical/protocol/schemas/transition.schema.json",
-      "sha256": "sha256:295d23d34de9d433a885796da5235772d339bff9432ae2d6a1af4f5452034eec"
+      "sha256": "sha256:5c11b9834b20a0222fba8c1a847206be0e802ea6825b420a8586d1dae44a968d"
     },
     {
       "path": "extension/canonical/source/network-extension-model.json",
-      "sha256": "sha256:ce8ae7650a0d17dc0a2bee01428793ea5e204be34360d6d58b07a2b0377ba24c"
+      "sha256": "sha256:edb71c3d7f29c2b85dd45b2d00d0107a296e015c288a0ef324d8c9d1bcc37f1f"
     },
     {
       "path": "upstream/ASET_SEED_BINDING.json",
@@ -195,7 +331,7 @@
   ],
   "implementation_precedence": "NONE",
   "normative_source": "extension/canonical/source/network-extension-model.json",
-  "package_digest": "sha256:64d718812cea7768f21b288fc525298516d9150ecd790016ffb6513bfe68c1c1",
+  "package_digest": "sha256:8a4c1adc326b25ff16e2e2b4a7abdf74162613515e05a27fdf37c6a634134459",
   "schema_version": 1,
   "upstream_binding": "upstream/ASET_SEED_BINDING.json"
 }

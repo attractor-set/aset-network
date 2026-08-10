@@ -1,0 +1,31 @@
+{
+  "document_type": "aset-network-federation-profile-scope",
+  "legacy_state_ownership": [
+    "federation_id",
+    "federation_epoch",
+    "members",
+    "routes",
+    "exports"
+  ],
+  "legacy_transition_ownership": [
+    "FEDERATION_GENESIS",
+    "MEMBER_JOIN",
+    "ROUTE_GRANT",
+    "EXPORT_ARTIFACT",
+    "SUSPEND_ROUTE",
+    "MEMBER_WITHDRAW"
+  ],
+  "minimal_core_relation": {
+    "history": "SEPARATE_APPEND_ONLY_EVIDENCE_TRACE",
+    "imports": "RETAINED_BY_NETWORK_ADMISSION_CORE",
+    "recognitions": "SEED_DERIVED_COMPATIBILITY_RECEIPT_SURFACE"
+  },
+  "normative_when_claimed": true,
+  "not_owned": [
+    "imports",
+    "recognitions"
+  ],
+  "note": "This optional profile owns federation lifecycle after the alpha.3 minimal admission-core cutover. Federation membership or routing never creates target-local Authority.",
+  "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
+  "schema_version": 1
+}

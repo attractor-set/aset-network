@@ -1,39 +1,36 @@
 {
-  "claim_boundary": [
-    "The proof applies to the declared refinement mapping and the exact pinned SeedResolution.tla.",
-    "The proof does not establish unbounded TLC state-space coverage, wire-schema equivalence, cryptographic security, transport availability, or concrete Authority-ID/Binding construction beyond the declared abstraction mapping."
-  ],
   "document_type": "aset-network-seed-refinement-proof-evidence",
   "network_artifacts": {
     "mapping": {
       "module": "NetworkExtensionSeedRefinement",
       "path": "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
-      "sha256": "sha256:e009ea452dbec8355af0f3029089f0d12d7276a36c30ea783551f6799a8e7348"
+      "sha256": "sha256:d02d4ddc4715a3d6749225d896dc984ab510b9e28986b46461956785dfe51c7e"
     },
     "proof": {
       "module": "NetworkExtensionSeedRefinementProofs",
       "path": "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
-      "sha256": "sha256:c5392cea3c6cea2e30f00959d178f83f2c2c668cd1dbea6bd687fcd366bd6e6d"
+      "sha256": "sha256:319dcd3e78d2ffeda43528287d9963bc46f656b0983bcddf43e32bf72e320a42"
     }
   },
   "normative_precedence": "MACHINE_READABLE_CANON",
-  "profile": "ASET-NETWORK-SEED-REFINEMENT-TLAPS-V1",
+  "profile": "ASET-NETWORK-SEED-REFINEMENT-TLAPS-V2",
   "proof_gate": {
     "final_theorems": [
-      "NetworkSafetyRefinesSeedResolution",
-      "NetworkEvaluatorMatchesSeedResolution"
+      "NetworkExtensionRefinesSeedSafetySpec",
+      "NetworkProjectionMatchesSeedResolution"
     ],
+    "materialization": "REPRODUCED_WITH_PINNED_TLAPM",
     "obligation_count_semantics": "RECORDED_EVIDENCE_NOT_FIXED_SEMANTIC_CONTRACT",
-    "obligations_proved": 261,
+    "obligations_proved": 35,
     "runner": "tools/run_seed_refinement_tlaps.py",
-    "verdict": "PASS"
+    "verdict": "MECHANICALLY_PROVED"
   },
   "schema_version": 1,
   "scope": "PINNED_SEED_REFINEMENT",
   "status": "MECHANICALLY_PROVED",
   "tlapm": {
-    "commit": "4600b24c6d95a25ff081ad37b63b2a01c29d43a5",
-    "version": "4600b24"
+    "required_commit": "4600b24c6d95a25ff081ad37b63b2a01c29d43a5",
+    "required_version": "4600b24"
   },
   "upstream_seed": {
     "materialization": "EXTERNAL_PINNED_SEED_SOURCE_NOT_VENDORED",

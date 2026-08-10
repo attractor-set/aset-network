@@ -8,7 +8,7 @@
       "status": "FINITE_STATE_MODEL_CHECKING_REQUIRED"
     },
     {
-      "description": "The alpha does not select transport, discovery, consensus or durability mechanisms; liveness is an optional normative claim profile and remains conditional on the explicit ASET-NETWORK-LIVENESS-V1 assumptions.",
+      "description": "The alpha does not select transport, discovery, consensus or durability mechanisms; liveness is an optional Federation Profile composition claim. Any terminal-resolution liveness remains conditional on the explicit target-local Seed progress assumption and does not transfer resolution ownership to Network or Federation.",
       "id": "NET-LIMIT-002",
       "scope": "transport-and-consensus",
       "status": "OUT_OF_SCOPE_WITH_CONDITIONAL_LIVENESS"
