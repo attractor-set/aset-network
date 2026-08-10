@@ -16,7 +16,7 @@ foreign evidence -> ADMIT_IMPORT -> target-local UNKNOWN/BLOCKED import -> Seed
 
 `imports` is the only Network semantic-state field. `ADMIT_IMPORT` is the only Network transition kind. Admission never authorizes an effect and never creates terminal recognition. `ALLOW` / `BLOCK` remain exclusively target-local Seed semantics.
 
-Federation membership, routing, source export lifecycle and conditional liveness are optional profile concerns, not Network-core semantics. Any terminal-resolution liveness claim is explicitly target-local Seed-owned.
+Federation membership/routing and conditional liveness are separate optional profiles, not Network-core semantics. The Federation Profile owns federation lifecycle only; the Liveness Profile owns conditional progress claims only. They may be composed without either becoming the parent of the other. Any terminal-resolution progress assumption remains explicitly target-local Seed-owned.
 
 ## Upstream binding
 
@@ -31,7 +31,8 @@ The exact descriptor is `upstream/ASET_SEED_BINDING.json`. Network may strengthe
 ## Normative surfaces
 
 - `extension/canonical/source/network-extension-model.json` — minimal admission canon.
-- `extension/canonical/protocol/` — core wire objects plus optional profile surfaces.
+- `extension/canonical/protocol/` — core wire objects only.
+- `extension/canonical/profiles/` — separate optional profile entities.
 - `extension/canonical/conformance/cases/` — four alpha.3 core cases.
 - `extension/canonical/CANON_PACKAGE.json` — complete canon package.
 
@@ -50,11 +51,15 @@ SUSPEND_ROUTE
 MEMBER_WITHDRAW
 ```
 
-The profile has a native non-normative oracle at `reference/federation_profile_reference.py` and an independent 10-case conformance surface under `extension/canonical/conformance/federation-profile-cases/`. Federation transitions stutter with respect to Network admission state. Terminal recognition is not a Federation operation and remains exclusively target-local Seed-owned.
+All Federation-owned artifacts live under `extension/canonical/profiles/federation/`. The profile has a native non-normative oracle at `reference/profiles/federation.py` and an independent 10-case conformance surface. Federation transitions stutter with respect to Network admission state. Terminal recognition and liveness are not Federation operations.
 
 ## Dynamic profiles
 
 `ASET-NETWORK-DYNAMIC-PROFILES-V1` adds no Network state and no Network transitions. `ProfileDefinition` and `ProfileBinding` are immutable content-addressed evidence. Applicability is derived only from target-local Seed `ALLOW` on the exact projected binding. Availability, verification or remote recognition never activates a profile.
+
+## Liveness Profile
+
+`ASET-NETWORK-LIVENESS-V1` is an independent optional dynamic profile. It owns no Network state and no transition kinds. It declares conditional progress guarantees and the capabilities required from a separately composed profile. The currently checked composition pairs it with `ASET-NETWORK-FEDERATION-PROFILE-V1`; that pairing is assurance evidence, not a parent/child relationship.
 
 ## Formal assurance state
 
@@ -63,7 +68,7 @@ The current proof chain has two mechanically proved TLAPS relations:
 1. machine canon -> `NetworkExtension.tla` behavioral equivalence;
 2. minimal Network -> pinned `SeedResolution.tla` refinement.
 
-The materialized results are canon equivalence `3/3` and minimal Network -> Seed `35/35`. The optional Federation Profile has separate bounded TLC safety and composition-liveness models: `FederationProfile.tla` and `FederationCompositionLiveness.tla`. The liveness model treats `Resolve(e)` only as an assurance witness of target-local Seed progress; it creates no Network- or Federation-owned recognition state.
+The materialized core results are canon equivalence `3/3` and minimal Network -> Seed `35/35`. Federation lifecycle safety is profile-local assurance under `extension/canonical/profiles/federation/assurance/`. Liveness is a separate optional profile under `extension/canonical/profiles/liveness/`. Their bounded composition assurance lives separately under `extension/canonical/assurance/profile-compositions/federation-liveness/`; it treats `Resolve(e)` only as a witness of target-local Seed progress and creates no parent relation or transferred ownership between profiles.
 
 ## Validation
 

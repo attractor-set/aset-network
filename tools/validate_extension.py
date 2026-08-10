@@ -10,12 +10,13 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
-from reference.federation_profile_reference import execute_case as execute_federation_case
+from reference.profiles.federation import execute_case as execute_federation_case
 from tools.dynamic_profile_conformance import run_profile_conformance, validate_wire_object
 
 ROOT = Path(__file__).resolve().parents[1]
 C = ROOT / "extension/canonical"
-S = C / "protocol/schemas"
+CORE_SCHEMAS = C / "protocol/schemas"
+PROFILE_SCHEMA_DIRS = sorted((C / "profiles").glob("*/schemas"))
 UP = ROOT / "upstream/ASET_SEED_BINDING.json"
 EXPECTED_SEED = {
     "seed_release_tag": "seed-0.3.0-alpha.3",
@@ -40,6 +41,16 @@ FORBIDDEN_HISTORICAL_PATHS = [
     "extension/canonical/formal/NetworkAdmissionCore.tla",
 ]
 
+FORBIDDEN_PROFILE_LEAK_PATHS = [
+    "extension/canonical/protocol/federation-profile.json",
+    "extension/canonical/protocol/dynamic-profile-profile.json",
+    "extension/canonical/conformance/federation-profile-conformance-profile.json",
+    "extension/canonical/conformance/dynamic-profile-conformance-profile.json",
+    "extension/canonical/formal/FederationProfile.tla",
+    "extension/canonical/formal/FederationCompositionLiveness.tla",
+    "extension/canonical/liveness",
+]
+
 
 def sha(path: Path) -> str:
     return "sha256:" + hashlib.sha256(Path(path).read_bytes()).hexdigest()
@@ -62,16 +73,18 @@ def self_digest(path: Path, field: str) -> dict:
 def registry() -> tuple[Registry, dict[str, dict]]:
     resources = []
     schemas = {}
-    for path in sorted(S.glob("*.json")):
-        data = json.loads(path.read_text())
-        Draft202012Validator.check_schema(data)
-        resources.append((data["$id"], Resource.from_contents(data)))
-        schemas[path.name] = data
+    for schema_dir in [CORE_SCHEMAS, *PROFILE_SCHEMA_DIRS]:
+        for path in sorted(schema_dir.glob("*.json")):
+            data = json.loads(path.read_text())
+            Draft202012Validator.check_schema(data)
+            resources.append((data["$id"], Resource.from_contents(data)))
+            schemas[path.name] = data
     return Registry().with_resources(resources), schemas
 
 
 def verify_current_federation_profile() -> None:
-    profile = json.loads((C / "protocol/federation-profile.json").read_text())
+    profile_path = C / "profiles/federation/profile.json"
+    profile = json.loads(profile_path.read_text())
     semantics = profile.get("profile_semantics", {})
     if semantics.get("network_admission_state_fields") != ["imports"]:
         raise SystemExit("federation profile Network projection mismatch")
@@ -90,27 +103,113 @@ def verify_current_federation_profile() -> None:
         raise SystemExit("federation transition ownership mismatch")
     if semantics.get("seed_owned_terminal_recognition") is not True:
         raise SystemExit("federation profile must not own terminal recognition")
+    if profile.get("provided_capabilities") != [
+        "RETAINED_EXPORT",
+        "DELIVERY",
+        "TARGET_OBSERVATION",
+    ]:
+        raise SystemExit("federation capability catalogue mismatch")
 
-    definition_path = C / "protocol/profiles/federation-profile-definition.json"
+    definition_path = C / "profiles/federation/definition.json"
     definition = json.loads(definition_path.read_text())
     ok, code = validate_wire_object("PROFILE_DEFINITION", definition)
     if not ok:
         raise SystemExit(f"federation profile definition invalid: {code}")
     expected_components = {
         "parent_contract_digest": sha(C / "source/network-extension-model.json"),
-        "scope_digest": sha(C / "protocol/profiles/federation-profile-scope.json"),
-        "requirements_digest": sha(C / "protocol/profiles/federation-profile-requirements.json"),
-        "invariants_digest": sha(C / "protocol/profiles/federation-profile-invariants.json"),
+        "scope_digest": sha(C / "profiles/federation/scope.json"),
+        "requirements_digest": sha(C / "profiles/federation/requirements.json"),
+        "invariants_digest": sha(C / "profiles/federation/invariants.json"),
     }
     for field, expected in expected_components.items():
         if definition.get(field) != expected:
             raise SystemExit(f"federation profile component digest mismatch: {field}")
+
+    declared_schemas = {item["name"]: item for item in profile.get("wire_schemas", [])}
+    actual_schemas = {
+        path.name: sha(path) for path in (C / "profiles/federation/schemas").glob("*.json")
+    }
+    if set(declared_schemas) != set(actual_schemas):
+        raise SystemExit("federation wire schema catalogue mismatch")
+    for name, digest in actual_schemas.items():
+        if declared_schemas[name].get("sha256") != digest:
+            raise SystemExit(f"federation wire schema digest mismatch: {name}")
+
+    safety = profile.get("assurance", {}).get("safety", {})
+    for key, digest_key in [("path", "sha256"), ("config", "config_sha256")]:
+        if sha(ROOT / safety[key]) != safety[digest_key]:
+            raise SystemExit(f"federation profile assurance digest mismatch: {key}")
+
+
+def verify_liveness_profile() -> None:
+    profile = json.loads((C / "profiles/liveness/profile.json").read_text())
+    if profile.get("profile_id") != "ASET-NETWORK-LIVENESS-V1":
+        raise SystemExit("liveness profile identity mismatch")
+    if "parent_profile" in profile:
+        raise SystemExit("liveness profile must not be nested under another profile")
+    claim = profile.get("claim_semantics", {})
+    if (
+        claim.get("claim_type") != "OPTIONAL_DYNAMIC_PROFILE"
+        or claim.get("required_for_core_conformance") is not False
+    ):
+        raise SystemExit("liveness optional-profile claim semantics mismatch")
+    composition = profile.get("composition_semantics", {})
+    if composition.get("profile_parent_required") is not False:
+        raise SystemExit("liveness profile must compose without a profile parent")
+    if composition.get("required_profile_capabilities") != [
+        "RETAINED_EXPORT",
+        "DELIVERY",
+        "TARGET_OBSERVATION",
+    ]:
+        raise SystemExit("liveness required-capability catalogue mismatch")
+    resolution = profile.get("resolution_semantics", {})
+    if resolution.get("resolution_owner") != "PINNED_TARGET_LOCAL_SEED" or resolution.get(
+        "terminal_local_results"
+    ) != ["ALLOW", "BLOCK"]:
+        raise SystemExit("liveness terminal-resolution ownership mismatch")
+
+    definition = json.loads((C / "profiles/liveness/definition.json").read_text())
+    ok, code = validate_wire_object("PROFILE_DEFINITION", definition)
+    if not ok:
+        raise SystemExit(f"liveness profile definition invalid: {code}")
+    expected_components = {
+        "parent_contract_digest": sha(C / "source/network-extension-model.json"),
+        "scope_digest": sha(C / "profiles/liveness/scope.json"),
+        "requirements_digest": sha(C / "profiles/liveness/requirements.json"),
+        "invariants_digest": sha(C / "profiles/liveness/invariants.json"),
+    }
+    for field, expected in expected_components.items():
+        if definition.get(field) != expected:
+            raise SystemExit(f"liveness profile component digest mismatch: {field}")
+
+
+def verify_federation_liveness_composition() -> None:
+    path = C / "assurance/profile-compositions/federation-liveness/composition.json"
+    composition = json.loads(path.read_text())
+    if composition.get("member_profiles") != [
+        "ASET-NETWORK-FEDERATION-PROFILE-V1",
+        "ASET-NETWORK-LIVENESS-V1",
+    ]:
+        raise SystemExit("federation+liveness composition members mismatch")
+    if composition.get("profile_parent_relation") is not False:
+        raise SystemExit("profile composition must not create a parent relation")
+    binding = composition.get("capability_binding", {})
+    if binding.get("provided") != binding.get("required"):
+        raise SystemExit("federation+liveness capability binding mismatch")
+    assurance = composition.get("assurance", {})
+    for key, digest_key in [("path", "sha256"), ("config", "config_sha256")]:
+        if sha(ROOT / assurance[key]) != assurance[digest_key]:
+            raise SystemExit(f"profile-composition assurance digest mismatch: {key}")
 
 
 def main() -> int:
     for relative in FORBIDDEN_HISTORICAL_PATHS:
         if (ROOT / relative).exists():
             raise SystemExit(f"historical Network compatibility artifact remains: {relative}")
+
+    for relative in FORBIDDEN_PROFILE_LEAK_PATHS:
+        if (ROOT / relative).exists():
+            raise SystemExit(f"profile artifact leaked into core surface: {relative}")
 
     package = self_digest(C / "CANON_PACKAGE.json", "package_digest")
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
@@ -171,11 +270,6 @@ def main() -> int:
         if sha(ROOT / canon_projection[key]) != canon_projection[digest_key]:
             raise SystemExit(f"canon projection relation digest mismatch: {key}")
 
-    for assurance in relation.get("federation_assurance", {}).values():
-        for key, digest_key in [("path", "sha256"), ("config", "config_sha256")]:
-            if sha(ROOT / assurance[key]) != assurance[digest_key]:
-                raise SystemExit(f"federation assurance digest mismatch: {key}")
-
     generation = subprocess.run(
         [sys.executable, "-m", "tools.generate_canon_tla_projection", "--check"],
         cwd=ROOT,
@@ -231,6 +325,11 @@ def main() -> int:
     if "legacy_alpha2_refinement" in relation:
         raise SystemExit("historical Network refinement must not remain in current relation")
 
+    if "federation_assurance" in relation or "federation_lifecycle" in relation.get(
+        "projection_surfaces", {}
+    ):
+        raise SystemExit("profile assurance must not be embedded in the core formal relation")
+
     harness = relation.get("tlc_harness", {})
     if harness.get("module") != "NetworkExtensionTLC" or harness.get("properties") != [
         "ImportsAppendOnlyTemporal"
@@ -248,26 +347,25 @@ def main() -> int:
     if "PROPERTIES" in base_config or "ImportsAppendOnlyTemporal" not in harness_config:
         raise SystemExit("TLC property must live only in the temporal harness config")
 
-    liveness = json.loads((C / "liveness/liveness-profile.json").read_text())
-    if liveness.get("parent_profile") != "ASET-NETWORK-FEDERATION-PROFILE-V1":
-        raise SystemExit("liveness parent profile mismatch")
-    resolution = liveness.get("resolution_semantics", {})
-    if resolution.get("resolution_owner") != "PINNED_TARGET_LOCAL_SEED" or resolution.get(
-        "terminal_local_results"
-    ) != ["ALLOW", "BLOCK"]:
-        raise SystemExit("liveness terminal-resolution ownership mismatch")
-    if "legacy_assurance_projection" in resolution:
-        raise SystemExit("legacy resolution adapter remains in current liveness profile")
-    if not any(
-        assumption.get("id") == "NET-LIVE-A-003"
-        and assumption.get("name") == "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
-        for assumption in liveness.get("assumptions", [])
-    ):
-        raise SystemExit("liveness Seed progress assumption mismatch")
-
     schema_registry, schemas = registry()
     protocol = json.loads((C / "protocol/protocol-profile.json").read_text())
-    actual = {path.name: sha(path) for path in S.glob("*.json")}
+    expected_profile_catalog = [
+        {
+            "profile_id": "ASET-NETWORK-DYNAMIC-PROFILES-V1",
+            "path": "extension/canonical/profiles/dynamic/profile.json",
+        },
+        {
+            "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
+            "path": "extension/canonical/profiles/federation/profile.json",
+        },
+        {
+            "profile_id": "ASET-NETWORK-LIVENESS-V1",
+            "path": "extension/canonical/profiles/liveness/profile.json",
+        },
+    ]
+    if protocol.get("optional_profile_catalog") != expected_profile_catalog:
+        raise SystemExit("protocol direct profile catalogue mismatch")
+    actual = {path.name: sha(path) for path in CORE_SCHEMAS.glob("*.json")}
     if (
         protocol["schema_count"] != len(actual)
         or {item["name"]: item["sha256"] for item in protocol["schemas"]} != actual
@@ -298,15 +396,15 @@ def main() -> int:
         raise SystemExit(f"dynamic-profile conformance failed: {dynamic_failures[0][0]}")
 
     verify_current_federation_profile()
-    federation = json.loads(
-        (C / "conformance/federation-profile-conformance-profile.json").read_text()
-    )
+    verify_liveness_profile()
+    verify_federation_liveness_composition()
+    federation = json.loads((C / "profiles/federation/conformance/profile.json").read_text())
     if federation["case_count"] != 10 or federation.get("source_semantics") != (
         "NATIVE_FEDERATION_PROFILE_CASES"
     ):
         raise SystemExit("federation profile conformance identity/count mismatch")
     for item in federation["cases"]:
-        if "/federation-profile-cases/" not in item["path"]:
+        if "/profiles/federation/conformance/cases/" not in item["path"]:
             raise SystemExit(f"federation case is not native: {item['case_id']}")
         path = ROOT / item["path"]
         if item["sha256"] != sha(path):
@@ -327,6 +425,8 @@ def main() -> int:
     print(f"OK: Seed TLAPS status={seed_evidence['status']}")
     print("OK: current canonical surface contains no historical compatibility artifacts")
     print("OK: federation profile is self-contained")
+    print("OK: liveness profile is independent")
+    print("OK: federation+liveness composition is explicit assurance")
     print("OK: dynamic profiles add no Network state or transitions")
     print("OK: schemas valid")
     print("OK: core conformance cases=4")

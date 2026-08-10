@@ -1,0 +1,27 @@
+{
+  "document_type": "aset-network-liveness-profile-requirements",
+  "profile_id": "ASET-NETWORK-LIVENESS-V1",
+  "requirements": [
+    {
+      "id": "LIVE-REQ-001",
+      "text": "The profile MUST add no Network canonical state or transition kinds."
+    },
+    {
+      "id": "LIVE-REQ-002",
+      "text": "A liveness claim MUST identify a separately composed profile that provides the required retained-export, delivery and target-observation capabilities."
+    },
+    {
+      "id": "LIVE-REQ-003",
+      "text": "Every guarantee MUST remain conditional on its explicitly declared fairness and environment assumptions."
+    },
+    {
+      "id": "LIVE-REQ-004",
+      "text": "Terminal resolution progress MUST remain an external pinned target-local Seed assumption and MUST NOT be represented as a Network- or profile-owned transition."
+    },
+    {
+      "id": "LIVE-REQ-005",
+      "text": "Activation of this profile MUST use the Seed-bound dynamic-profile mechanism independently of activation of any composed profile."
+    }
+  ],
+  "schema_version": 1
+}

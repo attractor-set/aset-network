@@ -1,0 +1,9 @@
+{
+  "invariants_digest": "sha256:365bd4e308444c6ad2bb3b9e552b1069dd837ee88a2f82bc2360f6a805ce65a3",
+  "parent_contract_digest": "sha256:725946f92b6ebe12b805169f45d6a39d66b882ad4dc23120a9733780aea1b9d3",
+  "profile_digest": "sha256:5b5d711aeed25a52a133c2719c3c51afde29d728ebe1b62907887cce95f463c5",
+  "profile_id": "aset-network-liveness",
+  "profile_version": "v1",
+  "requirements_digest": "sha256:80cd394bbe289dec0c72cc9e2adcc57e81ef0e28a7a9ed7deb40ed334e909827",
+  "scope_digest": "sha256:8349e83f2251f285caf5fee577b8bbafdb9c1401e0bb667d157bbf56de57b14e"
+}

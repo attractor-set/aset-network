@@ -7,8 +7,8 @@ import sys
 import tomllib
 from pathlib import Path
 
-from reference.federation_profile_reference import execute_case as execute_federation_case
 from reference.network_reference import execute_case
+from reference.profiles.federation import execute_case as execute_federation_case
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -167,7 +167,7 @@ def test_historical_network_alpha2_surface_is_absent() -> None:
 
 
 def test_federation_profile_is_self_contained() -> None:
-    f = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
+    f = json.loads((ROOT / "extension/canonical/profiles/federation/profile.json").read_text())
     semantics = f["profile_semantics"]
     assert semantics["network_admission_state_fields"] == ["imports"]
     assert semantics["network_projection"] == (
@@ -186,15 +186,13 @@ def test_federation_profile_is_self_contained() -> None:
 
 def test_federation_conformance_is_optional_and_native() -> None:
     p = json.loads(
-        (
-            ROOT / "extension/canonical/conformance/federation-profile-conformance-profile.json"
-        ).read_text()
+        (ROOT / "extension/canonical/profiles/federation/conformance/profile.json").read_text()
     )
     assert p["required_for_core_conformance"] is False
     assert p["source_semantics"] == "NATIVE_FEDERATION_PROFILE_CASES"
     assert p["case_count"] == 10
     for item in p["cases"]:
-        assert "/federation-profile-cases/" in item["path"]
+        assert "/profiles/federation/conformance/cases/" in item["path"]
         case = json.loads((ROOT / item["path"]).read_text())
         assert case["case_id"] == item["case_id"]
         _, actual = execute_federation_case(case)
@@ -212,9 +210,7 @@ def test_package_is_alpha3_and_self_consistent() -> None:
 
 def test_dynamic_profiles_are_seed_bound_without_network_state_or_transitions() -> None:
     profile = json.loads(
-        (ROOT / "extension/canonical/protocol/dynamic-profile-profile.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "extension/canonical/profiles/dynamic/profile.json").read_text(encoding="utf-8")
     )
     assert profile["profile_id"] == "ASET-NETWORK-DYNAMIC-PROFILES-V1"
     assert profile["normative"] is True
@@ -245,7 +241,7 @@ def test_dynamic_profiles_are_seed_bound_without_network_state_or_transitions() 
 
 
 def test_dynamic_profile_wire_objects_are_exact_and_have_no_activation_field() -> None:
-    schema_dir = ROOT / "extension/canonical/protocol/schemas"
+    schema_dir = ROOT / "extension/canonical/profiles/dynamic/schemas"
     definition = json.loads((schema_dir / "profile-definition.schema.json").read_text())
     binding = json.loads((schema_dir / "profile-binding.schema.json").read_text())
 
@@ -293,9 +289,9 @@ def test_dynamic_profile_is_optional_core_claim() -> None:
 
 def test_dynamic_profile_target_context_domain_is_closed_under_seed_projection() -> None:
     schema = json.loads(
-        (ROOT / "extension/canonical/protocol/schemas/profile-binding.schema.json").read_text(
-            encoding="utf-8"
-        )
+        (
+            ROOT / "extension/canonical/profiles/dynamic/schemas/profile-binding.schema.json"
+        ).read_text(encoding="utf-8")
     )
     assert schema["properties"]["target_context_id"] == {
         "type": "string",
@@ -315,7 +311,7 @@ def test_dynamic_profile_content_addressing_is_executable() -> None:
 
     profile = json.loads(
         (
-            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json"
+            ROOT / "extension/canonical/profiles/dynamic/conformance/cases/positive/DP-POS-001.json"
         ).read_text(encoding="utf-8")
     )["object"]
     accepted, code = validate_wire_object("PROFILE_DEFINITION", profile)
@@ -333,7 +329,7 @@ def test_dynamic_profile_binding_digest_is_executable() -> None:
 
     binding = json.loads(
         (
-            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+            ROOT / "extension/canonical/profiles/dynamic/conformance/cases/positive/DP-POS-002.json"
         ).read_text(encoding="utf-8")
     )["object"]
     accepted, code = validate_wire_object("PROFILE_BINDING", binding)
@@ -346,7 +342,7 @@ def test_dynamic_profile_allow_does_not_carry_across_state_root_change() -> None
 
     case = json.loads(
         (
-            ROOT / "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json"
+            ROOT / "extension/canonical/profiles/dynamic/conformance/cases/negative/DP-NEG-004.json"
         ).read_text(encoding="utf-8")
     )
     assert execute_profile_case(case) == case["expected"]
@@ -355,9 +351,7 @@ def test_dynamic_profile_allow_does_not_carry_across_state_root_change() -> None
 
 def test_dynamic_profile_refinement_claim_does_not_imply_proof_status() -> None:
     profile = json.loads(
-        (ROOT / "extension/canonical/protocol/dynamic-profile-profile.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "extension/canonical/profiles/dynamic/profile.json").read_text(encoding="utf-8")
     )
     assurance = profile["assurance_semantics"]
     assert assurance["base_refinement_claim"] == (
@@ -372,9 +366,9 @@ def test_dynamic_profile_optional_conformance_cases_are_exact() -> None:
     from tools.dynamic_profile_conformance import run_profile_conformance
 
     profile = json.loads(
-        (
-            ROOT / "extension/canonical/conformance/dynamic-profile-conformance-profile.json"
-        ).read_text(encoding="utf-8")
+        (ROOT / "extension/canonical/profiles/dynamic/conformance/profile.json").read_text(
+            encoding="utf-8"
+        )
     )
     assert profile["claims_profile"] == "ASET-NETWORK-DYNAMIC-PROFILES-V1"
     assert profile["required_for_core_conformance"] is False
@@ -389,7 +383,7 @@ def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_fo
 
     case = json.loads(
         (
-            ROOT / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+            ROOT / "extension/canonical/profiles/dynamic/conformance/cases/positive/DP-POS-002.json"
         ).read_text(encoding="utf-8")
     )
     projected = project_seed_binding(case["object"])
@@ -408,7 +402,18 @@ def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_fo
 def test_federation_profile_definition_is_valid() -> None:
     from tools.dynamic_profile_conformance import validate_wire_object
 
-    p = ROOT / "extension/canonical/protocol/profiles/federation-profile-definition.json"
+    p = ROOT / "extension/canonical/profiles/federation/definition.json"
+    d = json.loads(p.read_text())
+    assert validate_wire_object("PROFILE_DEFINITION", d) == (True, "PROFILE_DEFINITION_VALID")
+    assert d["parent_contract_digest"] == sha(
+        ROOT / "extension/canonical/source/network-extension-model.json"
+    )
+
+
+def test_liveness_profile_definition_is_valid() -> None:
+    from tools.dynamic_profile_conformance import validate_wire_object
+
+    p = ROOT / "extension/canonical/profiles/liveness/definition.json"
     d = json.loads(p.read_text())
     assert validate_wire_object("PROFILE_DEFINITION", d) == (True, "PROFILE_DEFINITION_VALID")
     assert d["parent_contract_digest"] == sha(
@@ -433,9 +438,20 @@ def test_release_metadata_matches_alpha3_minimal_admission() -> None:
     )
 
 
-def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
-    live = json.loads((ROOT / "extension/canonical/liveness/liveness-profile.json").read_text())
-    assert live["parent_profile"] == "ASET-NETWORK-FEDERATION-PROFILE-V1"
+def test_liveness_profile_is_independent_and_seed_owned_at_resolution() -> None:
+    live = json.loads((ROOT / "extension/canonical/profiles/liveness/profile.json").read_text())
+    assert "parent_profile" not in live
+    assert live["claim_semantics"] == {
+        "claim_type": "OPTIONAL_DYNAMIC_PROFILE",
+        "normative_when_claimed": True,
+        "required_for_core_conformance": False,
+    }
+    assert live["composition_semantics"]["profile_parent_required"] is False
+    assert live["composition_semantics"]["required_profile_capabilities"] == [
+        "RETAINED_EXPORT",
+        "DELIVERY",
+        "TARGET_OBSERVATION",
+    ]
     assert live["resolution_semantics"]["resolution_owner"] == "PINNED_TARGET_LOCAL_SEED"
     assert live["resolution_semantics"]["terminal_local_results"] == ["ALLOW", "BLOCK"]
     assert "legacy_assurance_projection" not in live["resolution_semantics"]
@@ -443,10 +459,49 @@ def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
     assert a3["name"] == "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
 
 
-def test_federation_scope_has_no_historical_ownership_vocabulary() -> None:
-    scope = json.loads(
-        (ROOT / "extension/canonical/protocol/profiles/federation-profile-scope.json").read_text()
+def test_federation_and_liveness_are_composed_profiles_not_parent_child() -> None:
+    federation = json.loads(
+        (ROOT / "extension/canonical/profiles/federation/profile.json").read_text()
     )
+    liveness = json.loads((ROOT / "extension/canonical/profiles/liveness/profile.json").read_text())
+    composition = json.loads(
+        (
+            ROOT
+            / (
+                "extension/canonical/assurance/profile-compositions/"
+                "federation-liveness/composition.json"
+            )
+        ).read_text()
+    )
+    assert (
+        federation["provided_capabilities"]
+        == liveness["composition_semantics"]["required_profile_capabilities"]
+    )
+    assert composition["member_profiles"] == [
+        federation["profile_id"],
+        liveness["profile_id"],
+    ]
+    assert composition["profile_parent_relation"] is False
+    assert (
+        composition["capability_binding"]["provided"]
+        == composition["capability_binding"]["required"]
+    )
+
+
+def test_profile_entities_are_physically_separated_from_core() -> None:
+    canon = ROOT / "extension/canonical"
+    assert (canon / "profiles/dynamic/profile.json").is_file()
+    assert (canon / "profiles/federation/profile.json").is_file()
+    assert (canon / "profiles/liveness/profile.json").is_file()
+    assert not (canon / "protocol/federation-profile.json").exists()
+    assert not (canon / "liveness").exists()
+    assert not (canon / "formal/FederationProfile.tla").exists()
+    assert not (canon / "formal/FederationCompositionLiveness.tla").exists()
+    assert not (canon / "conformance/federation-profile-conformance-profile.json").exists()
+
+
+def test_federation_scope_has_no_historical_ownership_vocabulary() -> None:
+    scope = json.loads((ROOT / "extension/canonical/profiles/federation/scope.json").read_text())
     assert "legacy_state_ownership" not in scope
     assert "legacy_transition_ownership" not in scope
     assert scope["state_ownership"] == [
@@ -474,7 +529,14 @@ def test_tlc_append_only_property_is_temporal_harness_only() -> None:
     assert "ImportsAppendOnlyTemporal == [][ImportsAppendOnly]_vars" in harness
     assert "PROPERTIES" not in base_cfg
     assert "ImportsAppendOnlyTemporal" in harness_cfg
-    assert MODELS["safety"] == ("NetworkExtensionTLC.tla", "NetworkExtensionTLC.cfg")
+    assert MODELS["safety"]["module"] == "NetworkExtensionTLC.tla"
+    assert MODELS["safety"]["config"] == "NetworkExtensionTLC.cfg"
+    assert MODELS["federation-profile"]["cwd"] == (
+        ROOT / "extension/canonical/profiles/federation/assurance"
+    )
+    assert MODELS["federation-liveness"]["cwd"] == (
+        ROOT / "extension/canonical/assurance/profile-compositions/federation-liveness"
+    )
 
 
 def test_tlc_harness_does_not_change_normative_proof_target() -> None:
@@ -483,6 +545,8 @@ def test_tlc_harness_does_not_change_normative_proof_target() -> None:
     assert relation["target_model"]["path"] == "extension/canonical/formal/NetworkExtension.tla"
     assert relation["tlc_harness"]["scope"] == "BOUNDED_TEMPORAL_MODEL_CHECKING_ONLY"
     assert relation["tlc_harness"]["properties"] == ["ImportsAppendOnlyTemporal"]
+    assert "federation_assurance" not in relation
+    assert "federation_lifecycle" not in relation["projection_surfaces"]
 
 
 def test_rights_baseline_captures_alpha3_release_and_full_proof_chain() -> None:
@@ -497,8 +561,8 @@ def test_rights_baseline_captures_alpha3_release_and_full_proof_chain() -> None:
         "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
         "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
         "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
-        "extension/canonical/formal/FederationProfile.tla",
-        "extension/canonical/formal/FederationCompositionLiveness.tla",
+        "extension/canonical/profiles/federation/assurance/FederationProfile.tla",
+        "extension/canonical/assurance/profile-compositions/federation-liveness/FederationCompositionLiveness.tla",
         "extension/canonical/assurance/canon-refinement-proof.json",
         "extension/canonical/assurance/seed-refinement-proof.json",
         "upstream/ASET_SEED_BINDING.json",

@@ -60,22 +60,24 @@
   "optional_claim_profiles": [
     {
       "activation_authority": "TARGET_LOCAL_SEED_ONLY",
-      "conformance_profile": "extension/canonical/conformance/dynamic-profile-conformance-profile.json",
+      "conformance_profile": "extension/canonical/profiles/dynamic/conformance/profile.json",
       "normative_when_claimed": true,
+      "profile": "extension/canonical/profiles/dynamic/profile.json",
       "profile_id": "ASET-NETWORK-DYNAMIC-PROFILES-V1",
       "required_for_core_conformance": false
     },
     {
-      "conformance_profile": "extension/canonical/conformance/federation-profile-conformance-profile.json",
+      "conformance_profile": "extension/canonical/profiles/federation/conformance/profile.json",
       "normative_when_claimed": true,
+      "profile": "extension/canonical/profiles/federation/profile.json",
       "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
       "required_for_core_conformance": false
     },
     {
       "normative_when_claimed": true,
+      "profile": "extension/canonical/profiles/liveness/profile.json",
       "profile_id": "ASET-NETWORK-LIVENESS-V1",
-      "required_for_core_conformance": false,
-      "scope": "FEDERATION_PROFILE_ONLY"
+      "required_for_core_conformance": false
     }
   ],
   "positive_count": 3,

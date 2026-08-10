@@ -11,8 +11,10 @@ Seed
 Network
   owns foreign-evidence admission: imports + ADMIT_IMPORT
 
-Federation Profile
-  owns optional federation topology/lifecycle
+Profiles
+  Dynamic Profile contract
+  Federation Profile -> owns optional federation topology/lifecycle
+  Liveness Profile -> owns optional conditional progress claims
 ```
 
 ### Network core
@@ -48,8 +50,12 @@ The optional `ASET-NETWORK-FEDERATION-PROFILE-V1` owns state `{federation_id, fe
 
 `imports` stays in Network. Terminal recognition stays in the pinned target-local Seed. The profile has its own executable oracle and native conformance cases; it does not depend on a historical Network release model.
 
-Federation safety is checked in `FederationProfile.tla`. Conditional composition liveness is checked separately in `FederationCompositionLiveness.tla`; target-local resolution remains an external Seed-owned progress assumption.
+Federation safety is checked by the profile-local assurance module `profiles/federation/assurance/FederationProfile.tla`. `ASET-NETWORK-LIVENESS-V1` is a separate profile with no state or transition ownership. Their compatibility is checked by the separate assurance relation under `assurance/profile-compositions/federation-liveness/`; target-local resolution remains an external Seed-owned progress assumption.
 
 ## Evidence history
 
 `history` remains a separate normative append-only trace rather than transition-enabling semantic state. It never confers Authority.
+
+## Profile directory boundary
+
+Every optional profile is a separate canonical entity under `extension/canonical/profiles/<profile>/`. Core protocol, conformance and formal directories contain core artifacts only. Cross-profile assurance belongs under `extension/canonical/assurance/profile-compositions/` and MUST NOT be used to imply profile inheritance.

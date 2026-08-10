@@ -3,12 +3,27 @@
   "extension_version": "0.1.0-alpha.3",
   "implementation_precedence": "NONE",
   "normative": true,
+  "optional_profile_catalog": [
+    {
+      "path": "extension/canonical/profiles/dynamic/profile.json",
+      "profile_id": "ASET-NETWORK-DYNAMIC-PROFILES-V1"
+    },
+    {
+      "path": "extension/canonical/profiles/federation/profile.json",
+      "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1"
+    },
+    {
+      "path": "extension/canonical/profiles/liveness/profile.json",
+      "profile_id": "ASET-NETWORK-LIVENESS-V1"
+    }
+  ],
   "optional_profiles": [
     "ASET-NETWORK-DYNAMIC-PROFILES-V1",
-    "ASET-NETWORK-FEDERATION-PROFILE-V1"
+    "ASET-NETWORK-FEDERATION-PROFILE-V1",
+    "ASET-NETWORK-LIVENESS-V1"
   ],
   "profile_id": "ASET-NETWORK-EXTENSION-WIRE-V2",
-  "schema_count": 12,
+  "schema_count": 5,
   "schema_version": 1,
   "schemas": [
     {
@@ -26,27 +41,6 @@
       "sha256": "sha256:e81c2fba6dd54361699665f6ea83c6bdebf45930fab5b3248f74611c783e4729"
     },
     {
-      "id": "https://spec.aset.example/network/0.1/schemas/export-envelope.schema.json",
-      "name": "export-envelope.schema.json",
-      "owner": "FEDERATION_PROFILE",
-      "path": "extension/canonical/protocol/schemas/export-envelope.schema.json",
-      "sha256": "sha256:bc81a8200f1e8d8048ea32b8a3c7bd75c8b992a502effea8b5634765c168065b"
-    },
-    {
-      "id": "https://spec.aset.example/network/0.1/schemas/federation-state.schema.json",
-      "name": "federation-state.schema.json",
-      "owner": "FEDERATION_PROFILE",
-      "path": "extension/canonical/protocol/schemas/federation-state.schema.json",
-      "sha256": "sha256:314ba2906954dfb7064630ef03ddaaa29764e6c5eb5d34c0c47b329253b4255a"
-    },
-    {
-      "id": "https://spec.aset.example/network/0.1/schemas/federation-transition.schema.json",
-      "name": "federation-transition.schema.json",
-      "owner": "FEDERATION_PROFILE",
-      "path": "extension/canonical/protocol/schemas/federation-transition.schema.json",
-      "sha256": "sha256:3fc3d9b9835cbd581f425d8f8f210c04efbb5aa3b5eac009640a7de646d49d74"
-    },
-    {
       "id": "https://spec.aset.example/network/0.1/schemas/import-observation.schema.json",
       "name": "import-observation.schema.json",
       "owner": "CORE",
@@ -54,39 +48,11 @@
       "sha256": "sha256:83b5f72f3f16138eb15484bc3ecf4bbec8354ad72bbf0bc1f974a9510e4b8d9c"
     },
     {
-      "id": "https://spec.aset.example/network/0.1/schemas/member-descriptor.schema.json",
-      "name": "member-descriptor.schema.json",
-      "owner": "FEDERATION_PROFILE",
-      "path": "extension/canonical/protocol/schemas/member-descriptor.schema.json",
-      "sha256": "sha256:e19a71284b0d85cbe5abbbab34abdd0d28f043bc279e1dafc30666fc6530f72b"
-    },
-    {
       "id": "https://spec.aset.example/network/0.1/schemas/network-state.schema.json",
       "name": "network-state.schema.json",
       "owner": "CORE",
       "path": "extension/canonical/protocol/schemas/network-state.schema.json",
       "sha256": "sha256:f5fcd82f24bfc9ea000192da4039c4edee23cdd44d6ba5844a8109371cf8392b"
-    },
-    {
-      "id": "https://spec.aset.example/network/0.1/schemas/profile-binding.schema.json",
-      "name": "profile-binding.schema.json",
-      "owner": "DYNAMIC_PROFILE",
-      "path": "extension/canonical/protocol/schemas/profile-binding.schema.json",
-      "sha256": "sha256:5b5bfa6b04d2a5fb0eb3c87f53030326167046ad6183b7a69240ae5c6f953de1"
-    },
-    {
-      "id": "https://spec.aset.example/network/0.1/schemas/profile-definition.schema.json",
-      "name": "profile-definition.schema.json",
-      "owner": "DYNAMIC_PROFILE",
-      "path": "extension/canonical/protocol/schemas/profile-definition.schema.json",
-      "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
-    },
-    {
-      "id": "https://spec.aset.example/network/0.1/schemas/route-grant.schema.json",
-      "name": "route-grant.schema.json",
-      "owner": "FEDERATION_PROFILE",
-      "path": "extension/canonical/protocol/schemas/route-grant.schema.json",
-      "sha256": "sha256:5d578c62d587ac916c5b929c64bdde04b5b8afb1450b4a65dd08b7eb19863366"
     },
     {
       "id": "https://spec.aset.example/network/0.1/schemas/transition.schema.json",

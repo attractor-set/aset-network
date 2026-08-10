@@ -13,7 +13,7 @@
       "tla_fairness": "WF_vars(Observe(e))"
     },
     {
-      "assurance_projection": "FederationCompositionLiveness.Resolve(e) is an assurance-only witness of target-local Seed terminal progress.",
+      "assurance_projection": "A profile-composition assurance may use Resolve(e) only as a witness of target-local Seed terminal progress.",
       "id": "NET-LIVE-A-003",
       "name": "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION",
       "text": "If target-local Seed resolution for an admitted import remains enabled, that local Seed decision is not postponed forever. This is an external composition assumption, not a Network-owned transition.",
@@ -27,13 +27,22 @@
     }
   ],
   "claim_semantics": {
-    "assumptions_must_be_declared": true,
-    "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
-    "core_conformance_profile": "ASET-NETWORK-FEDERATION-PROFILE-CONFORMANCE-V1",
-    "guarantees_apply_only_while_required_assumptions_hold": true,
+    "claim_type": "OPTIONAL_DYNAMIC_PROFILE",
+    "normative_when_claimed": true,
     "required_for_core_conformance": false
   },
+  "composition_semantics": {
+    "composition_rule": "COMPOSE_WITH_PROFILE_PROVIDING_REQUIRED_CAPABILITIES",
+    "profile_parent_required": false,
+    "required_profile_capabilities": [
+      "RETAINED_EXPORT",
+      "DELIVERY",
+      "TARGET_OBSERVATION"
+    ],
+    "target_local_seed_progress_assumption": "NET-LIVE-A-003"
+  },
   "document_type": "aset-network-extension-liveness-profile",
+  "dynamic_profile_contract": "ASET-NETWORK-DYNAMIC-PROFILES-V1",
   "extension_id": "ASET-NETWORK-EXTENSION",
   "extension_version": "0.1.0-alpha.3",
   "guarantees": [
@@ -69,9 +78,11 @@
       "tla_property": "EventuallyResolved"
     }
   ],
+  "invariants": "extension/canonical/profiles/liveness/invariants.json",
   "normative": true,
-  "parent_profile": "ASET-NETWORK-FEDERATION-PROFILE-V1",
+  "profile_definition": "extension/canonical/profiles/liveness/definition.json",
   "profile_id": "ASET-NETWORK-LIVENESS-V1",
+  "requirements": "extension/canonical/profiles/liveness/requirements.json",
   "resolution_semantics": {
     "eventual_allow_required": false,
     "global_agreement_required": false,
@@ -83,5 +94,6 @@
     "unconditional_transport_guarantee": false
   },
   "schema_version": 1,
-  "scope_rule": "Liveness is an optional Federation Profile composition claim. Delivery and observation remain Network/Federation concerns; terminal resolution remains owned by the pinned target-local Seed. Resolve(e) is assurance-only and creates no Network-owned recognition state."
+  "scope": "extension/canonical/profiles/liveness/scope.json",
+  "scope_rule": "Liveness is an independent optional profile. It adds no Network state or transitions and may be composed with any profile that provides its required progress capabilities. Terminal resolution remains owned by the pinned target-local Seed."
 }

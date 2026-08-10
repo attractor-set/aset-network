@@ -69,12 +69,12 @@
     "profile_binding": {
       "content_addressed_profile_reference": true,
       "role": "EXACT_TARGET_LOCAL_SEED_BINDING",
-      "schema": "extension/canonical/protocol/schemas/profile-binding.schema.json"
+      "schema": "extension/canonical/profiles/dynamic/schemas/profile-binding.schema.json"
     },
     "profile_definition": {
       "content_addressed": true,
       "role": "IMMUTABLE_EXTERNAL_EVIDENCE",
-      "schema": "extension/canonical/protocol/schemas/profile-definition.schema.json"
+      "schema": "extension/canonical/profiles/dynamic/schemas/profile-definition.schema.json"
     }
   },
   "profile_id": "ASET-NETWORK-DYNAMIC-PROFILES-V1",

@@ -65,11 +65,6 @@ def build_relation() -> dict[str, object]:
                 "formal_model": "NetworkHistory",
                 "scope": "APPEND_ONLY_ADMISSION_TRACE",
             },
-            "federation_lifecycle": {
-                "owner": "ASET-NETWORK-FEDERATION-PROFILE-V1",
-                "required_for_core_conformance": False,
-                "formal_model": "FederationProfile",
-            },
             "terminal_recognition": {"owner": "PINNED_TARGET_LOCAL_SEED"},
         },
         "seed_projection": {
@@ -123,25 +118,6 @@ def build_relation() -> dict[str, object]:
             "config": "extension/canonical/formal/NetworkHistory.cfg",
             "config_sha256": sha(F / "NetworkHistory.cfg"),
             "scope": "APPEND_ONLY_ADMISSION_TRACE",
-        },
-        "federation_assurance": {
-            "safety_model": {
-                "module": "FederationProfile",
-                "path": "extension/canonical/formal/FederationProfile.tla",
-                "sha256": sha(F / "FederationProfile.tla"),
-                "config": "extension/canonical/formal/FederationProfile.cfg",
-                "config_sha256": sha(F / "FederationProfile.cfg"),
-                "scope": "OPTIONAL_PROFILE_SAFETY",
-            },
-            "liveness_model": {
-                "module": "FederationCompositionLiveness",
-                "path": "extension/canonical/formal/FederationCompositionLiveness.tla",
-                "sha256": sha(F / "FederationCompositionLiveness.tla"),
-                "config": "extension/canonical/formal/FederationCompositionLiveness.cfg",
-                "config_sha256": sha(F / "FederationCompositionLiveness.cfg"),
-                "scope": "OPTIONAL_COMPOSITION_LIVENESS_ASSURANCE",
-                "seed_resolution_owner": "PINNED_TARGET_LOCAL_SEED",
-            },
         },
         "upstream_seed": {
             "release_tag": binding["seed_release_tag"],

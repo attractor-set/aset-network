@@ -17,7 +17,7 @@ Required before producing the baseline:
 - conformance tests pass;
 - TLC safety passes;
 - TLC history passes;
-- TLC conditional Federation Profile liveness passes when that optional claim is included;
+- TLC conditional Federation+Liveness profile-composition assurance passes when that optional claim is included;
 - canon -> Network TLAPS refinement/equivalence gate passes;
 - Network -> pinned Seed TLAPS refinement gate passes;
 
@@ -36,7 +36,7 @@ minimal NetworkExtension.tla
 pinned SeedResolution.tla
 ```
 
-TLC safety/history and optional Federation Profile liveness are separate bounded assurance surfaces and do not replace TLAPS.
+TLC safety/history and optional Federation+Liveness profile-composition assurance are separate bounded assurance surfaces and do not replace TLAPS.
 
 ## 2. Frozen identity record
 
