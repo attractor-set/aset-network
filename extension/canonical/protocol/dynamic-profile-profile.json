@@ -2,6 +2,14 @@
   "activation_semantics": {
     "active_profile_registry_is_normative_state": false,
     "availability_implies_activation": false,
+    "lifetime_semantics": {
+      "ambient_activation_state_defined": false,
+      "exact_state_binding_required": true,
+      "persistent_profile_policy_root_may_be_parent_defined": true,
+      "rule": "APPLICABILITY_EXISTS_ONLY_FOR_THE_EXACT_PROJECTED_SEED_BINDING",
+      "state_root_change_carries_forward": false,
+      "state_root_interpretation": "ProfileBinding.target_state_root is the exact state_root supplied to Seed for this resolution. This Network profile does not redefine Seed state-root semantics or carry ALLOW across a different state_root."
+    },
     "network_observation_implies_activation": false,
     "remote_recognition_implies_activation": false,
     "resolution_id_rule": "A fresh Seed resolution_id is required for each activation or reconsideration cycle.",
@@ -15,6 +23,13 @@
       "state_root": "ProfileBinding.target_state_root"
     },
     "verification_implies_activation": false
+  },
+  "assurance_semantics": {
+    "absence_means": "NO_REFINEMENT_EVIDENCE_IS_BOUND_BY_PROFILE_DEFINITION",
+    "base_refinement_claim": "NORMATIVE_NO_WEAKENING_OBLIGATION_NOT_PROOF_STATUS",
+    "mechanically_proved_status_rule": "A profile MUST NOT claim MECHANICALLY_PROVED refinement solely because refinement_evidence_digest is present; an independently verified assurance artifact bound by that digest must carry the proof status.",
+    "presence_means": "BINDS_AN_EXTERNAL_EVIDENCE_ARTIFACT_ONLY",
+    "refinement_evidence_digest_optional": true
   },
   "claim_semantics": {
     "claim_type": "OPTIONAL_CAPABILITY_CLAIM",
@@ -34,6 +49,7 @@
     "prefix": "sha256:",
     "rules": {
       "binding_digest": "SHA-256 of ProfileBinding with binding_digest omitted.",
+      "jcs_number_domain": "Profile wire schemas contain integer policy epochs only; target_policy_epoch is bounded to the interoperable IEEE-754 safe-integer range for deterministic RFC 8785 serialization.",
       "profile_digest": "SHA-256 of ProfileDefinition with profile_digest omitted."
     }
   },

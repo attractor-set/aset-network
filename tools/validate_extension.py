@@ -7,6 +7,11 @@ from pathlib import Path
 from jsonschema import Draft202012Validator
 from referencing import Registry, Resource
 
+from dynamic_profile_conformance import (
+    JCS_SAFE_INTEGER_MAX,
+    run_profile_conformance,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 CANON = ROOT / "extension/canonical"
 FORMAL_RELATION = CANON / "formal/canon-tla-relation.json"
@@ -321,6 +326,14 @@ def main() -> int:
         raise SystemExit("claimed dynamic-profile surface must remain normative")
     if dynamic_claim.get("activation_authority") != "TARGET_LOCAL_SEED_ONLY":
         raise SystemExit("dynamic-profile activation authority must remain target-local Seed")
+    if dynamic_claim.get("conformance_profile") != (
+        "extension/canonical/conformance/dynamic-profile-conformance-profile.json"
+    ):
+        raise SystemExit("dynamic-profile conformance profile binding mismatch")
+    if dynamic_claim.get("refinement_claim_status") != (
+        "DECLARED_NO_WEAKENING_NOT_MECHANICALLY_PROVED_BY_DEFAULT"
+    ):
+        raise SystemExit("dynamic-profile refinement claim status mismatch")
 
     dynamic_profile = json.loads(
         (CANON / "protocol/dynamic-profile-profile.json").read_text(encoding="utf-8")
@@ -366,6 +379,36 @@ def main() -> int:
         raise SystemExit("dynamic profile canonicalization mismatch")
     if digest_profile.get("hash") != "SHA-256":
         raise SystemExit("dynamic profile digest hash mismatch")
+    if "safe-integer range" not in digest_profile.get("rules", {}).get(
+        "jcs_number_domain", ""
+    ):
+        raise SystemExit("dynamic profile JCS integer domain must remain explicit")
+
+    lifetime = activation.get("lifetime_semantics", {})
+    if lifetime.get("rule") != (
+        "APPLICABILITY_EXISTS_ONLY_FOR_THE_EXACT_PROJECTED_SEED_BINDING"
+    ):
+        raise SystemExit("dynamic profile lifetime rule mismatch")
+    if lifetime.get("exact_state_binding_required") is not True:
+        raise SystemExit("dynamic profile must preserve exact Seed state binding")
+    if lifetime.get("state_root_change_carries_forward") is not False:
+        raise SystemExit("dynamic profile ALLOW must not carry across state_root changes")
+    if lifetime.get("ambient_activation_state_defined") is not False:
+        raise SystemExit("dynamic profile must not define ambient activation state")
+
+    assurance = dynamic_profile.get("assurance_semantics", {})
+    if assurance.get("base_refinement_claim") != (
+        "NORMATIVE_NO_WEAKENING_OBLIGATION_NOT_PROOF_STATUS"
+    ):
+        raise SystemExit("dynamic profile base refinement assurance mismatch")
+    if assurance.get("refinement_evidence_digest_optional") is not True:
+        raise SystemExit("dynamic profile refinement evidence must remain optional")
+    if assurance.get("presence_means") != "BINDS_AN_EXTERNAL_EVIDENCE_ARTIFACT_ONLY":
+        raise SystemExit("dynamic profile evidence digest must not imply proof status")
+    if "MUST NOT claim MECHANICALLY_PROVED" not in assurance.get(
+        "mechanically_proved_status_rule", ""
+    ):
+        raise SystemExit("dynamic profile proof-status boundary mismatch")
 
     refinement = dynamic_profile.get("refinement_semantics", {})
     if refinement.get("may_strengthen_parent") is not True:
@@ -407,6 +450,23 @@ def main() -> int:
         resources.append((data["$id"], Resource.from_contents(data)))
         by_name[path.name] = data
     registry = Registry().with_resources(resources)
+
+    profile_binding_schema = by_name["profile-binding.schema.json"]
+    target_context = profile_binding_schema["properties"]["target_context_id"]
+    if target_context != {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 256,
+        "pattern": r"^[A-Za-z0-9][A-Za-z0-9._:/\-]*$",
+    }:
+        raise SystemExit("dynamic profile target_context_id must stay Network/Seed-compatible")
+    target_epoch = profile_binding_schema["properties"]["target_policy_epoch"]
+    if target_epoch != {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": JCS_SAFE_INTEGER_MAX,
+    }:
+        raise SystemExit("dynamic profile policy epoch must stay JCS-interoperable")
 
     validator = Draft202012Validator(by_name["conformance-case.schema.json"], registry=registry)
     for path in (CANON / "conformance/cases").rglob("*.json"):
@@ -487,8 +547,31 @@ def main() -> int:
     if refinement.get("obligations_proved") != gate.get("obligations_proved"):
         raise SystemExit("ERROR: Seed refinement relation obligation evidence mismatch")
     print("OK: Seed TLAPS refinement mechanically proved")
+    dynamic_conformance_path = CANON / "conformance/dynamic-profile-conformance-profile.json"
+    dynamic_conformance = json.loads(dynamic_conformance_path.read_text(encoding="utf-8"))
+    if dynamic_conformance.get("claims_profile") != "ASET-NETWORK-DYNAMIC-PROFILES-V1":
+        raise SystemExit("dynamic-profile conformance claim binding mismatch")
+    if dynamic_conformance.get("required_for_core_conformance") is not False:
+        raise SystemExit("dynamic-profile cases must remain optional for core conformance")
+    cases = dynamic_conformance.get("cases", [])
+    if dynamic_conformance.get("case_count") != len(cases):
+        raise SystemExit("dynamic-profile conformance case count mismatch")
+    for item in cases:
+        case_path = ROOT / item["path"]
+        if not case_path.is_file():
+            raise SystemExit(f"missing dynamic-profile conformance case: {item['path']}")
+        if sha(case_path) != item["sha256"]:
+            raise SystemExit(f"dynamic-profile conformance digest mismatch: {item['case_id']}")
+    profile_failures = run_profile_conformance()
+    if profile_failures:
+        case_id, expected, actual = profile_failures[0]
+        raise SystemExit(
+            f"dynamic-profile conformance failed: {case_id}: expected={expected} actual={actual}"
+        )
+
     print("OK: schemas valid")
-    print("OK: conformance cases valid")
+    print("OK: core conformance cases valid")
+    print(f"OK: dynamic-profile conformance cases={len(cases)}")
     return 0
 
 

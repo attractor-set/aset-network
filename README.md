@@ -52,9 +52,9 @@ The main safety/liveness TLC state deliberately excludes the append-only executi
 
 ## Optional dynamic profiles
 
-`ASET-NETWORK-DYNAMIC-PROFILES-V1` adds a Seed-style profile boundary without adding Network state or transitions. Profile definitions are immutable content-addressed evidence; exact profile bindings project directly to Seed `ResolutionBinding` and become applicable only through target-local Seed `ALLOW`. Verification, availability, remote recognition and observation never activate a profile by themselves. The profile deliberately defines no runtime plugin lifecycle, precedence system or universal composition algebra.
+`ASET-NETWORK-DYNAMIC-PROFILES-V1` adds a Seed-style profile boundary without adding Network state or transitions. Profile definitions are immutable content-addressed evidence; exact profile bindings project directly to Seed `ResolutionBinding` and become applicable only through target-local Seed `ALLOW`. The binding domain is deliberately closed under the intersection of the Network and pinned Seed identifier domains, and profile/binding digests are checked by executable optional conformance cases. Applicability is exact-binding scoped: an `ALLOW` does not carry across a different Seed `state_root`. Verification, availability, remote recognition and observation never activate a profile by themselves. The no-weakening rule is normative but is not, by itself, a mechanically-proved refinement claim. The profile deliberately defines no runtime plugin lifecycle, precedence system or universal composition algebra.
 
-See `extension/canonical/protocol/dynamic-profile-profile.json` and the `profile-definition.schema.json` / `profile-binding.schema.json` wire schemas.
+See `extension/canonical/protocol/dynamic-profile-profile.json`, the `profile-definition.schema.json` / `profile-binding.schema.json` wire schemas, and `extension/canonical/conformance/dynamic-profile-conformance-profile.json`.
 
 ## Deliberately outside this alpha
 

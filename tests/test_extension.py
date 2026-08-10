@@ -610,3 +610,121 @@ def test_dynamic_profile_is_optional_core_claim() -> None:
     assert claim["required_for_core_conformance"] is False
     assert claim["normative_when_claimed"] is True
     assert claim["activation_authority"] == "TARGET_LOCAL_SEED_ONLY"
+
+
+def test_dynamic_profile_target_context_domain_is_closed_under_seed_projection() -> None:
+    schema = json.loads(
+        (
+            ROOT / "extension/canonical/protocol/schemas/profile-binding.schema.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert schema["properties"]["target_context_id"] == {
+        "type": "string",
+        "minLength": 3,
+        "maxLength": 256,
+        "pattern": r"^[A-Za-z0-9][A-Za-z0-9._:/\-]*$",
+    }
+    assert schema["properties"]["target_policy_epoch"] == {
+        "type": "integer",
+        "minimum": 0,
+        "maximum": 9007199254740991,
+    }
+
+
+def test_dynamic_profile_content_addressing_is_executable() -> None:
+    from tools.dynamic_profile_conformance import content_digest, validate_wire_object
+
+    profile = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-001.json"
+        ).read_text(encoding="utf-8")
+    )["object"]
+    accepted, code = validate_wire_object("PROFILE_DEFINITION", profile)
+    assert (accepted, code) == (True, "PROFILE_DEFINITION_VALID")
+    assert profile["profile_digest"] == content_digest(profile, "profile_digest")
+
+    mutated = dict(profile)
+    mutated["profile_version"] = "v2"
+    accepted, code = validate_wire_object("PROFILE_DEFINITION", mutated)
+    assert (accepted, code) == (False, "PROFILE_DIGEST_MISMATCH")
+
+
+def test_dynamic_profile_binding_digest_is_executable() -> None:
+    from tools.dynamic_profile_conformance import content_digest, validate_wire_object
+
+    binding = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+        ).read_text(encoding="utf-8")
+    )["object"]
+    accepted, code = validate_wire_object("PROFILE_BINDING", binding)
+    assert (accepted, code) == (True, "PROFILE_BINDING_VALID")
+    assert binding["binding_digest"] == content_digest(binding, "binding_digest")
+
+
+def test_dynamic_profile_allow_does_not_carry_across_state_root_change() -> None:
+    from tools.dynamic_profile_conformance import execute_case as execute_profile_case
+
+    case = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-004.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert execute_profile_case(case) == case["expected"]
+    assert case["expected"] == {"accepted": False, "code": "SEED_BINDING_MISMATCH"}
+
+
+def test_dynamic_profile_refinement_claim_does_not_imply_proof_status() -> None:
+    profile = json.loads(
+        (
+            ROOT / "extension/canonical/protocol/dynamic-profile-profile.json"
+        ).read_text(encoding="utf-8")
+    )
+    assurance = profile["assurance_semantics"]
+    assert assurance["base_refinement_claim"] == (
+        "NORMATIVE_NO_WEAKENING_OBLIGATION_NOT_PROOF_STATUS"
+    )
+    assert assurance["refinement_evidence_digest_optional"] is True
+    assert assurance["presence_means"] == "BINDS_AN_EXTERNAL_EVIDENCE_ARTIFACT_ONLY"
+    assert "MUST NOT claim MECHANICALLY_PROVED" in assurance["mechanically_proved_status_rule"]
+
+
+def test_dynamic_profile_optional_conformance_cases_are_exact() -> None:
+    from tools.dynamic_profile_conformance import run_profile_conformance
+
+    profile = json.loads(
+        (
+            ROOT / "extension/canonical/conformance/dynamic-profile-conformance-profile.json"
+        ).read_text(encoding="utf-8")
+    )
+    assert profile["claims_profile"] == "ASET-NETWORK-DYNAMIC-PROFILES-V1"
+    assert profile["required_for_core_conformance"] is False
+    assert profile["case_count"] == 8
+    assert profile["positive_count"] == 3
+    assert profile["negative_count"] == 5
+    assert run_profile_conformance() == []
+
+
+def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_form() -> None:
+    from tools.dynamic_profile_conformance import project_seed_binding
+
+    case = json.loads(
+        (
+            ROOT
+            / "extension/canonical/conformance/dynamic-profile-cases/positive/DP-POS-002.json"
+        ).read_text(encoding="utf-8")
+    )
+    projected = project_seed_binding(case["object"])
+    payload = {key: value for key, value in projected.items() if key != "binding_digest"}
+    canonical = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        allow_nan=False,
+    ).encode("utf-8")
+    expected = "sha256:" + hashlib.sha256(canonical).hexdigest()
+    assert projected["binding_digest"] == expected

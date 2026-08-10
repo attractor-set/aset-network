@@ -248,8 +248,10 @@
     },
     {
       "activation_authority": "TARGET_LOCAL_SEED_ONLY",
+      "conformance_profile": "extension/canonical/conformance/dynamic-profile-conformance-profile.json",
       "normative_when_claimed": true,
       "profile_id": "ASET-NETWORK-DYNAMIC-PROFILES-V1",
+      "refinement_claim_status": "DECLARED_NO_WEAKENING_NOT_MECHANICALLY_PROVED_BY_DEFAULT",
       "required_for_core_conformance": false
     }
   ],
