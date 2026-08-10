@@ -60,7 +60,7 @@ all federation actions -> stutter on imports
 legacy resolution      -> stutter on imports
 ```
 
-`NetworkLegacyAdmissionRefinementProofs.tla` contains the temporal refinement theorem candidate `LegacyNetworkRefinesMinimalAdmission`. Its status is deliberately pending until the pinned local TLAPM gate succeeds.
+`NetworkLegacyAdmissionRefinementProofs.tla` contains the temporal refinement theorem `LegacyNetworkRefinesMinimalAdmission`. It is materialized as `MECHANICALLY_PROVED` with `23/23` obligations under the pinned TLAPM.
 
 ## Evidence history
 

@@ -16,7 +16,7 @@ foreign evidence -> ADMIT_IMPORT -> target-local UNKNOWN/BLOCKED import -> Seed
 
 `imports` is the only Network semantic-state field. `ADMIT_IMPORT` is the only Network transition kind. Admission never authorizes an effect and never creates terminal recognition. `ALLOW` / `BLOCK` remain exclusively target-local Seed semantics.
 
-Federation membership, routing, source export lifecycle and conditional transport liveness are optional profile concerns, not Network-core semantics.
+Federation membership, routing, source export lifecycle and conditional liveness are optional profile concerns, not Network-core semantics. Any terminal-resolution liveness claim is explicitly target-local Seed-owned.
 
 ## Upstream binding
 

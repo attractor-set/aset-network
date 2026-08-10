@@ -1,5 +1,5 @@
 from __future__ import annotations
-import hashlib,json,subprocess,sys
+import hashlib,json,subprocess,sys,tomllib
 from pathlib import Path
 from jsonschema import Draft202012Validator
 from referencing import Registry,Resource
@@ -22,6 +22,8 @@ def registry():
  return Registry().with_resources(resources),schemas
 def main():
  package=self_digest(C/'CANON_PACKAGE.json','package_digest')
+ project=tomllib.loads((ROOT/'pyproject.toml').read_text())['project']
+ if project.get('version')!='0.1.0a3' or project.get('description')!='Minimal cross-context evidence admission extension for ASET Seed': raise SystemExit('project metadata does not match alpha.3 minimal admission release')
  if package['extension_version']!='0.1.0-alpha.3' or package['canon_id']!='ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3': raise SystemExit('package identity mismatch')
  for item in package['files']:
   p=ROOT/item['path']
@@ -60,10 +62,24 @@ def main():
  if canon['generated_projection']['profile']!='ASET-NETWORK-CANON-TLA-PROJECTION-V3' or canon['source_model']['sha256']!=sha(C/'source/network-extension-model.json') or canon['target_model']['sha256']!=sha(C/'formal/NetworkExtension.tla'): raise SystemExit('canon refinement binding mismatch')
  if canon['status']!='MECHANICALLY_PROVED' or canon['proof_evidence'].get('status')!='MECHANICALLY_PROVED' or canon['proof_evidence'].get('obligations_proved')!=3: raise SystemExit('canon refinement materialization mismatch')
  reduction=json.loads((C/'assurance/minimal-core-reduction.json').read_text())
+ if reduction.get('normative_core',{}).get('semantic_state_fields')!=['imports'] or reduction.get('normative_core',{}).get('transition_kinds')!=['ADMIT_IMPORT']: raise SystemExit('minimal-core reduction metadata still uses non-normative/shadow core')
  if reduction['verification'].get('legacy_tlaps_status')!='MECHANICALLY_PROVED' or reduction['verification'].get('legacy_tlaps_obligations_proved')!=23: raise SystemExit('minimal-core legacy proof materialization mismatch')
  if rel['canon_projection'].get('status')!='MECHANICALLY_PROVED' or rel['canon_projection'].get('obligations_proved')!=3: raise SystemExit('formal relation canon proof status/count mismatch')
  if rel['seed_refinement'].get('status')!='MECHANICALLY_PROVED' or rel['seed_refinement'].get('obligations_proved')!=35: raise SystemExit('formal relation Seed proof status/count mismatch')
  if rel['legacy_alpha2_refinement'].get('status')!='MECHANICALLY_PROVED' or rel['legacy_alpha2_refinement'].get('obligations_proved')!=23: raise SystemExit('formal relation legacy proof status/count mismatch')
+ harness=rel.get('tlc_harness',{})
+ if harness.get('module')!='NetworkExtensionTLC' or harness.get('properties')!=['ImportsAppendOnlyTemporal']: raise SystemExit('TLC temporal harness relation mismatch')
+ for key,dkey in [('path','sha256'),('config','config_sha256')]:
+  if sha(ROOT/harness[key])!=harness[dkey]: raise SystemExit(f'TLC temporal harness digest mismatch: {key}')
+ ht=(C/'formal/NetworkExtensionTLC.tla').read_text()
+ if 'ImportsAppendOnlyTemporal == [][ImportsAppendOnly]_vars' not in ht: raise SystemExit('TLC append-only property must temporalize the normative action predicate')
+ base_cfg=(C/'formal/NetworkExtension.cfg').read_text(); harness_cfg=(C/'formal/NetworkExtensionTLC.cfg').read_text()
+ if 'PROPERTIES' in base_cfg or 'ImportsAppendOnlyTemporal' not in harness_cfg: raise SystemExit('TLC property must live only in the temporal harness config')
+ live=json.loads((C/'liveness/liveness-profile.json').read_text())
+ if live.get('parent_profile')!='ASET-NETWORK-FEDERATION-PROFILE-V1': raise SystemExit('liveness parent profile mismatch')
+ rs=live.get('resolution_semantics',{})
+ if rs.get('resolution_owner')!='PINNED_TARGET_LOCAL_SEED' or rs.get('terminal_local_results')!=['ALLOW','BLOCK'] or rs.get('legacy_assurance_projection')!={'ACCEPT':'ALLOW','DENY':'BLOCK'}: raise SystemExit('liveness terminal-resolution ownership/projection mismatch')
+ if not any(a.get('id')=='NET-LIVE-A-003' and a.get('name')=='TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION' for a in live.get('assumptions',[])): raise SystemExit('liveness Seed progress assumption mismatch')
  r,schemas=registry(); protocol=json.loads((C/'protocol/protocol-profile.json').read_text())
  actual={p.name:sha(p) for p in S.glob('*.json')}
  if protocol['schema_count']!=len(actual) or {x['name']:x['sha256'] for x in protocol['schemas']}!=actual: raise SystemExit('protocol schema catalogue mismatch')

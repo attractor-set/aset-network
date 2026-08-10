@@ -4,6 +4,7 @@ import hashlib
 import json
 import subprocess
 import sys
+import tomllib
 from pathlib import Path
 
 from reference.network_reference import apply_transition, execute_case
@@ -362,3 +363,54 @@ def test_full_local_non_tlaps_validation_stack() -> None:
     ]:
         r=subprocess.run(cmd,cwd=ROOT,text=True,capture_output=True)
         assert r.returncode==0,r.stdout+r.stderr
+
+
+def test_release_metadata_matches_alpha3_minimal_admission() -> None:
+    project=tomllib.loads((ROOT/"pyproject.toml").read_text())["project"]
+    assert project["version"]=="0.1.0a3"
+    assert project["description"]=="Minimal cross-context evidence admission extension for ASET Seed"
+
+
+def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
+    live=json.loads((ROOT/"extension/canonical/liveness/liveness-profile.json").read_text())
+    assert live["parent_profile"]=="ASET-NETWORK-FEDERATION-PROFILE-V1"
+    assert live["resolution_semantics"]["resolution_owner"]=="PINNED_TARGET_LOCAL_SEED"
+    assert live["resolution_semantics"]["terminal_local_results"]==["ALLOW","BLOCK"]
+    assert live["resolution_semantics"]["legacy_assurance_projection"]=={"ACCEPT":"ALLOW","DENY":"BLOCK"}
+    a3=next(x for x in live["assumptions"] if x["id"]=="NET-LIVE-A-003")
+    assert a3["name"]=="TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
+
+
+def test_reduction_metadata_no_longer_calls_normative_core_candidate() -> None:
+    reduction=json.loads((ROOT/"extension/canonical/assurance/minimal-core-reduction.json").read_text())
+    assert "candidate" not in reduction
+    assert reduction["normative_core"]["semantic_state_fields"]==["imports"]
+    assert reduction["normative_core"]["transition_kinds"]==["ADMIT_IMPORT"]
+    fed=json.loads((ROOT/"extension/canonical/protocol/federation-profile.json").read_text())
+    assert "candidate_network_transition" not in fed["extraction_semantics"]
+    assert fed["extraction_semantics"]["normative_network_transition"]==["ADMIT_IMPORT"]
+
+
+def test_tlc_append_only_property_is_temporal_harness_only() -> None:
+    formal = ROOT / "extension/canonical/formal"
+    normative = (formal / "NetworkExtension.tla").read_text()
+    harness = (formal / "NetworkExtensionTLC.tla").read_text()
+    base_cfg = (formal / "NetworkExtension.cfg").read_text()
+    harness_cfg = (formal / "NetworkExtensionTLC.cfg").read_text()
+    runner = (ROOT / "tools/run_tlc.py").read_text()
+
+    assert "ImportsAppendOnly == imports \\subseteq imports'" in normative
+    assert "ImportsAppendOnlyTemporal == [][ImportsAppendOnly]_vars" in harness
+    assert "PROPERTIES" not in base_cfg
+    assert "ImportsAppendOnlyTemporal" in harness_cfg
+    assert "'safety':('NetworkExtensionTLC.tla','NetworkExtensionTLC.cfg')" in runner
+
+
+def test_tlc_harness_does_not_change_normative_proof_target() -> None:
+    relation = json.loads(
+        (ROOT / "extension/canonical/formal/canon-tla-relation.json").read_text()
+    )
+    assert relation["target_model"]["module"] == "NetworkExtension"
+    assert relation["target_model"]["path"] == "extension/canonical/formal/NetworkExtension.tla"
+    assert relation["tlc_harness"]["scope"] == "BOUNDED_TEMPORAL_MODEL_CHECKING_ONLY"
+    assert relation["tlc_harness"]["properties"] == ["ImportsAppendOnlyTemporal"]

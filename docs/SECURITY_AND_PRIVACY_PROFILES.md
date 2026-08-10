@@ -1,5 +1,5 @@
 # Security and privacy profiles
 
-The federation-recognition core is cryptographically neutral. Implementations must bind a separately versioned security profile declaring at least identity proof, signature verification, replay protection, key custody, revocation, transport confidentiality and audit retention.
+The minimal admission core is cryptographically neutral. Implementations that claim a concrete security profile must separately declare identity proof, signature verification, replay protection, key custody, revocation, transport confidentiality and audit-retention guarantees appropriate to that profile. Federation-specific security requirements belong to the optional Federation Profile or to profiles composed over it, not to the universal Network core.
 
-Homomorphic encryption is a valid future privacy profile for inter-federative or metafederative computation over private inputs. Such a profile must preserve local sovereignty: joint computation does not create a superior Context, and every participant retains local authority to recognize or reject the resulting Outcome.
+Homomorphic encryption remains a valid future privacy profile for inter-federative or metafederative computation over private inputs. Such a profile must preserve local sovereignty: joint computation does not create a superior Context, and every participant retains target-local Seed authority over recognition of resulting evidence or outcomes.

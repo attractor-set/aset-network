@@ -1,5 +1,5 @@
 ------------------------ MODULE NetworkAdmissionCore ------------------------
-EXTENDS NetworkExtension
+EXTENDS NetworkExtensionTLC
 
 (***************************************************************************
 Compatibility name retained from the alpha.2 shadow-extraction slice.

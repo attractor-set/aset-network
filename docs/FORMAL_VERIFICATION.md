@@ -45,7 +45,7 @@ A TLC pass checks a bounded state space. It is not a substitute for any of these
 
 ## Legacy refinement
 
-`NetworkLegacyAlpha2.tla` preserves the previous assurance model as an historical proof source. The cutover mapping instantiates alpha.3 `NetworkExtension` on the legacy `imports` variable. `Observe` refines `AdmitImport`; all other legacy actions stutter with respect to `imports`. The intended final theorem is:
+`NetworkLegacyAlpha2.tla` preserves the previous assurance model as an historical proof source. The cutover mapping instantiates alpha.3 `NetworkExtension` on the legacy `imports` variable. `Observe` refines `AdmitImport`; all other legacy actions stutter with respect to `imports`. The mechanically proved final theorem is:
 
 ```text
 LegacyNetworkRefinesMinimalAdmission ==

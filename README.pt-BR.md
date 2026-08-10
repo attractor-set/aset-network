@@ -14,7 +14,7 @@ foreign evidence -> ADMIT_IMPORT -> UNKNOWN/BLOCKED -> target-local Seed
 
 O Network possui uma única estrutura de estado semântico, `imports`, e uma única transição mutável, `ADMIT_IMPORT`. A admissão não cria Authority nem autoriza efeitos. `ALLOW/BLOCK` terminais pertencem exclusivamente ao Seed local.
 
-Federação, rotas, ciclo de exportação e liveness de transporte condicional são perfis opcionais.
+Federação, rotas, ciclo de exportação e liveness condicional são perfis opcionais. Qualquer garantia de terminal-resolution permanece explicitamente sob o Seed local do alvo.
 
 ## Vínculo com Seed
 

@@ -8,9 +8,6 @@
   "dynamic_profile_contract": "ASET-NETWORK-DYNAMIC-PROFILES-V1",
   "extension_version": "0.1.0-alpha.3",
   "extraction_semantics": {
-    "candidate_network_transition": [
-      "ADMIT_IMPORT"
-    ],
     "legacy_mapping": {
       "OBSERVE_IMPORT": "ADMIT_IMPORT",
       "RECORD_RECOGNITION": "SEED_DERIVED_STUTTER"
@@ -19,6 +16,9 @@
       "imports"
     ],
     "normative_core_changed_by_this_slice": true,
+    "normative_network_transition": [
+      "ADMIT_IMPORT"
+    ],
     "phase": "NORMATIVE_PROFILE_AFTER_CORE_CUTOVER",
     "profile_owned_legacy_state_fields": [
       "federation_id",

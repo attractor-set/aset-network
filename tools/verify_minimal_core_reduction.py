@@ -21,7 +21,7 @@ def verify_profile_definition():
 
 def verify_decomposition():
     r=json.loads(REDUCTION.read_text()); f=json.loads(FED.read_text())
-    if r['candidate']['semantic_state_fields']!=['imports'] or r['candidate']['transition_kinds']!=['ADMIT_IMPORT']:
+    if r['normative_core']['semantic_state_fields']!=['imports'] or r['normative_core']['transition_kinds']!=['ADMIT_IMPORT']:
         raise SystemExit('normative minimal core is not imports + ADMIT_IMPORT')
     if r.get('normative') is not True or r.get('status')!='NORMATIVE_CUTOVER_ALPHA3':
         raise SystemExit('minimal-core reduction is not normative cutover')

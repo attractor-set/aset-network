@@ -101,10 +101,10 @@
       "owner": "PINNED_TARGET_LOCAL_SEED"
     }
   },
-  "relation_digest": "sha256:c0b0ab2ff5b5e7946bfca8da433c10a377ada148cfe2a335e7292d071cb8e8f0",
+  "relation_digest": "sha256:20aaa94015a73f3c22d99cf42d2d764eb05635795f93006df60bfdac72fdf5a3",
   "safety_model": {
     "config": "extension/canonical/formal/NetworkExtension.cfg",
-    "sha256": "sha256:290cc7670c8dce217748d0d2a0541309cca12b0760263cf009c155c424e6b16f",
+    "sha256": "sha256:2df6ff47534df5fe77fc793cb0f91d84cb310e1c626d7a0c6f535e7497c4bb34",
     "specification": "SafetySpec"
   },
   "schema_version": 1,
@@ -146,6 +146,17 @@
     "path": "extension/canonical/formal/NetworkExtension.tla",
     "scope": "MINIMAL_ADMISSION_SEMANTIC_STATE_SAFETY_MODEL",
     "sha256": "sha256:ac09e7b12a182236f0f3da402ee50552fc89d525891f510dad2142fc1ff57521"
+  },
+  "tlc_harness": {
+    "config": "extension/canonical/formal/NetworkExtensionTLC.cfg",
+    "config_sha256": "sha256:69f0465f0ce0cfd0f2e253fc001d825d4abef625250bdb950fd9e9235f821c9c",
+    "module": "NetworkExtensionTLC",
+    "path": "extension/canonical/formal/NetworkExtensionTLC.tla",
+    "properties": [
+      "ImportsAppendOnlyTemporal"
+    ],
+    "scope": "BOUNDED_TEMPORAL_MODEL_CHECKING_ONLY",
+    "sha256": "sha256:2ec8b55fbf12e257ffd5660443efc5fd59ed52b7df6d8078a3c466a18f5aaa1f"
   },
   "upstream_seed": {
     "canon_id": "ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1",

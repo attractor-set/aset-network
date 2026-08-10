@@ -14,7 +14,7 @@ foreign evidence -> ADMIT_IMPORT -> UNKNOWN/BLOCKED -> target-local Seed
 
 У Network ровно одна структура семантического состояния — `imports` — и один изменяющий переход — `ADMIT_IMPORT`. Admission не создаёт Authority и не разрешает effect. Терминальные `ALLOW/BLOCK` принадлежат только локальному Seed.
 
-Федеративное членство, маршруты, экспортный lifecycle и условная transport-liveness вынесены в опциональные профили.
+Федеративное членство, маршруты, экспортный lifecycle и условная liveness вынесены в опциональные профили. Любая terminal-resolution liveness явно остаётся в собственности target-local Seed.
 
 ## Привязка к Seed
 

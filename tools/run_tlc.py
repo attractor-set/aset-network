@@ -3,11 +3,11 @@ import argparse, os, shutil, subprocess
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1]; FORMAL=ROOT/'extension/canonical/formal'; DEFAULT_JAR=ROOT/'.tooling/tla2tools.jar'; META=ROOT/'.tooling/tlc'
 MODELS={
- 'safety':('NetworkExtension.tla','NetworkExtension.cfg'),
+ 'safety':('NetworkExtensionTLC.tla','NetworkExtensionTLC.cfg'),
  'admission-alias':('NetworkAdmissionCore.tla','NetworkAdmissionCore.cfg'),
  'history':('NetworkHistory.tla','NetworkHistory.cfg'),
  'legacy-safety':('NetworkLegacyAlpha2.tla','NetworkLegacyAlpha2.cfg'),
- 'legacy-liveness':('NetworkLegacyAlpha2.tla','NetworkLegacyAlpha2Liveness.cfg'),
+ 'federation-liveness':('NetworkLegacyAlpha2.tla','NetworkLegacyAlpha2Liveness.cfg'),
 }
 def main():
  ap=argparse.ArgumentParser(); ap.add_argument('model',choices=[*MODELS,'all'],nargs='?',default='all'); ap.add_argument('--jar',type=Path); a=ap.parse_args(); jar=(a.jar or Path(os.environ.get('TLA2TOOLS_JAR',DEFAULT_JAR))).expanduser().resolve()

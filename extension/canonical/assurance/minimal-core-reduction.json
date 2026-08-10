@@ -1,21 +1,48 @@
 {
-  "candidate": {
-    "evidence_history_fields": ["history"],
-    "formal_config": "extension/canonical/formal/NetworkExtension.cfg",
-    "formal_model": "extension/canonical/formal/NetworkExtension.tla",
-    "semantic_state_fields": ["imports"],
-    "transition_kinds": ["ADMIT_IMPORT"]
-  },
   "decomposition": {
-    "federation_profile_state_fields": ["federation_id", "federation_epoch", "members", "routes", "exports"],
-    "federation_profile_transition_kinds": ["FEDERATION_GENESIS", "MEMBER_JOIN", "ROUTE_GRANT", "EXPORT_ARTIFACT", "SUSPEND_ROUTE", "MEMBER_WITHDRAW"],
-    "network_admission_state_fields": ["imports"],
-    "network_admission_transition_mapping": {"OBSERVE_IMPORT": "ADMIT_IMPORT"},
-    "seed_derived_state_fields": ["recognitions"],
-    "seed_derived_transition_kinds": ["RECORD_RECOGNITION"]
+    "federation_profile_state_fields": [
+      "federation_id",
+      "federation_epoch",
+      "members",
+      "routes",
+      "exports"
+    ],
+    "federation_profile_transition_kinds": [
+      "FEDERATION_GENESIS",
+      "MEMBER_JOIN",
+      "ROUTE_GRANT",
+      "EXPORT_ARTIFACT",
+      "SUSPEND_ROUTE",
+      "MEMBER_WITHDRAW"
+    ],
+    "network_admission_state_fields": [
+      "imports"
+    ],
+    "network_admission_transition_mapping": {
+      "OBSERVE_IMPORT": "ADMIT_IMPORT"
+    },
+    "seed_derived_state_fields": [
+      "recognitions"
+    ],
+    "seed_derived_transition_kinds": [
+      "RECORD_RECOGNITION"
+    ]
   },
   "document_type": "aset-network-minimal-core-normative-reduction",
   "normative": true,
+  "normative_core": {
+    "evidence_history_fields": [
+      "history"
+    ],
+    "formal_config": "extension/canonical/formal/NetworkExtension.cfg",
+    "formal_model": "extension/canonical/formal/NetworkExtension.tla",
+    "semantic_state_fields": [
+      "imports"
+    ],
+    "transition_kinds": [
+      "ADMIT_IMPORT"
+    ]
+  },
   "preservation_boundary": {
     "admission_projection": "legacy OBSERVE_IMPORT -> normative ADMIT_IMPORT",
     "federation_lifecycle_owner": "ASET-NETWORK-FEDERATION-PROFILE-V1",
@@ -29,8 +56,8 @@
   "status": "NORMATIVE_CUTOVER_ALPHA3",
   "verification": {
     "legacy_conformance_trace_projection": "tools/verify_minimal_core_reduction.py",
+    "legacy_tlaps_obligations_proved": 23,
     "legacy_tlaps_refinement_module": "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
-    "legacy_tlaps_status": "MECHANICALLY_PROVED",
-    "legacy_tlaps_obligations_proved": 23
+    "legacy_tlaps_status": "MECHANICALLY_PROVED"
   }
 }

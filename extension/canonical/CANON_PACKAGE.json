@@ -18,11 +18,11 @@
     },
     {
       "path": "extension/canonical/assurance/limitations.json",
-      "sha256": "sha256:b4e83ea352494eea568314e5f2a5e050372faf5e8a29c1bbbdb2a8e9117be440"
+      "sha256": "sha256:360b5ac994675306e3b4b9dfde940e20d804a5a898379fd961a443693243f60d"
     },
     {
       "path": "extension/canonical/assurance/minimal-core-reduction.json",
-      "sha256": "sha256:b87897386a7ebe8c5258e40e91b65f40ff2bfa35217a88f7f75062e46b630352"
+      "sha256": "sha256:e33ff40cb1a6d7b426fd01c5a7bc4bdf063e823c32cc367d7fd198a4b60c1a39"
     },
     {
       "path": "extension/canonical/assurance/seed-refinement-proof.json",
@@ -162,11 +162,11 @@
     },
     {
       "path": "extension/canonical/formal/NetworkAdmissionCore.cfg",
-      "sha256": "sha256:290cc7670c8dce217748d0d2a0541309cca12b0760263cf009c155c424e6b16f"
+      "sha256": "sha256:69f0465f0ce0cfd0f2e253fc001d825d4abef625250bdb950fd9e9235f821c9c"
     },
     {
       "path": "extension/canonical/formal/NetworkAdmissionCore.tla",
-      "sha256": "sha256:95ab04eed6c1eb58c2edf2b7f1c0fa44ef56946e7dcb124d1f2326cfb73a9671"
+      "sha256": "sha256:4ff0f392104234b1b75a66584361e59a9215861b011a7700423248a795d933c2"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonProjection.tla",
@@ -178,7 +178,7 @@
     },
     {
       "path": "extension/canonical/formal/NetworkExtension.cfg",
-      "sha256": "sha256:290cc7670c8dce217748d0d2a0541309cca12b0760263cf009c155c424e6b16f"
+      "sha256": "sha256:2df6ff47534df5fe77fc793cb0f91d84cb310e1c626d7a0c6f535e7497c4bb34"
     },
     {
       "path": "extension/canonical/formal/NetworkExtension.tla",
@@ -195,6 +195,14 @@
     {
       "path": "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
       "sha256": "sha256:319dcd3e78d2ffeda43528287d9963bc46f656b0983bcddf43e32bf72e320a42"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkExtensionTLC.cfg",
+      "sha256": "sha256:69f0465f0ce0cfd0f2e253fc001d825d4abef625250bdb950fd9e9235f821c9c"
+    },
+    {
+      "path": "extension/canonical/formal/NetworkExtensionTLC.tla",
+      "sha256": "sha256:2ec8b55fbf12e257ffd5660443efc5fd59ed52b7df6d8078a3c466a18f5aaa1f"
     },
     {
       "path": "extension/canonical/formal/NetworkHistory.cfg",
@@ -226,11 +234,11 @@
     },
     {
       "path": "extension/canonical/formal/canon-tla-relation.json",
-      "sha256": "sha256:af7722eb885d7166be009ce82474cd62a490eaf8f60e858ab25db7e9af92d2af"
+      "sha256": "sha256:cd82dca0069648426f18591a3a125f78051a6e062d34761f97747e6d1aa0a3f7"
     },
     {
       "path": "extension/canonical/liveness/liveness-profile.json",
-      "sha256": "sha256:b87f7e7bee311dccb1d269e4e3b8a972111efee2156dc3da23e94e1ae0505255"
+      "sha256": "sha256:3882a863dd0ed56875690dfb500245045283da888a053627b4d254b9184f3819"
     },
     {
       "path": "extension/canonical/protocol/dynamic-profile-profile.json",
@@ -238,7 +246,7 @@
     },
     {
       "path": "extension/canonical/protocol/federation-profile.json",
-      "sha256": "sha256:f88b16cdc65f19c780a07c85cafe941a08f81afbc5ee8451befc94a4744b1e48"
+      "sha256": "sha256:77ddb63160ef6ae638708c85fd2e104bd11f03fb25fd8768fceb2b975adb57ab"
     },
     {
       "path": "extension/canonical/protocol/profiles/federation-profile-definition.json",
@@ -323,7 +331,7 @@
   ],
   "implementation_precedence": "NONE",
   "normative_source": "extension/canonical/source/network-extension-model.json",
-  "package_digest": "sha256:437e7a32146723d7c32484c9c0a6e561bd735f5425a238bdddc866d0ef779678",
+  "package_digest": "sha256:8a4c1adc326b25ff16e2e2b4a7abdf74162613515e05a27fdf37c6a634134459",
   "schema_version": 1,
   "upstream_binding": "upstream/ASET_SEED_BINDING.json"
 }
