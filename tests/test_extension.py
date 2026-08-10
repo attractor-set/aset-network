@@ -414,3 +414,26 @@ def test_tlc_harness_does_not_change_normative_proof_target() -> None:
     assert relation["target_model"]["path"] == "extension/canonical/formal/NetworkExtension.tla"
     assert relation["tlc_harness"]["scope"] == "BOUNDED_TEMPORAL_MODEL_CHECKING_ONLY"
     assert relation["tlc_harness"]["properties"] == ["ImportsAppendOnlyTemporal"]
+
+
+def test_rights_baseline_captures_alpha3_release_and_full_proof_chain() -> None:
+    from tools.build_rights_baseline import ARTIFACTS
+
+    artifacts = set(ARTIFACTS)
+    required = {
+        "pyproject.toml",
+        "extension/canonical/CANON_PACKAGE.json",
+        "extension/canonical/source/network-extension-model.json",
+        "extension/canonical/formal/canon-tla-relation.json",
+        "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
+        "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
+        "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
+        "extension/canonical/formal/NetworkLegacyAlpha2.tla",
+        "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
+        "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
+        "extension/canonical/assurance/canon-refinement-proof.json",
+        "extension/canonical/assurance/seed-refinement-proof.json",
+        "extension/canonical/assurance/legacy-admission-refinement-proof.json",
+        "upstream/ASET_SEED_BINDING.json",
+    }
+    assert required <= artifacts
