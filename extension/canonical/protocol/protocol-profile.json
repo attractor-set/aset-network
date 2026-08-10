@@ -8,7 +8,7 @@
     "ASET-NETWORK-FEDERATION-PROFILE-V1"
   ],
   "profile_id": "ASET-NETWORK-EXTENSION-WIRE-V2",
-  "schema_count": 13,
+  "schema_count": 12,
   "schema_version": 1,
   "schemas": [
     {
@@ -80,13 +80,6 @@
       "owner": "DYNAMIC_PROFILE",
       "path": "extension/canonical/protocol/schemas/profile-definition.schema.json",
       "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
-    },
-    {
-      "id": "https://spec.aset.example/network/0.1/schemas/recognition-receipt.schema.json",
-      "name": "recognition-receipt.schema.json",
-      "owner": "LEGACY_ONLY_SEED_DERIVED",
-      "path": "extension/canonical/protocol/schemas/recognition-receipt.schema.json",
-      "sha256": "sha256:97158bfcafa419cdedb9edc53b028a8144db47836b5f8d7016912a7e1e56e0fe"
     },
     {
       "id": "https://spec.aset.example/network/0.1/schemas/route-grant.schema.json",

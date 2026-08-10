@@ -1,8 +1,8 @@
 {
-  "case_id": "NET-POS-003",
+  "case_id": "FED-POS-008",
   "expected": {
     "accepted": true,
-    "code": "ROUTE_GRANTED",
+    "code": "MEMBER_WITHDRAWN",
     "enforcement": "NOT_APPLICABLE",
     "semantic_status": "NOT_APPLICABLE",
     "state_changed": true
@@ -60,6 +60,20 @@
         }
       },
       "transition_id": "t:4"
+    },
+    {
+      "kind": "SUSPEND_ROUTE",
+      "payload": {
+        "route_id": "route:A-B"
+      },
+      "transition_id": "t:8"
+    },
+    {
+      "kind": "MEMBER_WITHDRAW",
+      "payload": {
+        "context_id": "ctx:A"
+      },
+      "transition_id": "t:9"
     }
   ]
 }

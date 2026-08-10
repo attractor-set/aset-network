@@ -12,12 +12,11 @@ DEFAULT_JAR = ROOT / ".tooling/tla2tools.jar"
 META = ROOT / ".tooling/tlc"
 MODELS = {
     "safety": ("NetworkExtensionTLC.tla", "NetworkExtensionTLC.cfg"),
-    "admission-alias": ("NetworkAdmissionCore.tla", "NetworkAdmissionCore.cfg"),
     "history": ("NetworkHistory.tla", "NetworkHistory.cfg"),
-    "legacy-safety": ("NetworkLegacyAlpha2.tla", "NetworkLegacyAlpha2.cfg"),
+    "federation-profile": ("FederationProfile.tla", "FederationProfile.cfg"),
     "federation-liveness": (
-        "NetworkLegacyAlpha2.tla",
-        "NetworkLegacyAlpha2Liveness.cfg",
+        "FederationCompositionLiveness.tla",
+        "FederationCompositionLiveness.cfg",
     ),
 }
 

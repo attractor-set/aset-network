@@ -1,5 +1,5 @@
 {
-  "case_id": "NET-POS-002",
+  "case_id": "FED-POS-002",
   "expected": {
     "accepted": true,
     "code": "MEMBER_JOINED",

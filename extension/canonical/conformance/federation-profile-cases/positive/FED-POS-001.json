@@ -1,5 +1,5 @@
 {
-  "case_id": "NET-POS-001",
+  "case_id": "FED-POS-001",
   "expected": {
     "accepted": true,
     "code": "FEDERATION_CREATED",

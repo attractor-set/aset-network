@@ -13,7 +13,7 @@
       "tla_fairness": "WF_vars(Observe(e))"
     },
     {
-      "assurance_projection": "Legacy Resolve(e) represents target-local Seed resolution only for bounded liveness assurance.",
+      "assurance_projection": "FederationCompositionLiveness.Resolve(e) is an assurance-only witness of target-local Seed terminal progress.",
       "id": "NET-LIVE-A-003",
       "name": "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION",
       "text": "If target-local Seed resolution for an admitted import remains enabled, that local Seed decision is not postponed forever. This is an external composition assumption, not a Network-owned transition.",
@@ -75,10 +75,6 @@
   "resolution_semantics": {
     "eventual_allow_required": false,
     "global_agreement_required": false,
-    "legacy_assurance_projection": {
-      "ACCEPT": "ALLOW",
-      "DENY": "BLOCK"
-    },
     "resolution_owner": "PINNED_TARGET_LOCAL_SEED",
     "terminal_local_results": [
       "ALLOW",
@@ -87,5 +83,5 @@
     "unconditional_transport_guarantee": false
   },
   "schema_version": 1,
-  "scope_rule": "Liveness is an optional Federation Profile composition claim. Delivery and observation remain Network/Federation concerns; terminal resolution remains owned by the pinned target-local Seed. The legacy Resolve/ACCEPT/DENY model is used only as an assurance projection and does not create Network-owned recognition semantics."
+  "scope_rule": "Liveness is an optional Federation Profile composition claim. Delivery and observation remain Network/Federation concerns; terminal resolution remains owned by the pinned target-local Seed. Resolve(e) is assurance-only and creates no Network-owned recognition state."
 }

@@ -24,9 +24,6 @@ def main() -> int:
     binding = json.loads(BIND.read_text())
     canon_evidence = json.loads((C / "assurance/canon-refinement-proof.json").read_text())
     seed_evidence = json.loads((C / "assurance/seed-refinement-proof.json").read_text())
-    legacy_evidence = json.loads(
-        (C / "assurance/legacy-admission-refinement-proof.json").read_text()
-    )
     relation = {
         "document_type": "aset-network-canon-tla-relation",
         "schema_version": 1,
@@ -70,6 +67,7 @@ def main() -> int:
             "federation_lifecycle": {
                 "owner": "ASET-NETWORK-FEDERATION-PROFILE-V1",
                 "required_for_core_conformance": False,
+                "formal_model": "FederationProfile",
             },
             "terminal_recognition": {"owner": "PINNED_TARGET_LOCAL_SEED"},
         },
@@ -103,17 +101,6 @@ def main() -> int:
             "obligations_proved": seed_evidence["proof_gate"]["obligations_proved"],
             "status": seed_evidence["status"],
         },
-        "legacy_alpha2_refinement": {
-            "legacy_module": "NetworkLegacyAlpha2",
-            "mapping_module": "NetworkLegacyAdmissionRefinement",
-            "proof_module": "NetworkLegacyAdmissionRefinementProofs",
-            "final_theorem": "LegacyNetworkRefinesMinimalAdmission",
-            "obligations_proved": legacy_evidence["proof_gate"]["obligations_proved"],
-            "status": legacy_evidence["status"],
-            "evidence_path": (
-                "extension/canonical/assurance/legacy-admission-refinement-proof.json"
-            ),
-        },
         "safety_model": {
             "specification": "SafetySpec",
             "config": "extension/canonical/formal/NetworkExtension.cfg",
@@ -136,6 +123,25 @@ def main() -> int:
             "config_sha256": sha(F / "NetworkHistory.cfg"),
             "scope": "APPEND_ONLY_ADMISSION_TRACE",
         },
+        "federation_assurance": {
+            "safety_model": {
+                "module": "FederationProfile",
+                "path": "extension/canonical/formal/FederationProfile.tla",
+                "sha256": sha(F / "FederationProfile.tla"),
+                "config": "extension/canonical/formal/FederationProfile.cfg",
+                "config_sha256": sha(F / "FederationProfile.cfg"),
+                "scope": "OPTIONAL_PROFILE_SAFETY",
+            },
+            "liveness_model": {
+                "module": "FederationCompositionLiveness",
+                "path": "extension/canonical/formal/FederationCompositionLiveness.tla",
+                "sha256": sha(F / "FederationCompositionLiveness.tla"),
+                "config": "extension/canonical/formal/FederationCompositionLiveness.cfg",
+                "config_sha256": sha(F / "FederationCompositionLiveness.cfg"),
+                "scope": "OPTIONAL_COMPOSITION_LIVENESS_ASSURANCE",
+                "seed_resolution_owner": "PINNED_TARGET_LOCAL_SEED",
+            },
+        },
         "upstream_seed": {
             "release_tag": binding["seed_release_tag"],
             "release_commit": binding["seed_release_commit"],
@@ -147,26 +153,10 @@ def main() -> int:
             "conformance_kit_sha256": binding["seed_conformance_kit_sha256"],
         },
         "invariant_coverage": [
-            {
-                "id": "NET-INV-001",
-                "tla": "NoRemoteAuthorityState",
-                "status": "TLC_INVARIANT",
-            },
-            {
-                "id": "NET-INV-002",
-                "tla": "AdmissionFailClosed",
-                "status": "TLC_INVARIANT",
-            },
-            {
-                "id": "NET-INV-003",
-                "tla": "NoTerminalRecognitionState",
-                "status": "TLC_INVARIANT",
-            },
-            {
-                "id": "NET-INV-004",
-                "tla": "NetworkHistory",
-                "status": "TLC_TRACE_PROPERTY",
-            },
+            {"id": "NET-INV-001", "tla": "NoRemoteAuthorityState", "status": "TLC_INVARIANT"},
+            {"id": "NET-INV-002", "tla": "AdmissionFailClosed", "status": "TLC_INVARIANT"},
+            {"id": "NET-INV-003", "tla": "NoTerminalRecognitionState", "status": "TLC_INVARIANT"},
+            {"id": "NET-INV-004", "tla": "NetworkHistory", "status": "TLC_TRACE_PROPERTY"},
             {
                 "id": "NET-INV-005",
                 "tla": "set membership guard + reference conformance",

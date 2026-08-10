@@ -1,10 +1,10 @@
 {
-  "case_id": "NET-NEG-008",
+  "case_id": "FED-NEG-003",
   "expected": {
     "accepted": false,
-    "code": "SEED_ENFORCEMENT_MISMATCH",
-    "enforcement": "BLOCKED",
-    "semantic_status": "UNKNOWN",
+    "code": "ROUTE_SUSPENDED",
+    "enforcement": "NOT_APPLICABLE",
+    "semantic_status": "NOT_APPLICABLE",
     "state_changed": false
   },
   "initial_state": null,
@@ -62,6 +62,13 @@
       "transition_id": "t:4"
     },
     {
+      "kind": "SUSPEND_ROUTE",
+      "payload": {
+        "route_id": "route:A-B"
+      },
+      "transition_id": "t:8"
+    },
+    {
       "kind": "EXPORT_ARTIFACT",
       "payload": {
         "export": {
@@ -76,43 +83,6 @@
         }
       },
       "transition_id": "t:5"
-    },
-    {
-      "kind": "OBSERVE_IMPORT",
-      "payload": {
-        "import": {
-          "artifact_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-          "enforcement": "BLOCKED",
-          "export_id": "export:1",
-          "import_id": "import:1",
-          "question_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
-          "resolution_id": "resolution:B:1",
-          "route_id": "route:A-B",
-          "scope_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-          "semantic_status": "UNKNOWN",
-          "target_context_id": "ctx:B",
-          "target_policy_epoch": 4
-        }
-      },
-      "transition_id": "t:6"
-    },
-    {
-      "kind": "RECORD_RECOGNITION",
-      "payload": {
-        "recognition": {
-          "enforcement": "ALLOW",
-          "import_id": "import:1",
-          "question_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
-          "recognition_id": "recognition:1",
-          "resolution_id": "resolution:B:1",
-          "scope_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-          "seed_record_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
-          "semantic_status": "DENY",
-          "target_context_id": "ctx:B",
-          "target_policy_epoch": 4
-        }
-      },
-      "transition_id": "t:7"
     }
   ]
 }

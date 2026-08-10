@@ -6,23 +6,15 @@
   "files": [
     {
       "path": "extension/canonical/assurance/canon-refinement-proof.json",
-      "sha256": "sha256:676ca929891854e568733afb1dd58bc5d1390bf62dbe16db6f79743b5e7bbbac"
+      "sha256": "sha256:0c39bad70ca78d8b355aad360ea29ab21b59130422fc60974343c08fbd2d6134"
     },
     {
       "path": "extension/canonical/assurance/canon-tla-refinement.json",
-      "sha256": "sha256:161557ec56d0d04abc5cd347c85b519b5ecfb037fd30fc786bcdf9142779e384"
-    },
-    {
-      "path": "extension/canonical/assurance/legacy-admission-refinement-proof.json",
-      "sha256": "sha256:c7f4da89e64df5270fac807c8cea57ccc4f0c5660d93fa307bc10895e14033db"
+      "sha256": "sha256:6ff729744859f541cb5ba7859355ea05750eb5d95584041ee910ce694bc36bb0"
     },
     {
       "path": "extension/canonical/assurance/limitations.json",
       "sha256": "sha256:360b5ac994675306e3b4b9dfde940e20d804a5a898379fd961a443693243f60d"
-    },
-    {
-      "path": "extension/canonical/assurance/minimal-core-reduction.json",
-      "sha256": "sha256:e33ff40cb1a6d7b426fd01c5a7bc4bdf063e823c32cc367d7fd198a4b60c1a39"
     },
     {
       "path": "extension/canonical/assurance/seed-refinement-proof.json",
@@ -46,7 +38,7 @@
     },
     {
       "path": "extension/canonical/conformance/conformance-profile.json",
-      "sha256": "sha256:aed75101c4a95a6f929226c6df058142bf8e676a2b64086b228d2fd155b5eab7"
+      "sha256": "sha256:7404b74d712b2e9b3e174074c211b5a06c1a5cd4d5683608ca50f6e340eab59f"
     },
     {
       "path": "extension/canonical/conformance/dynamic-profile-cases/negative/DP-NEG-001.json",
@@ -85,92 +77,68 @@
       "sha256": "sha256:3352d5f9429a6dbed9f2122cde67420e6df99b2a49302f71e8b198741c2eb5e3"
     },
     {
+      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-001.json",
+      "sha256": "sha256:8ca3dad9e0f8f3b58c4f3e8769efe57c0ad1d21cc1fa70c7a4d010c3bdb3b7cb"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-002.json",
+      "sha256": "sha256:012b5f5bf890a625bd1d66cf96ded6a9ff58815345b600bba031af19ea3befcd"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-003.json",
+      "sha256": "sha256:4ee5a684e946cad4d6a62ae9ef6d43259989b13b74971822ad547d11b5b3bc37"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-004.json",
+      "sha256": "sha256:0ad2b0daa9d4019870c08121435f08c62704f5309386507e5cab1e121436fc6b"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/negative/FED-NEG-010.json",
+      "sha256": "sha256:b637686b74e74a49ffb10bbfc70b144393aa8e884586408ce7eabb4db045ead7"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-001.json",
+      "sha256": "sha256:abb0e54d213b3b301f161d733c41fddc3462d40beb1bd3fbc89c2b6f7fda1861"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-002.json",
+      "sha256": "sha256:7a7bf13a05931b5cb9da7b6e15bbb698f40a40488471c769173bd39398e55287"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-003.json",
+      "sha256": "sha256:516f15fc4dbc994a528c9d4b57cf11cff1deb5746694f7335b1b81110a41ef13"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-004.json",
+      "sha256": "sha256:585918de832e1a9916e3aae92a6b955f801c5b118103c9c233a67febbc1d7dde"
+    },
+    {
+      "path": "extension/canonical/conformance/federation-profile-cases/positive/FED-POS-008.json",
+      "sha256": "sha256:b3ae7490254bec7097abd5030b27bf70bc043b3bee0d40317431033f07e995b4"
+    },
+    {
       "path": "extension/canonical/conformance/federation-profile-conformance-profile.json",
-      "sha256": "sha256:8008befd40b2224c33d59d0c9feea827e98b0031f72f588805c55bd2f0966900"
+      "sha256": "sha256:b91b5b5b2092849a52df88120fc285a0963629fc412b6c56006c09599bb6ed02"
     },
     {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-001.json",
-      "sha256": "sha256:b0d8c131af202ed259c8bffca835179f7ad95fae9e9cb409314de2934a920849"
+      "path": "extension/canonical/formal/FederationCompositionLiveness.cfg",
+      "sha256": "sha256:4e8032e34ac71c62af33e476d68d3ca6a6d6823bb1c901164976401af0f95999"
     },
     {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-002.json",
-      "sha256": "sha256:388b898a1e4998fd6a09fe6cff9190ea9735a17c86d5b781389062fe579a72f6"
+      "path": "extension/canonical/formal/FederationCompositionLiveness.tla",
+      "sha256": "sha256:8311f1b34e6a8f7f47e49afd7870680891d4744a32ac33d2ab2564af57ee410c"
     },
     {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-003.json",
-      "sha256": "sha256:5a39454402d6c15600461434e2f9a39044537a0f958c8de492ecacbfe3433d31"
+      "path": "extension/canonical/formal/FederationProfile.cfg",
+      "sha256": "sha256:56521ce429c773908ea9bd0bc552b68ad309424bdde037f36baf05205f0c487c"
     },
     {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-004.json",
-      "sha256": "sha256:a1eb82181230b491fea2b7968b2a7ff82c7c941f12cebac579e7806255cd9091"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-005.json",
-      "sha256": "sha256:e40c58dc7f98d5f86c2b7e331b1d08a0e3505afea513a65e9b6570d46e318ea7"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-006.json",
-      "sha256": "sha256:37bf8592944b0a180211c7e7e36d9347c8d4204e442c3e1b0f36ded9efaf1b4c"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-007.json",
-      "sha256": "sha256:935efad7bbe12a871c5e8f9b2e7215ddaa4d2322198ad39f39074eb4c179d23a"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-008.json",
-      "sha256": "sha256:cb54d5f5d594998fdeb807cabe15a41896942063e3b06c97c84b5a058a379f0a"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-009.json",
-      "sha256": "sha256:cbb4df54292b5a1d96f2567e65ea96f8b799ca4b7aed8a627f48c16ae8a5864f"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/negative/NET-NEG-010.json",
-      "sha256": "sha256:6585924c1dba29a2209bf589d03c1c573f98f77c026c3d9be0760b3f97acbf31"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-001.json",
-      "sha256": "sha256:0f9951c7f4fea4f48f121581dc5ebfab3453c63c8097b9993576a4eb9eaae78b"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-002.json",
-      "sha256": "sha256:cac830db68339c6fd2d42adb511ad43d154ef6092adee8589d629ba7ddb4121d"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-003.json",
-      "sha256": "sha256:bfed9949716fcabb3619c980afcc0a5c8c2b5c0740d448ededd4279b6a589b52"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-004.json",
-      "sha256": "sha256:d22728c55d8622b513b98c6bf0be4c535e6bf55939d11d850bf22d95b5f6fe4f"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-005.json",
-      "sha256": "sha256:7be2c254a9ee5266c191ae65c839bc94d928f056da2387739d1131646d2b2391"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-006.json",
-      "sha256": "sha256:2eb4cd43abe1122db3d6d36b39ba488a807b597e9f6327acdc7e4e18993d579a"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-007.json",
-      "sha256": "sha256:6f321ea1be5517a68ebe120a3cde45c953d82ee42a93f34b6d8abb29fbc7ec27"
-    },
-    {
-      "path": "extension/canonical/conformance/legacy-alpha2-cases/positive/NET-POS-008.json",
-      "sha256": "sha256:48147e71e825ca410f51b88827e5ef4e10f9bb5b70e7218a42230dbeeb5831a0"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkAdmissionCore.cfg",
-      "sha256": "sha256:69f0465f0ce0cfd0f2e253fc001d825d4abef625250bdb950fd9e9235f821c9c"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkAdmissionCore.tla",
-      "sha256": "sha256:4ff0f392104234b1b75a66584361e59a9215861b011a7700423248a795d933c2"
+      "path": "extension/canonical/formal/FederationProfile.tla",
+      "sha256": "sha256:33fd90486aabb5067a66f1f3ca923a684ac9b29fbaf611cdce41aa8b491e119a"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonProjection.tla",
-      "sha256": "sha256:659814e4749790d74bfa6dd871e4f8a20f024759c92928b7d794b8a87f9eba51"
+      "sha256": "sha256:7fd4946c113e5adf4ed4f8628f8aa06f98fcd26e6c9699cab290efe0b618f003"
     },
     {
       "path": "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
@@ -213,32 +181,12 @@
       "sha256": "sha256:3fc47fc3b5fe049d90448260a7d427835c39871df4855fb6ca3f5dc793f59286"
     },
     {
-      "path": "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
-      "sha256": "sha256:40b5e16304f2075297170d3a6704368278753b1658f8595897861896b428b098"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
-      "sha256": "sha256:29505c7164647961a1276ce3380a33f554946805e7533a8b353b5a04b60783bd"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkLegacyAlpha2.cfg",
-      "sha256": "sha256:3ddd779e5636fa573e3983fa4ed9359302cd66802c040df6b102ae40a9765718"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkLegacyAlpha2.tla",
-      "sha256": "sha256:19d04d22b52bb18a2e893c26f7b894ba578a48385f978a44c12da632fe371d61"
-    },
-    {
-      "path": "extension/canonical/formal/NetworkLegacyAlpha2Liveness.cfg",
-      "sha256": "sha256:caa8e32e6e8bea75ef1ed83434e261e45e6375a3248a2d920e0498df8d00ddb3"
-    },
-    {
       "path": "extension/canonical/formal/canon-tla-relation.json",
-      "sha256": "sha256:cd82dca0069648426f18591a3a125f78051a6e062d34761f97747e6d1aa0a3f7"
+      "sha256": "sha256:1b23da4fdd2c835555812234a21faf81078d944f3cf2934dcc7d53f32dca070b"
     },
     {
       "path": "extension/canonical/liveness/liveness-profile.json",
-      "sha256": "sha256:3882a863dd0ed56875690dfb500245045283da888a053627b4d254b9184f3819"
+      "sha256": "sha256:a83a7b5225f21f7301d63d5e68278512a67503cb6d4d3cd2dee4bb0e0b0a0027"
     },
     {
       "path": "extension/canonical/protocol/dynamic-profile-profile.json",
@@ -246,11 +194,11 @@
     },
     {
       "path": "extension/canonical/protocol/federation-profile.json",
-      "sha256": "sha256:77ddb63160ef6ae638708c85fd2e104bd11f03fb25fd8768fceb2b975adb57ab"
+      "sha256": "sha256:90567a57243804978f5e8721ddf0d3168a7bde5c470d1d891dd85c2a9a18dccb"
     },
     {
       "path": "extension/canonical/protocol/profiles/federation-profile-definition.json",
-      "sha256": "sha256:9d5a711aac6e31318d3eac5294b95f7267c6a34612917e5666d8d911a0fffea1"
+      "sha256": "sha256:35017328e109277b88956f401ce11f9e8d44ffbd2def823776cf3fb05ccfcc9d"
     },
     {
       "path": "extension/canonical/protocol/profiles/federation-profile-invariants.json",
@@ -262,11 +210,11 @@
     },
     {
       "path": "extension/canonical/protocol/profiles/federation-profile-scope.json",
-      "sha256": "sha256:4824a98c0771fa4a0f456573bad59c10ba27742313841430bbe49f652d99fb64"
+      "sha256": "sha256:71946c6c4d8da20d5678253a5862d8c33dd5d2db1a7ca741fc9364446de2bc34"
     },
     {
       "path": "extension/canonical/protocol/protocol-profile.json",
-      "sha256": "sha256:12a50da19df57962e8821a154c80795813164abf88dc4ed60cd4674fb139be33"
+      "sha256": "sha256:7ec28951d0e7a2f4887cd2fed02cc74519b0753e347295d1ad7ef052628b5146"
     },
     {
       "path": "extension/canonical/protocol/schemas/common.schema.json",
@@ -309,10 +257,6 @@
       "sha256": "sha256:c3713362f824bc2b79ac48c37997f58c45b842ff1c04550eff3473ee235c4e7c"
     },
     {
-      "path": "extension/canonical/protocol/schemas/recognition-receipt.schema.json",
-      "sha256": "sha256:97158bfcafa419cdedb9edc53b028a8144db47836b5f8d7016912a7e1e56e0fe"
-    },
-    {
       "path": "extension/canonical/protocol/schemas/route-grant.schema.json",
       "sha256": "sha256:5d578c62d587ac916c5b929c64bdde04b5b8afb1450b4a65dd08b7eb19863366"
     },
@@ -322,7 +266,7 @@
     },
     {
       "path": "extension/canonical/source/network-extension-model.json",
-      "sha256": "sha256:edb71c3d7f29c2b85dd45b2d00d0107a296e015c288a0ef324d8c9d1bcc37f1f"
+      "sha256": "sha256:d3b4c0613e8f698d187e8afc281245f82c1ae61eb3e8e6f2efca129f271b5cae"
     },
     {
       "path": "upstream/ASET_SEED_BINDING.json",
@@ -331,7 +275,7 @@
   ],
   "implementation_precedence": "NONE",
   "normative_source": "extension/canonical/source/network-extension-model.json",
-  "package_digest": "sha256:8a4c1adc326b25ff16e2e2b4a7abdf74162613515e05a27fdf37c6a634134459",
+  "package_digest": "sha256:91d690d4daf8ae48fc0cb80c33d0963889b6d7f4b0565c3d54ad726e59219d1c",
   "schema_version": 1,
   "upstream_binding": "upstream/ASET_SEED_BINDING.json"
 }

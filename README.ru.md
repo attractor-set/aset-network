@@ -27,10 +27,14 @@ Network может усиливать ограничения Seed, но не о�
 
 ## Federation Profile
 
-`ASET-NETWORK-FEDERATION-PROFILE-V1` теперь владеет бывшими alpha.2 операциями `FEDERATION_GENESIS`, `MEMBER_JOIN`, `ROUTE_GRANT`, `EXPORT_ARTIFACT`, `SUSPEND_ROUTE`, `MEMBER_WITHDRAW`. `RECORD_RECOGNITION` туда не переносится: terminal recognition остаётся Seed-owned.
+`ASET-NETWORK-FEDERATION-PROFILE-V1` — самостоятельный опциональный dynamic profile. Он владеет состоянием федеративного lifecycle и переходами `FEDERATION_GENESIS`, `MEMBER_JOIN`, `ROUTE_GRANT`, `EXPORT_ARTIFACT`, `SUSPEND_ROUTE`, `MEMBER_WITHDRAW`. Его ненормативный oracle находится в `reference/federation_profile_reference.py`, а 10 нативных conformance cases — в `extension/canonical/conformance/federation-profile-cases/`.
+
+Federation-переходы являются stutter относительно admission-состояния Network. Terminal recognition не является операцией Federation и остаётся исключительно в собственности target-local Seed.
 
 ## Формальная проверка
 
-Alpha.3 изменяет нормативный canon, поэтому доказательства alpha.2 намеренно не переиспользуются. Три новых proof-модуля реально прогнаны закреплённым TLAPM и материализованы как `MECHANICALLY_PROVED`: canon->TLA `3/3`, minimal Network->Seed `35/35`, legacy alpha.2->minimal `23/23`. TLC и conformance остаются отдельными assurance surfaces и не подменяют TLAPS.
+Текущая TLAPS-цепочка содержит два механически доказанных отношения: canon->`NetworkExtension.tla` `3/3` и minimal Network->Seed `35/35`. Для Federation Profile отдельно существуют bounded TLC safety и composition-liveness модели `FederationProfile.tla` и `FederationCompositionLiveness.tla`. `Resolve(e)` в liveness-модели — только assurance witness прогресса target-local Seed и не создаёт Network/Federation recognition state.
+
+Историческая совместимость старых релизов Network сохраняется Git history и immutable tags, а не переносится в текущий canon package и release gate.
 
 Нормативным источником остаётся `extension/canonical/`; `reference/` — только ненормативный executable oracle.

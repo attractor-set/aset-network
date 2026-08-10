@@ -20,7 +20,6 @@ Required before producing the baseline:
 - TLC conditional Federation Profile liveness passes when that optional claim is included;
 - canon -> Network TLAPS refinement/equivalence gate passes;
 - Network -> pinned Seed TLAPS refinement gate passes;
-- legacy alpha.2 -> minimal Network TLAPS refinement gate passes.
 
 For `0.1.0-alpha.3`, the expected assurance shape is:
 
@@ -35,11 +34,6 @@ minimal NetworkExtension.tla
         | TLAPS 35/35
         v
 pinned SeedResolution.tla
-
-legacy alpha.2 Network
-        | TLAPS 23/23
-        v
-minimal NetworkExtension.tla
 ```
 
 TLC safety/history and optional Federation Profile liveness are separate bounded assurance surfaces and do not replace TLAPS.
@@ -67,8 +61,6 @@ NETWORK_CANON_REFINEMENT_STATUS=MECHANICALLY_PROVED
 NETWORK_CANON_REFINEMENT_OBLIGATIONS=
 NETWORK_SEED_REFINEMENT_STATUS=MECHANICALLY_PROVED
 NETWORK_SEED_REFINEMENT_OBLIGATIONS=
-NETWORK_LEGACY_ADMISSION_REFINEMENT_STATUS=MECHANICALLY_PROVED
-NETWORK_LEGACY_ADMISSION_REFINEMENT_OBLIGATIONS=
 
 PINNED_SEED_RELEASE_COMMIT=
 PINNED_SEED_RESOLUTION_SHA256=
