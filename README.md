@@ -18,6 +18,13 @@ foreign evidence -> ADMIT_IMPORT -> target-local UNKNOWN/BLOCKED import -> Seed
 
 Federation membership/routing and conditional liveness are separate optional profiles, not Network-core semantics. The Federation Profile owns federation lifecycle only; the Liveness Profile owns conditional progress claims only. They may be composed without either becoming the parent of the other. Any terminal-resolution progress assumption remains explicitly target-local Seed-owned.
 
+## Direct repository topology
+
+- Upstream specification: [ASET](https://github.com/attractor-set/ASET) — direct normative parent.
+- Downstream reference implementation: [ASET Network Python SQLite](https://github.com/attractor-set/aset-network-python-sqlite) — non-normative reference implementation of this extension.
+
+Only direct repository relationships are listed here. Transitive relationships are discovered through their immediate parent repositories.
+
 ## Upstream binding
 
 - Seed release: `seed-0.3.0-alpha.3`
