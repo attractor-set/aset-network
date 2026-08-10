@@ -7,7 +7,7 @@ import sys
 import tomllib
 from pathlib import Path
 
-from reference.legacy_network_reference import execute_case as execute_legacy_case
+from reference.federation_profile_reference import execute_case as execute_federation_case
 from reference.network_reference import execute_case
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -28,7 +28,7 @@ def test_upstream_binding_is_exact() -> None:
 def test_normative_core_is_one_state_one_transition() -> None:
     m = json.loads((ROOT / "extension/canonical/source/network-extension-model.json").read_text())
     assert m["version"] == "0.1.0-alpha.3"
-    assert m["status"] == "MINIMAL_ADMISSION_CORE_ALPHA3_NORMATIVE_CUTOVER"
+    assert m["status"] == "MINIMAL_ADMISSION_CORE_NORMATIVE"
     assert m["state_partition"]["semantic_state_fields"] == ["imports"]
     assert m["state_partition"]["evidence_history_fields"] == ["history"]
     assert m["transition_kinds"] == ["ADMIT_IMPORT"]
@@ -94,15 +94,14 @@ def test_formal_core_has_one_variable_and_one_action() -> None:
     assert "VARIABLE imports" in t
     assert "VARIABLES" not in t
     assert "AdmitImport(o) ==" in t
-    for legacy in ["Join(c)", "GrantRoute", "ResolveAccept", "ResolveDeny", "Withdraw(c)"]:
-        assert legacy not in t
+    for forbidden in ["Join(c)", "GrantRoute", "ResolveAccept", "ResolveDeny", "Withdraw(c)"]:
+        assert forbidden not in t
 
 
 def test_alpha3_proof_evidence_is_materialized_and_exact() -> None:
     expected = {
         "canon-refinement-proof.json": 3,
         "seed-refinement-proof.json": 35,
-        "legacy-admission-refinement-proof.json": 23,
     }
     for name, count in expected.items():
         e = json.loads((ROOT / "extension/canonical/assurance" / name).read_text())
@@ -116,24 +115,33 @@ def test_alpha3_proof_evidence_is_materialized_and_exact() -> None:
     assert rel["canon_projection"]["obligations_proved"] == 3
     assert rel["seed_refinement"]["status"] == "MECHANICALLY_PROVED"
     assert rel["seed_refinement"]["obligations_proved"] == 35
-    assert rel["legacy_alpha2_refinement"]["status"] == "MECHANICALLY_PROVED"
-    assert rel["legacy_alpha2_refinement"]["obligations_proved"] == 23
+    assert "legacy_alpha2_refinement" not in rel
 
 
-def test_legacy_alpha2_traces_project_to_minimal_core() -> None:
-    from tools.verify_minimal_core_reduction import verify_conformance_trace_projection
+def test_historical_network_alpha2_surface_is_absent() -> None:
+    forbidden = [
+        "reference/legacy_network_reference.py",
+        "tools/verify_minimal_core_reduction.py",
+        "tools/run_legacy_admission_refinement_tlaps.py",
+        "extension/canonical/assurance/legacy-admission-refinement-proof.json",
+        "extension/canonical/assurance/minimal-core-reduction.json",
+        "extension/canonical/formal/NetworkLegacyAlpha2.tla",
+        "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
+        "extension/canonical/formal/NetworkAdmissionCore.tla",
+        "extension/canonical/conformance/legacy-alpha2-cases",
+    ]
+    assert all(not (ROOT / relative).exists() for relative in forbidden)
 
-    assert verify_conformance_trace_projection() == 18
 
-
-def test_federation_profile_is_post_cutover_owner() -> None:
+def test_federation_profile_is_self_contained() -> None:
     f = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
-    e = f["extraction_semantics"]
-    assert e["phase"] == "NORMATIVE_PROFILE_AFTER_CORE_CUTOVER"
-    assert e["normative_core_changed_by_this_slice"] is True
-    assert e["network_admission_state_retained"] == ["imports"]
-    assert e["seed_derived_legacy_state_fields"] == ["recognitions"]
-    assert set(e["profile_owned_legacy_transition_kinds"]) == {
+    semantics = f["profile_semantics"]
+    assert semantics["network_admission_state_fields"] == ["imports"]
+    assert semantics["network_projection"] == (
+        "FEDERATION_PROFILE_TRANSITIONS_STUTTER_ON_NETWORK_ADMISSION_STATE"
+    )
+    assert semantics["seed_owned_terminal_recognition"] is True
+    assert set(semantics["profile_owned_transition_kinds"]) == {
         "FEDERATION_GENESIS",
         "MEMBER_JOIN",
         "ROUTE_GRANT",
@@ -143,18 +151,20 @@ def test_federation_profile_is_post_cutover_owner() -> None:
     }
 
 
-def test_federation_conformance_is_optional_and_legacy_backed() -> None:
+def test_federation_conformance_is_optional_and_native() -> None:
     p = json.loads(
         (
             ROOT / "extension/canonical/conformance/federation-profile-conformance-profile.json"
         ).read_text()
     )
     assert p["required_for_core_conformance"] is False
+    assert p["source_semantics"] == "NATIVE_FEDERATION_PROFILE_CASES"
     assert p["case_count"] == 10
     for item in p["cases"]:
-        assert "/legacy-alpha2-cases/" in item["path"]
+        assert "/federation-profile-cases/" in item["path"]
         case = json.loads((ROOT / item["path"]).read_text())
-        _, actual = execute_legacy_case(case)
+        assert case["case_id"] == item["case_id"]
+        _, actual = execute_federation_case(case)
         assert actual == case["expected"]
 
 
@@ -362,7 +372,7 @@ def test_dynamic_profile_seed_projection_digest_matches_pinned_seed_canonical_fo
     assert projected["binding_digest"] == expected
 
 
-def test_federation_profile_definition_is_valid_after_cutover() -> None:
+def test_federation_profile_definition_is_valid() -> None:
     from tools.dynamic_profile_conformance import validate_wire_object
 
     p = ROOT / "extension/canonical/protocol/profiles/federation-profile-definition.json"
@@ -376,7 +386,6 @@ def test_federation_profile_definition_is_valid_after_cutover() -> None:
 def test_full_local_non_tlaps_validation_stack() -> None:
     for cmd in [
         [sys.executable, "-m", "tools.validate_extension"],
-        [sys.executable, "-m", "tools.verify_minimal_core_reduction"],
         [sys.executable, "-m", "tools.run_conformance"],
     ]:
         r = subprocess.run(cmd, cwd=ROOT, text=True, capture_output=True)
@@ -396,24 +405,28 @@ def test_liveness_profile_preserves_seed_resolution_ownership() -> None:
     assert live["parent_profile"] == "ASET-NETWORK-FEDERATION-PROFILE-V1"
     assert live["resolution_semantics"]["resolution_owner"] == "PINNED_TARGET_LOCAL_SEED"
     assert live["resolution_semantics"]["terminal_local_results"] == ["ALLOW", "BLOCK"]
-    assert live["resolution_semantics"]["legacy_assurance_projection"] == {
-        "ACCEPT": "ALLOW",
-        "DENY": "BLOCK",
-    }
+    assert "legacy_assurance_projection" not in live["resolution_semantics"]
     a3 = next(x for x in live["assumptions"] if x["id"] == "NET-LIVE-A-003")
     assert a3["name"] == "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION"
 
 
-def test_reduction_metadata_no_longer_calls_normative_core_candidate() -> None:
-    reduction = json.loads(
-        (ROOT / "extension/canonical/assurance/minimal-core-reduction.json").read_text()
+def test_federation_scope_has_no_historical_ownership_vocabulary() -> None:
+    scope = json.loads(
+        (ROOT / "extension/canonical/protocol/profiles/federation-profile-scope.json").read_text()
     )
-    assert "candidate" not in reduction
-    assert reduction["normative_core"]["semantic_state_fields"] == ["imports"]
-    assert reduction["normative_core"]["transition_kinds"] == ["ADMIT_IMPORT"]
-    fed = json.loads((ROOT / "extension/canonical/protocol/federation-profile.json").read_text())
-    assert "candidate_network_transition" not in fed["extraction_semantics"]
-    assert fed["extraction_semantics"]["normative_network_transition"] == ["ADMIT_IMPORT"]
+    assert "legacy_state_ownership" not in scope
+    assert "legacy_transition_ownership" not in scope
+    assert scope["state_ownership"] == [
+        "federation_id",
+        "federation_epoch",
+        "members",
+        "routes",
+        "exports",
+    ]
+    assert scope["minimal_core_relation"]["imports"] == "OWNED_BY_NETWORK_ADMISSION_CORE"
+    assert scope["minimal_core_relation"]["terminal_recognition"] == (
+        "OWNED_BY_PINNED_TARGET_LOCAL_SEED"
+    )
 
 
 def test_tlc_append_only_property_is_temporal_harness_only() -> None:
@@ -451,12 +464,10 @@ def test_rights_baseline_captures_alpha3_release_and_full_proof_chain() -> None:
         "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
         "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
         "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
-        "extension/canonical/formal/NetworkLegacyAlpha2.tla",
-        "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
-        "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
+        "extension/canonical/formal/FederationProfile.tla",
+        "extension/canonical/formal/FederationCompositionLiveness.tla",
         "extension/canonical/assurance/canon-refinement-proof.json",
         "extension/canonical/assurance/seed-refinement-proof.json",
-        "extension/canonical/assurance/legacy-admission-refinement-proof.json",
         "upstream/ASET_SEED_BINDING.json",
     }
     assert required <= artifacts

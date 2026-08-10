@@ -1,14 +1,14 @@
 {
-  "case_id": "NET-POS-006",
+  "case_id": "FED-NEG-004",
   "expected": {
-    "accepted": true,
-    "code": "LOCALLY_RECOGNIZED",
-    "enforcement": "ALLOW",
-    "semantic_status": "ACCEPT",
-    "state_changed": true
+    "accepted": false,
+    "code": "ROUTE_BINDING_MISMATCH",
+    "enforcement": "NOT_APPLICABLE",
+    "semantic_status": "NOT_APPLICABLE",
+    "state_changed": false
   },
   "initial_state": null,
-  "polarity": "positive",
+  "polarity": "negative",
   "steps": [
     {
       "kind": "FEDERATION_GENESIS",
@@ -68,7 +68,7 @@
           "artifact_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
           "export_id": "export:1",
           "route_id": "route:A-B",
-          "scope_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
+          "scope_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
           "source_context_id": "ctx:A",
           "source_policy_epoch": 1,
           "source_state_root": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
@@ -76,43 +76,6 @@
         }
       },
       "transition_id": "t:5"
-    },
-    {
-      "kind": "OBSERVE_IMPORT",
-      "payload": {
-        "import": {
-          "artifact_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-          "enforcement": "BLOCKED",
-          "export_id": "export:1",
-          "import_id": "import:1",
-          "question_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
-          "resolution_id": "resolution:B:1",
-          "route_id": "route:A-B",
-          "scope_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-          "semantic_status": "UNKNOWN",
-          "target_context_id": "ctx:B",
-          "target_policy_epoch": 4
-        }
-      },
-      "transition_id": "t:6"
-    },
-    {
-      "kind": "RECORD_RECOGNITION",
-      "payload": {
-        "recognition": {
-          "enforcement": "ALLOW",
-          "import_id": "import:1",
-          "question_digest": "sha256:3333333333333333333333333333333333333333333333333333333333333333",
-          "recognition_id": "recognition:1",
-          "resolution_id": "resolution:B:1",
-          "scope_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-          "seed_record_digest": "sha256:4444444444444444444444444444444444444444444444444444444444444444",
-          "semantic_status": "ACCEPT",
-          "target_context_id": "ctx:B",
-          "target_policy_epoch": 4
-        }
-      },
-      "transition_id": "t:7"
     }
   ]
 }

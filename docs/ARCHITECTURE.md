@@ -2,7 +2,7 @@
 
 ## Three boundaries
 
-ASET Network alpha.3 follows the same ownership discipline as Seed:
+ASET Network follows the same ownership discipline as Seed:
 
 ```text
 Seed
@@ -42,25 +42,13 @@ For assurance, an admitted observation maps to a fresh target-local Seed request
 
 Dynamic profile definitions are immutable evidence. Exact `ProfileBinding` values project to Seed `ResolutionBinding`; applicability is derived from target-local `ALLOW`. Profiles have no universal install/enable/disable state machine and cannot weaken parent semantics.
 
-## Federation Profile after cutover
+## Federation Profile
 
-The optional `ASET-NETWORK-FEDERATION-PROFILE-V1` owns the former alpha.2 lifecycle state `{federation_id, federation_epoch, members, routes, exports}` and transitions `{FEDERATION_GENESIS, MEMBER_JOIN, ROUTE_GRANT, EXPORT_ARTIFACT, SUSPEND_ROUTE, MEMBER_WITHDRAW}`.
+The optional `ASET-NETWORK-FEDERATION-PROFILE-V1` owns state `{federation_id, federation_epoch, members, routes, exports}` and transitions `{FEDERATION_GENESIS, MEMBER_JOIN, ROUTE_GRANT, EXPORT_ARTIFACT, SUSPEND_ROUTE, MEMBER_WITHDRAW}`.
 
-`imports` stays in Network. Legacy `recognitions` are Seed-derived and are not profile-owned.
+`imports` stays in Network. Terminal recognition stays in the pinned target-local Seed. The profile has its own executable oracle and native conformance cases; it does not depend on a historical Network release model.
 
-The retained alpha.2 reference model is now `reference/legacy_network_reference.py`; its 18 conformance traces are regression evidence rather than core conformance. Ten traces that exercise only federation-owned operations form the Federation Profile conformance surface.
-
-## Legacy reduction relation
-
-The formal alpha.2 observation record and the alpha.3 assurance observation universe share the same opaque `{source,target,artifact}` shape. Therefore:
-
-```text
-legacy OBSERVE_IMPORT -> alpha.3 AdmitImport
-all federation actions -> stutter on imports
-legacy resolution      -> stutter on imports
-```
-
-`NetworkLegacyAdmissionRefinementProofs.tla` contains the temporal refinement theorem `LegacyNetworkRefinesMinimalAdmission`. It is materialized as `MECHANICALLY_PROVED` with `23/23` obligations under the pinned TLAPM.
+Federation safety is checked in `FederationProfile.tla`. Conditional composition liveness is checked separately in `FederationCompositionLiveness.tla`; target-local resolution remains an external Seed-owned progress assumption.
 
 ## Evidence history
 

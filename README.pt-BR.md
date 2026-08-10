@@ -27,10 +27,14 @@ Network pode fortalecer as restrições de Seed, mas não enfraquecê-las nem su
 
 ## Federation Profile
 
-`ASET-NETWORK-FEDERATION-PROFILE-V1` passa a possuir as operações alpha.2 `FEDERATION_GENESIS`, `MEMBER_JOIN`, `ROUTE_GRANT`, `EXPORT_ARTIFACT`, `SUSPEND_ROUTE`, `MEMBER_WITHDRAW`. `RECORD_RECOGNITION` não é transferido: reconhecimento terminal continua Seed-owned.
+`ASET-NETWORK-FEDERATION-PROFILE-V1` é um dynamic profile opcional e autocontido. Ele possui o estado do ciclo de vida federativo e as transições `FEDERATION_GENESIS`, `MEMBER_JOIN`, `ROUTE_GRANT`, `EXPORT_ARTIFACT`, `SUSPEND_ROUTE`, `MEMBER_WITHDRAW`. O oracle não normativo está em `reference/federation_profile_reference.py` e os 10 casos nativos de conformidade estão em `extension/canonical/conformance/federation-profile-cases/`.
+
+As transições de Federation são stutter em relação ao estado de admission da Network. Terminal recognition não é uma operação de Federation e continua exclusivamente sob o Seed local do Context alvo.
 
 ## Verificação formal
 
-Alpha.3 altera o canon normativo, portanto a evidência de prova alpha.2 não é reutilizada. Os três novos módulos de prova foram executados com o TLAPM fixado e materializados como `MECHANICALLY_PROVED`: canon->TLA `3/3`, minimal Network->Seed `35/35`, legacy alpha.2->minimal `23/23`. TLC e conformance continuam superfícies de assurance separadas e não substituem TLAPS.
+A cadeia TLAPS atual contém duas relações mecanicamente provadas: canon->`NetworkExtension.tla` `3/3` e minimal Network->Seed `35/35`. O Federation Profile possui modelos TLC separados de safety e composition-liveness: `FederationProfile.tla` e `FederationCompositionLiveness.tla`. `Resolve(e)` no modelo de liveness é apenas um witness de assurance do progresso do Seed local e não cria estado de recognition da Network/Federation.
+
+A compatibilidade histórica de releases antigos da Network fica preservada no histórico Git e em tags imutáveis, não no canon package ou release gate atual.
 
 A fonte normativa permanece `extension/canonical/`; `reference/` é apenas um oracle executável não normativo.

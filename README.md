@@ -1,6 +1,6 @@
 # ASET Network Extension
 
-Status: **0.1.0-alpha.3 / minimal admission core normative cutover**
+Status: **0.1.0-alpha.3 / minimal admission core**
 
 ASET Network Extension is the minimal implementation-neutral boundary by which foreign evidence becomes a target-local candidate for ASET Seed resolution.
 
@@ -39,7 +39,7 @@ The Python implementations under `reference/` are non-normative conformance orac
 
 ## Federation Profile
 
-`ASET-NETWORK-FEDERATION-PROFILE-V1` now owns the former alpha.2 federation lifecycle:
+`ASET-NETWORK-FEDERATION-PROFILE-V1` is an optional dynamic profile with its own lifecycle state and transitions:
 
 ```text
 FEDERATION_GENESIS
@@ -50,7 +50,7 @@ SUSPEND_ROUTE
 MEMBER_WITHDRAW
 ```
 
-Legacy `RECORD_RECOGNITION` is **not** transferred to the profile; terminal recognition is Seed-owned. The old 18 alpha.2 traces are retained under `legacy-alpha2-cases/` as regression evidence, and the federation-owned subset is exposed through an optional 10-case Federation Profile conformance surface.
+The profile has a native non-normative oracle at `reference/federation_profile_reference.py` and an independent 10-case conformance surface under `extension/canonical/conformance/federation-profile-cases/`. Federation transitions stutter with respect to Network admission state. Terminal recognition is not a Federation operation and remains exclusively target-local Seed-owned.
 
 ## Dynamic profiles
 
@@ -58,15 +58,12 @@ Legacy `RECORD_RECOGNITION` is **not** transferred to the profile; terminal reco
 
 ## Formal assurance state
 
-The alpha.3 machine canon and generated `NetworkCanonProjection.tla` are new artifacts. Therefore the alpha.2 `MECHANICALLY_PROVED` evidence is deliberately **not reused**.
+The current proof chain has two mechanically proved TLAPS relations:
 
-This cutover ships fresh proof sources for:
+1. machine canon -> `NetworkExtension.tla` behavioral equivalence;
+2. minimal Network -> pinned `SeedResolution.tla` refinement.
 
-1. alpha.3 canon -> `NetworkExtension.tla` behavioral equivalence;
-2. minimal Network -> pinned `SeedResolution.tla` refinement;
-3. legacy alpha.2 Network -> alpha.3 minimal admission refinement.
-
-The three alpha.3 proof modules have now been rerun with the pinned TLAPM and are materialized as `MECHANICALLY_PROVED`: canon equivalence `3/3`, minimal Network -> Seed `35/35`, and legacy alpha.2 -> minimal admission `23/23`. TLC and conformance remain separate assurance surfaces and are not substitutes for TLAPS.
+The materialized results are canon equivalence `3/3` and minimal Network -> Seed `35/35`. The optional Federation Profile has separate bounded TLC safety and composition-liveness models: `FederationProfile.tla` and `FederationCompositionLiveness.tla`. The liveness model treats `Resolve(e)` only as an assurance witness of target-local Seed progress; it creates no Network- or Federation-owned recognition state.
 
 ## Validation
 
@@ -75,11 +72,10 @@ Non-TLAPS validation:
 ```bash
 python -m tools.generate_canon_tla_projection --check
 python -m tools.validate_extension
-python -m tools.verify_minimal_core_reduction
 python -m tools.run_conformance
 python -m pytest -q
 python -m tools.bootstrap_tla
-python -m tools.run_tlc safety
+python -m tools.run_tlc all
 ```
 
 Local proof gates with the pinned Seed checkout:
@@ -91,9 +87,6 @@ python -m tools.run_canon_refinement_tlaps \
 python -m tools.run_seed_refinement_tlaps \
   --tlapm ~/ASET/.tooling/tlapm/bin/tlapm \
   --seed-root ~/ASET
-
-python -m tools.run_legacy_admission_refinement_tlaps \
-  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm
 ```
 
 Apache-2.0 licensed. No implementation has semantic precedence over the machine-readable canon.

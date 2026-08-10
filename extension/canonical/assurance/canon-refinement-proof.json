@@ -4,7 +4,7 @@
     "generated_projection": {
       "module": "NetworkCanonProjection",
       "path": "extension/canonical/formal/NetworkCanonProjection.tla",
-      "sha256": "sha256:659814e4749790d74bfa6dd871e4f8a20f024759c92928b7d794b8a87f9eba51"
+      "sha256": "sha256:7fd4946c113e5adf4ed4f8628f8aa06f98fcd26e6c9699cab290efe0b618f003"
     },
     "proof": {
       "module": "NetworkCanonRefinementProofs",
@@ -13,7 +13,7 @@
     },
     "source_model": {
       "path": "extension/canonical/source/network-extension-model.json",
-      "sha256": "sha256:edb71c3d7f29c2b85dd45b2d00d0107a296e015c288a0ef324d8c9d1bcc37f1f"
+      "sha256": "sha256:d3b4c0613e8f698d187e8afc281245f82c1ae61eb3e8e6f2efca129f271b5cae"
     },
     "target_model": {
       "module": "NetworkExtension",

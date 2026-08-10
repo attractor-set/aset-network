@@ -29,12 +29,10 @@ ARTIFACTS = (
     "extension/canonical/formal/NetworkCanonRefinementProofs.tla",
     "extension/canonical/formal/NetworkExtensionSeedRefinement.tla",
     "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla",
-    "extension/canonical/formal/NetworkLegacyAlpha2.tla",
-    "extension/canonical/formal/NetworkLegacyAdmissionRefinement.tla",
-    "extension/canonical/formal/NetworkLegacyAdmissionRefinementProofs.tla",
+    "extension/canonical/formal/FederationProfile.tla",
+    "extension/canonical/formal/FederationCompositionLiveness.tla",
     "extension/canonical/assurance/canon-refinement-proof.json",
     "extension/canonical/assurance/seed-refinement-proof.json",
-    "extension/canonical/assurance/legacy-admission-refinement-proof.json",
     "upstream/ASET_SEED_BINDING.json",
 )
 

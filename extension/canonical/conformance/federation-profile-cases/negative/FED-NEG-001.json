@@ -1,8 +1,8 @@
 {
-  "case_id": "NET-NEG-004",
+  "case_id": "FED-NEG-001",
   "expected": {
     "accepted": false,
-    "code": "ROUTE_BINDING_MISMATCH",
+    "code": "ROUTE_MEMBER_UNKNOWN",
     "enforcement": "NOT_APPLICABLE",
     "semantic_status": "NOT_APPLICABLE",
     "state_changed": false
@@ -55,27 +55,11 @@
           "source_context_id": "ctx:A",
           "source_policy_epoch": 1,
           "status": "ACTIVE",
-          "target_context_id": "ctx:B",
+          "target_context_id": "ctx:missing",
           "target_policy_epoch": 4
         }
       },
       "transition_id": "t:4"
-    },
-    {
-      "kind": "EXPORT_ARTIFACT",
-      "payload": {
-        "export": {
-          "artifact_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-          "export_id": "export:1",
-          "route_id": "route:A-B",
-          "scope_digest": "sha256:9999999999999999999999999999999999999999999999999999999999999999",
-          "source_context_id": "ctx:A",
-          "source_policy_epoch": 1,
-          "source_state_root": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
-          "target_context_id": "ctx:B"
-        }
-      },
-      "transition_id": "t:5"
     }
   ]
 }

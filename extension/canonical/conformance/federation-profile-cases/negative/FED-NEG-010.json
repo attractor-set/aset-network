@@ -1,8 +1,8 @@
 {
-  "case_id": "NET-NEG-003",
+  "case_id": "FED-NEG-010",
   "expected": {
     "accepted": false,
-    "code": "ROUTE_SUSPENDED",
+    "code": "ACTIVE_ROUTE_DEPENDENCY",
     "enforcement": "NOT_APPLICABLE",
     "semantic_status": "NOT_APPLICABLE",
     "state_changed": false
@@ -62,27 +62,11 @@
       "transition_id": "t:4"
     },
     {
-      "kind": "SUSPEND_ROUTE",
+      "kind": "MEMBER_WITHDRAW",
       "payload": {
-        "route_id": "route:A-B"
+        "context_id": "ctx:A"
       },
-      "transition_id": "t:8"
-    },
-    {
-      "kind": "EXPORT_ARTIFACT",
-      "payload": {
-        "export": {
-          "artifact_digest": "sha256:1111111111111111111111111111111111111111111111111111111111111111",
-          "export_id": "export:1",
-          "route_id": "route:A-B",
-          "scope_digest": "sha256:eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee",
-          "source_context_id": "ctx:A",
-          "source_policy_epoch": 1,
-          "source_state_root": "sha256:2222222222222222222222222222222222222222222222222222222222222222",
-          "target_context_id": "ctx:B"
-        }
-      },
-      "transition_id": "t:5"
+      "transition_id": "t:9"
     }
   ]
 }

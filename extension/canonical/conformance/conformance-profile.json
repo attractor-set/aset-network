@@ -67,7 +67,6 @@
     },
     {
       "conformance_profile": "extension/canonical/conformance/federation-profile-conformance-profile.json",
-      "extraction_status": "NORMATIVE_PROFILE_AFTER_CORE_CUTOVER",
       "normative_when_claimed": true,
       "profile_id": "ASET-NETWORK-FEDERATION-PROFILE-V1",
       "required_for_core_conformance": false

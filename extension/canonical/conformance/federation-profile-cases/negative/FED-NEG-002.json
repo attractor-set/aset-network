@@ -1,5 +1,5 @@
 {
-  "case_id": "NET-NEG-002",
+  "case_id": "FED-NEG-002",
   "expected": {
     "accepted": false,
     "code": "SELF_ROUTE_FORBIDDEN",

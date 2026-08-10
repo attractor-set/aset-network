@@ -15,19 +15,13 @@ def empty_state() -> None:
     return None
 
 
-def _result(
-    accepted: bool,
-    code: str,
-    changed: bool,
-    status: str = "NOT_APPLICABLE",
-    enforcement: str = "NOT_APPLICABLE",
-) -> dict[str, Any]:
+def _result(accepted: bool, code: str, changed: bool) -> dict[str, Any]:
     return {
         "accepted": accepted,
         "code": code,
         "state_changed": changed,
-        "semantic_status": status,
-        "enforcement": enforcement,
+        "semantic_status": "NOT_APPLICABLE",
+        "enforcement": "NOT_APPLICABLE",
     }
 
 
@@ -49,8 +43,6 @@ def apply_transition(
             "members": {},
             "routes": {},
             "exports": {},
-            "imports": {},
-            "recognitions": {},
             "history": [],
         }
         return _append(state, transition, _result(True, "FEDERATION_CREATED", True))
@@ -121,103 +113,7 @@ def apply_transition(
         if not exact:
             return state, _result(False, "ROUTE_BINDING_MISMATCH", False)
         state["exports"][eid] = copy.deepcopy(export)
-        return _append(
-            state,
-            transition,
-            _result(
-                True,
-                "ARTIFACT_EXPORTED",
-                True,
-                "NOT_APPLICABLE",
-                "NOT_APPLICABLE",
-            ),
-        )
-
-    if kind == "OBSERVE_IMPORT":
-        observation = payload["import"]
-        iid = observation["import_id"]
-        existing = state["imports"].get(iid)
-        if existing == observation:
-            return state, _result(True, "IDEMPOTENT_REPLAY", False, "UNKNOWN", "BLOCKED")
-        if existing is not None:
-            return state, _result(False, "IDENTIFIER_CONFLICT", False, "UNKNOWN", "BLOCKED")
-        export = state["exports"].get(observation["export_id"])
-        route = state["routes"].get(observation["route_id"])
-        if export is None or route is None:
-            return state, _result(False, "EXPORT_OR_ROUTE_NOT_FOUND", False, "UNKNOWN", "BLOCKED")
-        target = state["members"].get(observation["target_context_id"])
-        if target is None or target["status"] != "ACTIVE":
-            return state, _result(False, "TARGET_CONTEXT_INACTIVE", False, "UNKNOWN", "BLOCKED")
-        exact = (
-            observation["route_id"] == export["route_id"]
-            and (
-                observation["target_context_id"]
-                == export["target_context_id"]
-                == route["target_context_id"]
-            )
-            and observation["artifact_digest"] == export["artifact_digest"]
-            and observation["scope_digest"] == export["scope_digest"] == route["scope_digest"]
-            and (
-                observation["target_policy_epoch"]
-                == route["target_policy_epoch"]
-                == target["policy_epoch"]
-            )
-        )
-        if not exact:
-            return state, _result(False, "IMPORT_BINDING_MISMATCH", False, "UNKNOWN", "BLOCKED")
-        if observation["semantic_status"] != "UNKNOWN" or observation["enforcement"] != "BLOCKED":
-            return state, _result(False, "IMPORT_MUST_START_BLOCKED", False, "UNKNOWN", "BLOCKED")
-        state["imports"][iid] = copy.deepcopy(observation)
-        return _append(
-            state,
-            transition,
-            _result(True, "IMPORT_OBSERVED", True, "UNKNOWN", "BLOCKED"),
-        )
-
-    if kind == "RECORD_RECOGNITION":
-        receipt = payload["recognition"]
-        rid = receipt["recognition_id"]
-        existing = state["recognitions"].get(rid)
-        if existing == receipt:
-            return state, _result(
-                True,
-                "IDEMPOTENT_REPLAY",
-                False,
-                receipt["semantic_status"],
-                receipt["enforcement"],
-            )
-        if existing is not None:
-            return state, _result(False, "IDENTIFIER_CONFLICT", False, "UNKNOWN", "BLOCKED")
-        observation = state["imports"].get(receipt["import_id"])
-        if observation is None:
-            return state, _result(False, "IMPORT_NOT_FOUND", False, "UNKNOWN", "BLOCKED")
-        exact = all(
-            receipt[k] == observation[k]
-            for k in (
-                "target_context_id",
-                "resolution_id",
-                "question_digest",
-                "scope_digest",
-                "target_policy_epoch",
-            )
-        )
-        if not exact:
-            return state, _result(False, "SEED_BINDING_MISMATCH", False, "UNKNOWN", "BLOCKED")
-        status = receipt["semantic_status"]
-        enforcement = receipt["enforcement"]
-        if status not in {"ACCEPT", "DENY"}:
-            return state, _result(
-                False,
-                "TERMINAL_SEED_DECISION_REQUIRED",
-                False,
-                "UNKNOWN",
-                "BLOCKED",
-            )
-        if (status, enforcement) not in {("ACCEPT", "ALLOW"), ("DENY", "BLOCKED")}:
-            return state, _result(False, "SEED_ENFORCEMENT_MISMATCH", False, "UNKNOWN", "BLOCKED")
-        state["recognitions"][rid] = copy.deepcopy(receipt)
-        code = "LOCALLY_RECOGNIZED" if status == "ACCEPT" else "LOCALLY_REJECTED"
-        return _append(state, transition, _result(True, code, True, status, enforcement))
+        return _append(state, transition, _result(True, "ARTIFACT_EXPORTED", True))
 
     if kind == "SUSPEND_ROUTE":
         rid = payload["route_id"]
@@ -237,9 +133,10 @@ def apply_transition(
         if member["status"] == "WITHDRAWN":
             return state, _result(True, "IDEMPOTENT_REPLAY", False)
         active_routes = [
-            r
-            for r in state["routes"].values()
-            if r["status"] == "ACTIVE" and cid in {r["source_context_id"], r["target_context_id"]}
+            route
+            for route in state["routes"].values()
+            if route["status"] == "ACTIVE"
+            and cid in {route["source_context_id"], route["target_context_id"]}
         ]
         if active_routes:
             return state, _result(False, "ACTIVE_ROUTE_DEPENDENCY", False)

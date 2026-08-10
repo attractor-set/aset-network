@@ -1,14 +1,14 @@
 {
-  "case_id": "NET-NEG-010",
+  "case_id": "FED-POS-003",
   "expected": {
-    "accepted": false,
-    "code": "ACTIVE_ROUTE_DEPENDENCY",
+    "accepted": true,
+    "code": "ROUTE_GRANTED",
     "enforcement": "NOT_APPLICABLE",
     "semantic_status": "NOT_APPLICABLE",
-    "state_changed": false
+    "state_changed": true
   },
   "initial_state": null,
-  "polarity": "negative",
+  "polarity": "positive",
   "steps": [
     {
       "kind": "FEDERATION_GENESIS",
@@ -60,13 +60,6 @@
         }
       },
       "transition_id": "t:4"
-    },
-    {
-      "kind": "MEMBER_WITHDRAW",
-      "payload": {
-        "context_id": "ctx:A"
-      },
-      "transition_id": "t:9"
     }
   ]
 }

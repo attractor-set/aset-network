@@ -1,9 +1,9 @@
 {
   "invariants_digest": "sha256:cc08858254cc47c60bd8287bd927db17bcc44f05e40a5e82075e1c2359587fb6",
-  "parent_contract_digest": "sha256:edb71c3d7f29c2b85dd45b2d00d0107a296e015c288a0ef324d8c9d1bcc37f1f",
-  "profile_digest": "sha256:fac064b33894b68e21f2d6ac1de8ee72b1d0ba144d8f834aa9224b56722e3733",
+  "parent_contract_digest": "sha256:d3b4c0613e8f698d187e8afc281245f82c1ae61eb3e8e6f2efca129f271b5cae",
+  "profile_digest": "sha256:ac6f3c7263a537d1491fa05afe8e7fd6d1ce1215eedccfca2f10f03bc0718d14",
   "profile_id": "aset-network-federation",
   "profile_version": "v1",
   "requirements_digest": "sha256:c03ae9ccddb066c83c8d35929e259c1c917d302597768179ac0cb944c27f0a3c",
-  "scope_digest": "sha256:4824a98c0771fa4a0f456573bad59c10ba27742313841430bbe49f652d99fb64"
+  "scope_digest": "sha256:71946c6c4d8da20d5678253a5862d8c33dd5d2db1a7ca741fc9364446de2bc34"
 }
