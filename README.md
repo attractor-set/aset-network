@@ -1,8 +1,8 @@
-# ASET Network Extension
+# ASET Network
 
 Status: **0.1.0-alpha.3 / minimal admission core**
 
-ASET Network Extension is the minimal implementation-neutral boundary by which foreign evidence becomes a target-local candidate for ASET Seed resolution.
+ASET Network is the minimal implementation-neutral boundary by which foreign evidence becomes a target-local candidate for ASET Seed resolution.
 
 ## Core rule
 
@@ -21,7 +21,7 @@ Federation membership/routing and conditional liveness are separate optional pro
 ## Direct repository topology
 
 - Upstream specification: [ASET](https://github.com/attractor-set/ASET) — direct normative parent.
-- Downstream reference implementation: [ASET Network Python SQLite](https://github.com/attractor-set/aset-network-python-sqlite) — non-normative reference implementation of this extension.
+- Downstream reference implementation: [ASET Network Python SQLite](https://github.com/attractor-set/aset-network-python-sqlite) — non-normative reference implementation of ASET Network.
 
 Only direct repository relationships are listed here. Transitive relationships are discovered through their immediate parent repositories.
 

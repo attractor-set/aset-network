@@ -441,17 +441,26 @@ def test_full_local_non_tlaps_validation_stack() -> None:
 
 def test_release_metadata_matches_alpha3_minimal_admission() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    assert project["name"] == "aset-network"
     assert project["version"] == "0.1.0a3"
     assert project["description"] == (
-        "Minimal cross-context evidence admission extension for ASET Seed"
+        "Minimal cross-context evidence admission semantics for ASET Seed"
     )
+
+
+def test_project_rename_preserves_alpha3_semantic_identity() -> None:
+    identity = (ROOT / "PROJECT_IDENTITY.md").read_text(encoding="utf-8")
+    package = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text())
+    assert "Semantic delta: **NONE**" in identity
+    assert package["canon_id"] == "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
+    assert package["extension_id"] == "ASET-NETWORK-EXTENSION"
 
 
 def test_repository_topology_contains_only_direct_relations() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
     assert project["urls"] == {
         "SeedSpecification": "https://github.com/attractor-set/ASET",
-        "Repository": "https://github.com/attractor-set/aset-network-extension",
+        "Repository": "https://github.com/attractor-set/aset-network",
         "ReferenceImplementation": "https://github.com/attractor-set/aset-network-python-sqlite",
     }
     for readme_name in ["README.md", "README.ru.md", "README.pt-BR.md"]:
