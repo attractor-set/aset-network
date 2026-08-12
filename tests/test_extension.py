@@ -111,7 +111,10 @@ def test_ci_enforces_exact_tree_and_pinned_seed_refinement() -> None:
     assert "git diff --cached --exit-code -- ." in workflow
     assert "python -m tools.build_release --verify-determinism" in workflow
     assert 'seed_commit="633c130187b2a2bb42f24cfd66662d475de385d2"' in workflow
+    assert 'assurance_commit="e89d984203a126f8bc62467224cdf6c5374dada7"' in workflow
     assert '--seed-root "$SEED_ROOT"' in workflow
+    assert '--assurance-root "$ASSURANCE_ROOT"' in workflow
+    assert "dist/network-seed-projection-assurance.json" in workflow
 
 
 def test_formal_gate_checks_generated_artifacts_without_rewriting_them() -> None:
@@ -120,6 +123,12 @@ def test_formal_gate_checks_generated_artifacts_without_rewriting_them() -> None
     assert '"tools.build_canon_package", "--check"' in source
     assert '"ruff", "format", "--check", "."' in source
     assert '"tools.run_seed_refinement_tlaps"' in source
+    assert '"SEED_PROJECTION_ASSURANCE"' in source
+    assert '"tools.check_seed_projection_assurance"' in source
+    assert 'parser.add_argument("--assurance-root", type=Path, required=True)' in source
+    assert '"seed_projection_assurance_verdict"' in source
+    assert '"EVIDENCE_COMPOSITION_CHECK"' in source
+    assert '"shared_seed_resolution_sha256"' in source
 
 
 def test_formal_core_has_one_variable_and_one_action() -> None:
