@@ -1,8 +1,8 @@
-# ASET Network Extension
+# ASET Network
 
 Status: **0.1.0-alpha.3 / núcleo mínimo de admissão**
 
-ASET Network Extension define a fronteira mínima e neutra de implementação pela qual evidência externa se torna candidata local para resolução pelo ASET Seed.
+ASET Network define a fronteira mínima e neutra de implementação pela qual evidência externa se torna candidata local para resolução pelo ASET Seed.
 
 ## Topologia direta dos repositórios
 

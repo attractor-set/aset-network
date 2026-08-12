@@ -31,7 +31,7 @@ EXPECTED_TLAPM = {
 EXPECTED_PROOF_COUNTS = {"canon": 3, "seed": 35}
 EXPECTED_PROJECT_URLS = {
     "SeedSpecification": "https://github.com/attractor-set/ASET",
-    "Repository": "https://github.com/attractor-set/aset-network-extension",
+    "Repository": "https://github.com/attractor-set/aset-network",
     "ReferenceImplementation": "https://github.com/attractor-set/aset-network-python-sqlite",
 }
 FORBIDDEN_DIRECT_REPOSITORY_TOKENS = {"aset-python-sqlite"}
@@ -228,10 +228,13 @@ def main() -> int:
         for url in project_urls.values()
     ):
         raise SystemExit("non-direct repository relation leaked into project URLs")
-    if project.get("version") != "0.1.0a3" or project.get("description") != (
-        "Minimal cross-context evidence admission extension for ASET Seed"
+    if (
+        project.get("name") != "aset-network"
+        or project.get("version") != "0.1.0a3"
+        or project.get("description")
+        != "Minimal cross-context evidence admission semantics for ASET Seed"
     ):
-        raise SystemExit("project metadata does not match alpha.3 minimal admission release")
+        raise SystemExit("project metadata does not match renamed alpha.3 project identity")
     if package["extension_version"] != "0.1.0-alpha.3" or package["canon_id"] != (
         "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
     ):

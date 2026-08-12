@@ -101,7 +101,7 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: aset-network-extension-formal-release-evidence-${{ github.sha }}
+          name: aset-network-formal-release-evidence-${{ github.sha }}
           if-no-files-found: warn
           path: |
             dist/formal-release-gate.json
@@ -111,7 +111,7 @@ jobs:
       - name: Upload INPI deposit snapshot
         uses: actions/upload-artifact@v4
         with:
-          name: aset-network-extension-inpi-deposit-${{ github.sha }}
+          name: aset-network-inpi-deposit-${{ github.sha }}
           if-no-files-found: error
           path: |
             dist/ASET-Network-Extension-Repository-Snapshot.zip

@@ -1,7 +1,7 @@
 [project]
-name = "aset-network-extension"
+name = "aset-network"
 version = "0.1.0a3"
-description = "Minimal cross-context evidence admission extension for ASET Seed"
+description = "Minimal cross-context evidence admission semantics for ASET Seed"
 requires-python = ">=3.12"
 license = {text = "Apache-2.0"}
 
@@ -17,5 +17,5 @@ select = ["E", "F", "I", "UP", "B"]
 
 [project.urls]
 SeedSpecification = "https://github.com/attractor-set/ASET"
-Repository = "https://github.com/attractor-set/aset-network-extension"
+Repository = "https://github.com/attractor-set/aset-network"
 ReferenceImplementation = "https://github.com/attractor-set/aset-network-python-sqlite"
