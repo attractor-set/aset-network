@@ -14,18 +14,12 @@ PROFILE_PATH = Path("assurance/seed-projection/ASSURANCE_PROFILE.json")
 NETWORK_CANON_PATH = Path("extension/canonical/CANON_PACKAGE.json")
 NETWORK_MODEL_PATH = Path("extension/canonical/source/network-extension-model.json")
 NETWORK_TLA_PATH = Path("extension/canonical/formal/NetworkExtension.tla")
-NETWORK_SEED_PROJECTION_PATH = Path(
-    "extension/canonical/formal/NetworkExtensionSeedProjection.tla"
-)
-NETWORK_SEED_REFINEMENT_PATH = Path(
-    "extension/canonical/formal/NetworkExtensionSeedRefinement.tla"
-)
+NETWORK_SEED_PROJECTION_PATH = Path("extension/canonical/formal/NetworkExtensionSeedProjection.tla")
+NETWORK_SEED_REFINEMENT_PATH = Path("extension/canonical/formal/NetworkExtensionSeedRefinement.tla")
 NETWORK_SEED_PROOFS_PATH = Path(
     "extension/canonical/formal/NetworkExtensionSeedRefinementProofs.tla"
 )
-NETWORK_SEED_EVIDENCE_PATH = Path(
-    "extension/canonical/assurance/seed-refinement-proof.json"
-)
+NETWORK_SEED_EVIDENCE_PATH = Path("extension/canonical/assurance/seed-refinement-proof.json")
 FEDERATION_PROFILE_PATH = Path("extension/canonical/profiles/federation/profile.json")
 FEDERATION_TLA_PATH = Path(
     "extension/canonical/profiles/federation/assurance/FederationProfile.tla"
@@ -109,34 +103,53 @@ def check(network_root: Path, seed_root: Path) -> dict[str, Any]:
         "Network transition kinds changed",
     )
     require(
-        "terminal recognition" in network_model.get("normative_scope", {}).get("does_not_define", []),
+        "terminal recognition"
+        in network_model.get("normative_scope", {}).get("does_not_define", []),
         "Network canon no longer excludes terminal recognition",
     )
 
     network_tla = (network_root / NETWORK_TLA_PATH).read_text(encoding="utf-8")
-    require(re.search(r"(?m)^VARIABLE\s+imports\s*$", network_tla) is not None,
-            "Network TLA no longer has exactly the imports variable declaration")
-    require(r"NetworkAction == \E o \in ObservationUniverse : AdmitImport(o)" in network_tla,
-            "NetworkAction is no longer the minimal AdmitImport action")
-    require("NoTerminalRecognitionState == TRUE" in network_tla,
-            "Network TLA no longer states absence of terminal recognition state")
+    require(
+        re.search(r"(?m)^VARIABLE\s+imports\s*$", network_tla) is not None,
+        "Network TLA no longer has exactly the imports variable declaration",
+    )
+    require(
+        r"NetworkAction == \E o \in ObservationUniverse : AdmitImport(o)" in network_tla,
+        "NetworkAction is no longer the minimal AdmitImport action",
+    )
+    require(
+        "NoTerminalRecognitionState == TRUE" in network_tla,
+        "Network TLA no longer states absence of terminal recognition state",
+    )
     require("AdmissionFailClosed" in network_tla, "Network fail-closed invariant missing")
 
     projection_tla = (network_root / NETWORK_SEED_PROJECTION_PATH).read_text(encoding="utf-8")
-    require(r'ProjectedSeedStatus(o) == IF o \in imports THEN "UNKNOWN"' in projection_tla,
-            "Seed projection no longer maps admitted imports to UNKNOWN")
-    require(r'ProjectedSeedEnforcement(o) == IF o \in imports THEN "BLOCKED"' in projection_tla,
-            "Seed projection no longer maps admitted imports to BLOCKED")
+    require(
+        r'ProjectedSeedStatus(o) == IF o \in imports THEN "UNKNOWN"' in projection_tla,
+        "Seed projection no longer maps admitted imports to UNKNOWN",
+    )
+    require(
+        r'ProjectedSeedEnforcement(o) == IF o \in imports THEN "BLOCKED"' in projection_tla,
+        "Seed projection no longer maps admitted imports to BLOCKED",
+    )
 
     refinement_tla = (network_root / NETWORK_SEED_REFINEMENT_PATH).read_text(encoding="utf-8")
-    require("Seed == INSTANCE SeedResolution" in refinement_tla,
-            "Network refinement no longer instantiates SeedResolution")
-    require("BridgeAdmitAsSeedRegister(o)" in refinement_tla,
-            "Network admission-to-Seed registration bridge missing")
-    require(r"ProjectedTerminalMeta == [r \in {} |-> r]" in refinement_tla,
-            "Network refinement acquired terminal Seed state")
-    require("ProjectedConflicts == {}" in refinement_tla,
-            "Network refinement acquired Seed conflict state")
+    require(
+        "Seed == INSTANCE SeedResolution" in refinement_tla,
+        "Network refinement no longer instantiates SeedResolution",
+    )
+    require(
+        "BridgeAdmitAsSeedRegister(o)" in refinement_tla,
+        "Network admission-to-Seed registration bridge missing",
+    )
+    require(
+        r"ProjectedTerminalMeta == [r \in {} |-> r]" in refinement_tla,
+        "Network refinement acquired terminal Seed state",
+    )
+    require(
+        "ProjectedConflicts == {}" in refinement_tla,
+        "Network refinement acquired Seed conflict state",
+    )
 
     proof_text = (network_root / NETWORK_SEED_PROOFS_PATH).read_text(encoding="utf-8")
     for theorem in (
@@ -146,56 +159,90 @@ def check(network_root: Path, seed_root: Path) -> dict[str, Any]:
         require(f"THEOREM {theorem} ==" in proof_text, f"required theorem missing: {theorem}")
 
     proof_gate = network_evidence.get("proof_gate", {})
-    require(network_evidence.get("status") == "MECHANICALLY_PROVED",
-            "Network-to-Seed refinement evidence is not mechanically proved")
-    require(proof_gate.get("obligations_proved") == network_subject["seed_refinement_obligations"],
-            "Network-to-Seed proof-obligation evidence changed")
-    require(set(proof_gate.get("final_theorems", [])) == {
-        "NetworkExtensionRefinesSeedSafetySpec",
-        "NetworkProjectionMatchesSeedResolution",
-    }, "Network-to-Seed final theorem set changed")
+    require(
+        network_evidence.get("status") == "MECHANICALLY_PROVED",
+        "Network-to-Seed refinement evidence is not mechanically proved",
+    )
+    require(
+        proof_gate.get("obligations_proved") == network_subject["seed_refinement_obligations"],
+        "Network-to-Seed proof-obligation evidence changed",
+    )
+    require(
+        set(proof_gate.get("final_theorems", []))
+        == {
+            "NetworkExtensionRefinesSeedSafetySpec",
+            "NetworkProjectionMatchesSeedResolution",
+        },
+        "Network-to-Seed final theorem set changed",
+    )
 
     network_seed_sha = network_evidence.get("upstream_seed", {}).get("sha256")
-    require(network_seed_sha == seed_subject["seed_resolution_sha256"],
-            "Network refinement points at a different SeedResolution source")
+    require(
+        network_seed_sha == seed_subject["seed_resolution_sha256"],
+        "Network refinement points at a different SeedResolution source",
+    )
 
-    require(v60.get("assurance_id") == v60_subject["assurance_id"],
-            "ASET public-v60 assurance id mismatch")
-    require(v60.get("package_digest") == v60_subject["package_digest"],
-            "ASET public-v60 package digest mismatch")
-    require(v60.get("expected_tlaps_obligations") == v60_subject["expected_tlaps_obligations"],
-            "ASET public-v60 obligation total mismatch")
-    require(v60.get("subject", {}).get("canon_id") == seed_subject["canon_id"],
-            "public v60 protects a different Seed canon id")
-    require(v60.get("subject", {}).get("canon_version") == seed_subject["canon_version"],
-            "public v60 protects a different Seed canon version")
-    require(v60.get("subject", {}).get("seed_resolution_sha256") == network_seed_sha,
-            "Network refinement and public v60 do not share the exact Seed subject")
-    require(sha256(seed_root / SEED_RESOLUTION_PATH) == network_seed_sha,
-            "local ASET SeedResolution bytes do not match the shared subject")
+    require(
+        v60.get("assurance_id") == v60_subject["assurance_id"],
+        "ASET public-v60 assurance id mismatch",
+    )
+    require(
+        v60.get("package_digest") == v60_subject["package_digest"],
+        "ASET public-v60 package digest mismatch",
+    )
+    require(
+        v60.get("expected_tlaps_obligations") == v60_subject["expected_tlaps_obligations"],
+        "ASET public-v60 obligation total mismatch",
+    )
+    require(
+        v60.get("subject", {}).get("canon_id") == seed_subject["canon_id"],
+        "public v60 protects a different Seed canon id",
+    )
+    require(
+        v60.get("subject", {}).get("canon_version") == seed_subject["canon_version"],
+        "public v60 protects a different Seed canon version",
+    )
+    require(
+        v60.get("subject", {}).get("seed_resolution_sha256") == network_seed_sha,
+        "Network refinement and public v60 do not share the exact Seed subject",
+    )
+    require(
+        sha256(seed_root / SEED_RESOLUTION_PATH) == network_seed_sha,
+        "local ASET SeedResolution bytes do not match the shared subject",
+    )
 
     for required in v60_subject["required_proof_relations"]:
         actual = proof_relation(v60, required["id"])
         require(actual is not None, f"public v60 relation missing: {required['id']}")
-        require(actual.get("final_theorem") == required["final_theorem"],
-                f"public v60 theorem changed: {required['id']}")
-        require(actual.get("expected_obligations") == required["expected_obligations"],
-                f"public v60 obligation evidence changed: {required['id']}")
+        require(
+            actual.get("final_theorem") == required["final_theorem"],
+            f"public v60 theorem changed: {required['id']}",
+        )
+        require(
+            actual.get("expected_obligations") == required["expected_obligations"],
+            f"public v60 obligation evidence changed: {required['id']}",
+        )
 
     semantics = federation_profile.get("profile_semantics", {})
-    require(semantics.get("network_admission_state_fields") == ["imports"],
-            "Federation profile Network projection fields changed")
+    require(
+        semantics.get("network_admission_state_fields") == ["imports"],
+        "Federation profile Network projection fields changed",
+    )
     require(
         semantics.get("network_projection")
         == "FEDERATION_PROFILE_TRANSITIONS_STUTTER_ON_NETWORK_ADMISSION_STATE",
         "Federation profile no longer declares Network-admission stutter",
     )
-    require(semantics.get("seed_owned_terminal_recognition") is True,
-            "Federation profile no longer leaves terminal recognition to Seed")
+    require(
+        semantics.get("seed_owned_terminal_recognition") is True,
+        "Federation profile no longer leaves terminal recognition to Seed",
+    )
     federation_tla = (network_root / FEDERATION_TLA_PATH).read_text(encoding="utf-8")
     variable_block = re.search(r"VARIABLES\s+([^\n]+)", federation_tla)
-    require(variable_block is not None and "imports" not in variable_block.group(1),
-            "Federation assurance state unexpectedly owns Network imports")
+    require(
+        variable_block is not None and "imports" not in variable_block.group(1),
+        "Federation assurance state unexpectedly owns Network imports",
+    )
 
     return {
         "assurance_id": profile["assurance_id"],
@@ -236,7 +283,9 @@ def main() -> int:
 
     if args.output:
         args.output.parent.mkdir(parents=True, exist_ok=True)
-        args.output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+        args.output.write_text(
+            json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+        )
     return 0
 
 
