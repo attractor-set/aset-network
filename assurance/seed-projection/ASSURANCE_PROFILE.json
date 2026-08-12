@@ -1,0 +1,65 @@
+{
+  "assurance_id": "ASET-NETWORK-SEED-PROJECTION-ASSURANCE-V1",
+  "document_type": "aset-network-seed-projection-assurance-profile",
+  "schema_version": 1,
+  "normative": false,
+  "normative_precedence": "NONE",
+  "relation_type": "EVIDENCE_COMPOSITION_OVER_SHARED_SEED_SUBJECT",
+  "network_subject": {
+    "canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3",
+    "extension_version": "0.1.0-alpha.3",
+    "semantic_state_fields": ["imports"],
+    "transition_kinds": ["ADMIT_IMPORT"],
+    "seed_refinement_profile": "ASET-NETWORK-SEED-REFINEMENT-TLAPS-V2",
+    "seed_refinement_obligations": 35,
+    "network_model_sha256": "sha256:ac09e7b12a182236f0f3da402ee50552fc89d525891f510dad2142fc1ff57521",
+    "seed_projection_sha256": "sha256:673756cf507754f694c61df64dffe55c1c96d5ac21bf1edc928f19bd1760fe24",
+    "seed_refinement_sha256": "sha256:d02d4ddc4715a3d6749225d896dc984ab510b9e28986b46461956785dfe51c7e",
+    "seed_refinement_proof_sha256": "sha256:319dcd3e78d2ffeda43528287d9963bc46f656b0983bcddf43e32bf72e320a42"
+  },
+  "shared_seed_subject": {
+    "canon_id": "ASET-SEED-RESOLUTION-CANON-0.3-ALPHA1",
+    "canon_version": "0.3.0-alpha.1",
+    "seed_resolution_sha256": "sha256:1c0ebb27ed52da289f0981dcb11b61b6a7fc5c4a030ba434ae0b1d53b286b926"
+  },
+  "public_v60_subject": {
+    "assurance_id": "ASET-SEED-RECOGNITION-BOUNDARY-ASSURANCE-V60",
+    "package_digest": "sha256:d537ad0555a0746e297f309e841aaccc8f059a44177400fd155253037a31747c",
+    "expected_tlaps_obligations": 2257,
+    "required_proof_relations": [
+      {
+        "id": "CANONICAL_PHASE_TO_SEED",
+        "final_theorem": "CanonicalPhaseSeedRefinesSeedResolution",
+        "expected_obligations": 299
+      },
+      {
+        "id": "SEED_TO_CANONICAL_PHASE",
+        "final_theorem": "SeedResolutionRefinesCanonicalPhaseSeed",
+        "expected_obligations": 370
+      }
+    ]
+  },
+  "projection_contract": {
+    "core_admission": "SEED_REGISTER_REFINING",
+    "admitted_effective_resolution": "UNKNOWN",
+    "admitted_effect_permitted": false,
+    "network_owned_terminal_recognition": false,
+    "federation_profile_projection": "SEED_STUTTER_VIA_UNCHANGED_NETWORK_IMPORTS"
+  },
+  "claim_boundary": {
+    "included": [
+      "exact identity composition of the mechanically proved Network-to-Seed bridge with public v60 over the same SeedResolution source",
+      "minimal Network core owns only imports and ADMIT_IMPORT",
+      "admitted foreign evidence remains UNKNOWN and effect-blocked until target-local Seed recognition",
+      "Network core owns no terminal recognition state",
+      "Federation Profile transitions stutter on Network admission state and own no Seed terminal-recognition state"
+    ],
+    "excluded": [
+      "a new mechanically composed Network-to-v60 TLAPS theorem",
+      "normative modification of ASET Seed or ASET Network Extension",
+      "implementation conformance",
+      "transport, liveness, cryptographic correctness, storage durability or distributed consistency",
+      "claims about optional profiles other than the explicitly checked Federation stutter boundary"
+    ]
+  }
+}
