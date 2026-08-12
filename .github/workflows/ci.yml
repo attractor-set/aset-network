@@ -58,12 +58,26 @@ jobs:
           git -C "$seed_root" checkout --detach FETCH_HEAD
           test "$(git -C "$seed_root" rev-parse HEAD)" = "$seed_commit"
           echo "SEED_ROOT=$seed_root" >> "$GITHUB_ENV"
+      - name: Fetch pinned ASET public-v60 assurance subject
+        shell: bash
+        run: |
+          set -euo pipefail
+          assurance_commit="e89d984203a126f8bc62467224cdf6c5374dada7"
+          assurance_root="$RUNNER_TEMP/ASET-assurance"
+          git init "$assurance_root"
+          git -C "$assurance_root" remote add origin https://github.com/attractor-set/ASET.git
+          git -C "$assurance_root" fetch --depth 1 origin "$assurance_commit"
+          git -C "$assurance_root" checkout --detach FETCH_HEAD
+          test "$(git -C "$assurance_root" rev-parse HEAD)" = "$assurance_commit"
+          python "$assurance_root/tools/build_seed_recognition_boundary_assurance.py" --check
+          echo "ASSURANCE_ROOT=$assurance_root" >> "$GITHUB_ENV"
       - name: Run full formal release gate
         timeout-minutes: 30
         run: |
           python -m tools.run_formal_release_gate \
             --tlapm "$TLAPM_BIN" \
-            --seed-root "$SEED_ROOT"
+            --seed-root "$SEED_ROOT" \
+            --assurance-root "$ASSURANCE_ROOT"
       - name: Verify exact committed tree
         shell: bash
         run: |
@@ -93,6 +107,7 @@ jobs:
             dist/formal-release-gate.json
             dist/network-canon-refinement-proof.json
             dist/network-seed-refinement-proof.json
+            dist/network-seed-projection-assurance.json
       - name: Upload INPI deposit snapshot
         uses: actions/upload-artifact@v4
         with:

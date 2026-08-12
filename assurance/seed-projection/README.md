@@ -64,3 +64,18 @@ python tools/check_seed_projection_assurance.py \
   --seed-root ~/ASET \
   --output dist/network-seed-projection-assurance.json
 ```
+
+## Formal release-gate integration
+
+The projection assurance is an external, mandatory precondition of the Network formal
+release gate. The release gate deliberately uses two independent ASET checkouts:
+
+- `--seed-root` points at the pinned Seed release used to reproduce the 35-obligation
+  Network-to-Seed TLAPS refinement;
+- `--assurance-root` points at the pinned public-v60 publication used to verify the
+  2257-obligation assurance identity and evidence composition.
+
+Keeping these roots distinct prevents the assurance publication identity from silently
+replacing the Seed release identity used by the existing refinement proof. The gate writes
+`dist/network-seed-projection-assurance.json`, binds its SHA-256 into the aggregate formal
+release report, and fails closed if the projection-assurance checker fails.
