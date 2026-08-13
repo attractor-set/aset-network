@@ -25,16 +25,6 @@ ALLOWED_ROOT_DIRS = {
     "tools",
     "upstream",
 }
-FORBIDDEN_ROOT_DIRS = {
-    "assurance",
-    "audit",
-    "docs",
-    "extension",
-    "governance",
-    "metadata",
-    "reference",
-    "standards",
-}
 EXPECTED_THEORY_FILES = {
     "theory/network-seed-reflection/formal/NetworkExtension.tla",
     "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinement.tla",
@@ -78,7 +68,6 @@ def validate_root_surface() -> None:
     require(files == ALLOWED_ROOT_FILES, f"root file surface drift: {file_drift}")
     dir_drift = sorted(dirs ^ ALLOWED_ROOT_DIRS)
     require(dirs == ALLOWED_ROOT_DIRS, f"root directory surface drift: {dir_drift}")
-    require(not (dirs & FORBIDDEN_ROOT_DIRS), "legacy root semantic/documentation surface returned")
 
 
 def validate_single_readme() -> None:

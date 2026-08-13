@@ -19,8 +19,11 @@ def require(condition: bool, message: str) -> None:
 
 
 def reject_self_declared_verdict(response: dict[str, Any]) -> None:
-    forbidden = {"pass", "verdict", "conformant", "conformance"}
-    require(not (forbidden & set(response)), "adapter self-declares conformance")
+    reserved_verdict_fields = {"pass", "verdict", "conformant", "conformance"}
+    require(
+        not (reserved_verdict_fields & set(response)),
+        "adapter must not self-declare conformance",
+    )
 
 
 def run_adapter(command: list[str], cwd: Path | None, request: dict[str, Any]) -> dict[str, Any]:
@@ -173,7 +176,7 @@ def verify_case_response(
     if stutter_case(actual):
         require(
             imports == case["initial_state"].get("imports", {}),
-            "replay/conflict mutated observed Network import state",
+            "replay/conflict changed observed Network import state",
         )
         require(
             actual.get("semantic_status") == formal["projected_resolution"],

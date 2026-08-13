@@ -119,15 +119,15 @@ def test_wrong_seed_facing_observable_is_rejected() -> None:
         assurance.check(ROOT, transcript=bad)
 
 
-def test_replay_state_mutation_is_rejected() -> None:
+def test_replay_state_change_is_rejected() -> None:
     bad = transcript()
     bad["cases"]["NET-POS-002"]["final_state"]["imports"]["imp-002"] = {"unexpected": True}
-    with pytest.raises(ValueError, match="replay/conflict mutated"):
+    with pytest.raises(ValueError, match="replay/conflict changed"):
         assurance.check(ROOT, transcript=bad)
 
 
 def test_adapter_may_not_self_declare_conformance() -> None:
     bad = transcript()
     bad["cases"]["NET-POS-001"]["verdict"] = "PASS"
-    with pytest.raises(ValueError, match="self-declares"):
+    with pytest.raises(ValueError, match="must not self-declare"):
         assurance.check(ROOT, transcript=bad)

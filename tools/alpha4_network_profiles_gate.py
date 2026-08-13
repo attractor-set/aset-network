@@ -107,7 +107,7 @@ def validate_dynamic() -> tuple[int, int]:
     dynamic = lines(DYNAMIC)
     require("STATE-ADDED NONE" in dynamic, "dynamic profile must add no state")
     require("TRANSITION-ADDED NONE" in dynamic, "dynamic profile must add no transitions")
-    require("NETWORK-STATE-MUTATION NEVER" in dynamic, "dynamic profile must not mutate Network")
+    require("NETWORK-STATE-CHANGE NEVER" in dynamic, "dynamic profile must preserve Network state")
     require("AUTHORITY-INHERITANCE NEVER" in dynamic, "dynamic profile authority boundary missing")
     require(
         "ACTIVATION TARGET-LOCAL-SEED-ALLOW EXACT-PROFILE-BINDING" in dynamic,
@@ -256,12 +256,18 @@ def validate_composition() -> None:
         "PROFILE-PARENT-RELATION FALSE" in composition,
         "composition must not create parent relation",
     )
-    require("STATE-OWNERSHIP-TRANSFER NONE" in composition, "composition state transfer forbidden")
+    require(
+        "STATE-OWNERSHIP-TRANSFER NONE" in composition,
+        "composition state ownership transfer must remain NONE",
+    )
     require(
         "TRANSITION-OWNERSHIP-TRANSFER NONE" in composition,
-        "composition transition transfer forbidden",
+        "composition transition ownership transfer must remain NONE",
     )
-    require("AUTHORITY-TRANSFER NONE" in composition, "composition authority transfer forbidden")
+    require(
+        "AUTHORITY-TRANSFER NONE" in composition,
+        "composition authority transfer must remain NONE",
+    )
     require(
         set(values(COMPOSITION, "PROVIDES")) == FEDERATION_CAPABILITIES,
         "composition provided capabilities mismatch",

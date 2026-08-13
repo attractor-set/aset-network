@@ -91,9 +91,21 @@ def test_alpha4_operational_and_relational_single_case_independent() -> None:
 
 def test_alpha4_seed_binding_is_content_addressed_not_commit_authority() -> None:
     sources = parse_binding()
-    assert len(sources) == 8
+    assert set(sources) == {
+        "seed/alpha4/SEED.aset",
+        "seed/alpha4/operational/components.forth",
+        "seed/alpha4/formal/RestrictedOperationalSemantics.tla",
+        "seed/alpha4/formal/ComponentRelations.tla",
+        "seed/alpha4/formal/OperationalRelationalPairingProofs.tla",
+        "seed/alpha4/formal/ComponentCompositionProofs.tla",
+        "seed/alpha4/causal/components.petri",
+        "theory/local-recognition/formal/LocalRecognitionAlgebra.tla",
+    }
     binding = (ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset").read_text(encoding="utf-8")
     assert "CONTENT-ADDRESSED" in binding
+    assert "RELEASE-TAG seed-0.4alpha-3way" in binding
+    assert "REQUIRED-SEED-CAUSAL-BIND ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN" in binding
+    assert "seed/alpha4/binding/graph.cddl" not in binding
     assert "COMMIT" not in binding
     assert "SEMANTIC-PRECEDENCE NONE" in binding
 
