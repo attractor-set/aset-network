@@ -5,10 +5,5 @@ __pycache__/
 dist/
 build/
 *.py[cod]
-.tooling/tla2tools.jar
-.tooling/tlc/
-.tooling/seed-formal/
-.tlacache/
-
-# Local formal-verification tooling
 .tooling/
+.tlacache/

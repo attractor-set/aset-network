@@ -21,14 +21,100 @@ ALLOWED_ROOT_DIRS = {
     "history",
     "network",
     "tests",
-    "theory",
     "tools",
     "upstream",
 }
-EXPECTED_THEORY_FILES = {
-    "theory/network-seed-reflection/formal/NetworkExtension.tla",
-    "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinement.tla",
-    "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinementProofs.tla",
+ALLOWED_ACTIVE_PATHS = {
+    ".editorconfig",
+    ".gitattributes",
+    ".github/workflows/verify.yml",
+    ".gitignore",
+    "CITATION.cff",
+    "LICENSE",
+    "NOTICE",
+    "README.md",
+    "history/REFERENCES.aset",
+    "network/alpha4/NETWORK.aset",
+    "network/alpha4/causal/components.petri",
+    "network/alpha4/formal/NetworkRelations.tla",
+    "network/alpha4/formal/OperationalRelationalPairingProofs.tla",
+    "network/alpha4/formal/RestrictedOperationalSemantics.tla",
+    "network/alpha4/formal/SeedBoundaryProofs.tla",
+    "network/alpha4/operational/components.forth",
+    "network/alpha4/profiles/PROFILES.aset",
+    "network/alpha4/profiles/composition/federation-liveness/FEDERATION_LIVENESS.aset",
+    (
+        "network/alpha4/profiles/composition/federation-liveness/assurance/"
+        "FederationLivenessContractProofs.tla"
+    ),
+    (
+        "network/alpha4/profiles/composition/federation-liveness/assurance/"
+        "FederationLivenessProgress.cfg"
+    ),
+    (
+        "network/alpha4/profiles/composition/federation-liveness/assurance/"
+        "FederationLivenessProgress.tla"
+    ),
+    "network/alpha4/profiles/composition/federation-liveness/causal/components.petri",
+    (
+        "network/alpha4/profiles/composition/federation-liveness/formal/"
+        "FederationLivenessCompositionRelations.tla"
+    ),
+    (
+        "network/alpha4/profiles/composition/federation-liveness/formal/"
+        "FederationLivenessOperationalRelationalPairingProofs.tla"
+    ),
+    (
+        "network/alpha4/profiles/composition/federation-liveness/formal/"
+        "FederationLivenessRestrictedOperationalSemantics.tla"
+    ),
+    "network/alpha4/profiles/composition/federation-liveness/operational/components.forth",
+    "network/alpha4/profiles/dynamic/DYNAMIC.aset",
+    "network/alpha4/profiles/dynamic/causal/components.petri",
+    "network/alpha4/profiles/dynamic/formal/DynamicOperationalRelationalPairingProofs.tla",
+    "network/alpha4/profiles/dynamic/formal/DynamicProfileBoundaryProofs.tla",
+    "network/alpha4/profiles/dynamic/formal/DynamicProfileRelations.tla",
+    "network/alpha4/profiles/dynamic/formal/DynamicRestrictedOperationalSemantics.tla",
+    "network/alpha4/profiles/dynamic/operational/components.forth",
+    "network/alpha4/profiles/federation/FEDERATION.aset",
+    "network/alpha4/profiles/federation/assurance/FederationProfile.cfg",
+    "network/alpha4/profiles/federation/assurance/FederationProfile.tla",
+    "network/alpha4/profiles/federation/causal/components.petri",
+    "network/alpha4/profiles/federation/formal/FederationOperationalRelationalPairingProofs.tla",
+    "network/alpha4/profiles/federation/formal/FederationRelations.tla",
+    "network/alpha4/profiles/federation/formal/FederationRestrictedOperationalSemantics.tla",
+    "network/alpha4/profiles/federation/formal/NetworkStutteringProofs.tla",
+    "network/alpha4/profiles/federation/operational/components.forth",
+    "network/alpha4/profiles/liveness/LIVENESS.aset",
+    "network/alpha4/profiles/liveness/causal/components.petri",
+    "network/alpha4/profiles/liveness/formal/LivenessBoundaryProofs.tla",
+    "network/alpha4/profiles/liveness/formal/LivenessContract.tla",
+    "network/alpha4/profiles/liveness/formal/LivenessOperationalRelationalPairingProofs.tla",
+    "network/alpha4/profiles/liveness/formal/LivenessRestrictedOperationalSemantics.tla",
+    "network/alpha4/profiles/liveness/operational/components.forth",
+    "pyproject.toml",
+    "requirements-ci.txt",
+    "tests/test_alpha4_network.py",
+    "tests/test_alpha4_network_profile_operational_pairing.py",
+    "tests/test_alpha4_network_profiles.py",
+    "tests/test_alpha4_network_three_way_assurance.py",
+    "tests/test_repository_minimal.py",
+    "tools/__init__.py",
+    "tools/alpha4_network_assurance.py",
+    "tools/alpha4_network_causal_expression.py",
+    "tools/alpha4_network_gate.py",
+    "tools/alpha4_network_paired_expression.py",
+    "tools/alpha4_network_profile_paired_expression.py",
+    "tools/alpha4_network_profiles_gate.py",
+    "tools/alpha4_network_triangulated_expression.py",
+    "tools/bootstrap_tla.py",
+    "tools/build_snapshot.py",
+    "tools/run_alpha4_network_profile_tlaps.py",
+    "tools/run_alpha4_network_profile_tlc.py",
+    "tools/run_alpha4_network_tlaps.py",
+    "tools/validate_alpha4_network.py",
+    "tools/validate_repository_minimal.py",
+    "upstream/ASET_SEED_ALPHA4_BINDING.aset",
 }
 
 
@@ -68,6 +154,8 @@ def validate_root_surface() -> None:
     require(files == ALLOWED_ROOT_FILES, f"root file surface drift: {file_drift}")
     dir_drift = sorted(dirs ^ ALLOWED_ROOT_DIRS)
     require(dirs == ALLOWED_ROOT_DIRS, f"root directory surface drift: {dir_drift}")
+    active_drift = sorted(paths ^ ALLOWED_ACTIVE_PATHS)
+    require(paths == ALLOWED_ACTIVE_PATHS, f"active repository surface drift: {active_drift}")
 
 
 def validate_single_readme() -> None:
@@ -86,7 +174,7 @@ def validate_active_network_line() -> None:
     require("ALPHA3-COMPATIBILITY NONE" in subject, "historical compatibility boundary drift")
 
 
-def validate_history_and_theory() -> None:
+def validate_history_surface() -> None:
     history = (ROOT / "history/REFERENCES.aset").read_text(encoding="utf-8")
     require("ASET-HISTORY 1" in history, "history header missing")
     require("STATE NETWORK-0.1.0-ALPHA.3" in history, "Alpha3 historical reference missing")
@@ -96,11 +184,17 @@ def validate_history_and_theory() -> None:
             "ASET-NETWORK-SEED-REFINEMENT-TLAPS-V2 35 MECHANICALLY_PROVED"
         )
         in history,
-        "retained reflection proof reference missing",
+        "historical reflection proof reference missing",
     )
-    theory_files = relative_files(ROOT / "theory")
-    theory_drift = sorted(theory_files ^ EXPECTED_THEORY_FILES)
-    require(theory_files == EXPECTED_THEORY_FILES, f"theory surface drift: {theory_drift}")
+    paths = repository_paths()
+    require(
+        not any(path.startswith("theory/") for path in paths),
+        "historical theory surface present",
+    )
+    require(
+        not any(path.startswith("extension/") for path in paths),
+        "legacy extension surface present",
+    )
 
 
 def validate_upstream_surface() -> None:
@@ -139,12 +233,13 @@ def main() -> int:
     validate_root_surface()
     validate_single_readme()
     validate_active_network_line()
-    validate_history_and_theory()
+    validate_history_surface()
     validate_upstream_surface()
     validate_verification_surface()
     validate_attribution()
     print("REPOSITORY_ACTIVE_SURFACE=MINIMAL")
     print("REPOSITORY_LEGACY_SEMANTIC_SURFACE=ABSENT")
+    print("REPOSITORY_HISTORICAL_EXECUTABLE_SURFACE=ABSENT")
     print("REPOSITORY_HISTORY_REFERENCES=PASS")
     print("REPOSITORY_COPYRIGHT_NOTICE=PASS")
     print("REPOSITORY_SINGLE_README=PASS")

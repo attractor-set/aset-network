@@ -23,8 +23,6 @@ jobs:
           java-version: "21"
       - run: python -m pip install -r requirements-ci.txt
       - run: python -m tools.bootstrap_tla
-      - name: Validate minimal repository surface
-        run: python -m tools.validate_repository_minimal
       - name: Validate current Network Alpha4 three-way representation
         run: python -m tools.alpha4_network_gate
       - name: Verify ASET Seed 0.4alpha 3-way content binding
@@ -64,27 +62,6 @@ jobs:
         run: python -m tools.run_alpha4_network_profile_tlaps --tlapm "$TLAPM_BIN"
       - name: Check Network Alpha4 profile safety and liveness composition
         run: python -m tools.run_alpha4_network_profile_tlc
-      - name: Fetch exact historical Seed subject for retained reflection theorem
-        shell: bash
-        run: |
-          set -euo pipefail
-          seed_commit="633c130187b2a2bb42f24cfd66662d475de385d2"
-          seed_root="$RUNNER_TEMP/aset-seed-alpha3"
-          git init "$seed_root"
-          git -C "$seed_root" remote add origin https://github.com/attractor-set/aset-seed.git
-          git -C "$seed_root" fetch --depth 1 origin "$seed_commit"
-          git -C "$seed_root" checkout --detach FETCH_HEAD
-          test "$(git -C "$seed_root" rev-parse HEAD)" = "$seed_commit"
-          echo "SEED_ALPHA3_ROOT=$seed_root" >> "$GITHUB_ENV"
-      - name: Re-prove Network-to-Seed reflection theory
-        run: |
-          python -m tools.run_network_seed_reflection_tlaps \
-            --tlapm "$TLAPM_BIN" \
-            --seed-root "$SEED_ALPHA3_ROOT"
-      - name: Generate black-box oracle from proved reflection theory
-        run: |
-          python -m tools.network_seed_reflection_oracle \
-            --output dist/network-seed-reflection-oracle.json
       - name: Verify exact committed tree
         shell: bash
         run: |
@@ -94,15 +71,6 @@ jobs:
           test -z "$(git status --porcelain --untracked-files=all)"
       - name: Verify deterministic repository snapshot
         run: python -m tools.build_snapshot --verify-determinism
-      - name: Upload generated reflection evidence
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: aset-network-reflection-evidence-${{ github.sha }}
-          if-no-files-found: warn
-          path: |
-            dist/network-seed-reflection-proof.json
-            dist/network-seed-reflection-oracle.json
       - name: Upload deterministic repository snapshot
         uses: actions/upload-artifact@v4
         with:
