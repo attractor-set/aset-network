@@ -230,7 +230,6 @@ def composition_relational_boundary(
     )
 
 
-
 def composition_operational_delivery_witness(
     exported: set[str], delivered: set[str], export: str
 ) -> bool:
@@ -293,6 +292,7 @@ def composition_relational_progress_witness(
         and composition_relational_observation_witness(delivered, observed, export)
         and composition_relational_resolution_witness(observed, resolved, export)
     )
+
 
 def bounded_composition_pairing_check() -> int:
     require_words(COMPOSITION_FORTH, EXPECTED_COMPOSITION_WORDS)
