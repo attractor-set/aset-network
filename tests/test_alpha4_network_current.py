@@ -7,32 +7,32 @@ from tools.validate_current_network import (
     EXPECTED_ALPHA3_RELEASE_COMMIT,
     EXPECTED_ALPHA4_BINDING_SHA256,
     sha256,
-    validate_current_pointer,
     validate_current_subjects,
     validate_history_boundary,
     validate_project_identity,
+    validate_unique_current_line,
 )
 from tools.validate_repository_minimal import repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 
 
-def test_alpha4_is_current_project_representation() -> None:
-    validate_current_pointer()
-    current = (ROOT / "network/CURRENT.aset").read_text(encoding="utf-8")
-    assert "CURRENT-REPRESENTATION network/alpha4/NETWORK.aset" in current
-    assert "CURRENT-PROFILES network/alpha4/profiles/PROFILES.aset" in current
-    assert "PROMOTION-SEMANTIC-DELTA NONE" in current
+def test_alpha4_is_the_unique_current_project_representation() -> None:
+    validate_unique_current_line()
+    paths = repository_paths()
+    assert "network/CURRENT.aset" not in paths
+    assert "network/alpha4/NETWORK.aset" in paths
+    assert "network/alpha4/profiles/PROFILES.aset" in paths
 
 
-def test_promotion_does_not_grant_semantic_precedence() -> None:
+def test_current_subjects_claim_no_semantic_precedence_or_alpha3_compatibility() -> None:
     validate_current_subjects()
-    current = (ROOT / "network/CURRENT.aset").read_text(encoding="utf-8")
     network = (ROOT / "network/alpha4/NETWORK.aset").read_text(encoding="utf-8")
     profiles = (ROOT / "network/alpha4/profiles/PROFILES.aset").read_text(encoding="utf-8")
-    assert "SEMANTIC-PRECEDENCE NONE" in current
     assert "SEMANTIC-PRECEDENCE NONE" in network
     assert "SEMANTIC-PRECEDENCE NONE" in profiles
+    assert "ALPHA3-COMPATIBILITY NONE" in network
+    assert "ALPHA3-COMPATIBILITY NONE" in profiles
 
 
 def test_alpha3_is_historical_reference_not_active_semantic_surface() -> None:

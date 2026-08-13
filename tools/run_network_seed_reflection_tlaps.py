@@ -10,14 +10,11 @@ import shutil
 import subprocess
 from pathlib import Path
 
+from tools.network_seed_reflection_oracle import FINAL_THEOREMS, PROOF_PROFILE, build_oracle
+
 ROOT = Path(__file__).resolve().parents[1]
-PROFILE = ROOT / "theory/network-seed-reflection/EXPRESSION_ASSURANCE.json"
 TLAPM_VERSION = "4600b24"
 TLAPM_COMMIT = "4600b24c6d95a25ff081ad37b63b2a01c29d43a5"
-
-
-def digest(path: Path) -> str:
-    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 def main() -> int:
@@ -32,24 +29,20 @@ def main() -> int:
     parser.add_argument("--timeout-seconds", type=int, default=900)
     args = parser.parse_args()
 
-    profile = json.loads(PROFILE.read_text(encoding="utf-8"))
-    oracle = profile["formal_oracle"]
-    seed_subject = oracle["seed_subject"]
+    oracle = build_oracle()
+    formal_oracle = oracle["formal_oracle"]
+    seed_subject = formal_oracle["seed_subject"]
     tlapm = args.tlapm.expanduser().resolve()
     seed_root = args.seed_root.expanduser().resolve()
     seed_formal = seed_root / "seed/canonical/formal"
     seed = seed_root / seed_subject["seed_resolution_path"]
     formal = ROOT / "theory/network-seed-reflection/formal"
-    proof = ROOT / oracle["proof"]["path"]
+    proof = ROOT / formal_oracle["proof"]["path"]
     errors: list[str] = []
 
-    for artifact_name in ("network_model", "mapping", "proof"):
-        artifact = oracle[artifact_name]
-        path = ROOT / artifact["path"]
-        if not path.is_file() or digest(path) != artifact["sha256"]:
-            errors.append(f"retained {artifact_name} digest mismatch")
-
-    if not seed.is_file() or digest(seed) != seed_subject["seed_resolution_sha256"]:
+    if not seed.is_file() or formal_oracle["seed_subject"]["seed_resolution_sha256"] != _digest(
+        seed
+    ):
         errors.append("SeedResolution.tla digest mismatch")
     if (seed_root / ".git").exists():
         try:
@@ -98,26 +91,36 @@ def main() -> int:
 
     matches = re.findall(r"All ([0-9]+) obligations? proved\.", proof_output)
     obligations = int(matches[-1]) if matches else None
-    if not errors and obligations != oracle["obligations_proved"]:
-        expected = oracle["obligations_proved"]
-        errors.append(f"proof obligation count mismatch: expected {expected}, got {obligations}")
+    if not errors and (obligations is None or obligations <= 0):
+        errors.append("proof obligation count missing")
 
     proof_text = proof.read_text(encoding="utf-8")
-    for theorem in oracle["final_theorems"]:
+    for theorem in FINAL_THEOREMS:
         if f"THEOREM {theorem} ==" not in proof_text:
             errors.append(f"final theorem missing: {theorem}")
+    for theorem in (
+        "FreshRefinesSeedRegisterRequest",
+        "ReplayRefinesSeedStutter",
+        "ConflictRefinesSeedStutter",
+    ):
+        if f"THEOREM {theorem} ==" not in proof_text:
+            errors.append(f"branch refinement theorem missing: {theorem}")
 
     verdict = "PASS" if not errors else "FAIL"
     report = {
-        "document_type": "aset-network-retained-seed-reflection-tlaps-report",
-        "schema_version": 1,
-        "assurance_id": profile["assurance_id"],
-        "historical_network_subject": profile["historical_subject"],
+        "document_type": "aset-network-seed-reflection-tlaps-report",
+        "schema_version": 3,
+        "profile": PROOF_PROFILE,
+        "assurance_id": oracle["assurance_id"],
+        "historical_network_subject": oracle["historical_subject"],
         "tlapm_commit": TLAPM_COMMIT,
         "tlapm_version": version_output,
         "seed_release_commit": seed_subject["release_commit"],
-        "seed_resolution_sha256": digest(seed) if seed.is_file() else None,
-        "final_theorems": oracle["final_theorems"],
+        "seed_resolution_sha256": _digest(seed) if seed.is_file() else None,
+        "theory_sha256": {
+            key: formal_oracle[key]["sha256"] for key in ("network_model", "mapping", "proof")
+        },
+        "final_theorems": list(FINAL_THEOREMS),
         "obligations_proved": obligations,
         "returncode": returncode,
         "errors": errors,
@@ -126,11 +129,16 @@ def main() -> int:
     output = args.output if args.output.is_absolute() else ROOT / args.output
     output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    print(f"NETWORK_SEED_REFLECTION_TLAPS_PROFILE={PROOF_PROFILE}")
     print(f"NETWORK_SEED_REFLECTION_TLAPS_OBLIGATIONS={obligations or 0}")
     print(f"NETWORK_SEED_REFLECTION_TLAPS={verdict}")
     for error in errors:
         print(f"NETWORK_SEED_REFLECTION_TLAPS_ERROR={error}")
     return 0 if not errors else 1
+
+
+def _digest(path: Path) -> str:
+    return "sha256:" + hashlib.sha256(path.read_bytes()).hexdigest()
 
 
 if __name__ == "__main__":

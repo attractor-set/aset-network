@@ -102,5 +102,7 @@ def test_alpha4_profile_surface_does_not_name_python_oracles() -> None:
 
 def test_no_historical_profile_surface_is_active() -> None:
     assert not any(path.startswith("extension/canonical/profiles/") for path in repository_paths())
-    current = (ROOT / "network/CURRENT.aset").read_text(encoding="utf-8")
-    assert "HISTORICAL-COMPATIBILITY NONE" in current
+    network = (ROOT / "network/alpha4/NETWORK.aset").read_text(encoding="utf-8")
+    profiles = (ROOT / "network/alpha4/profiles/PROFILES.aset").read_text(encoding="utf-8")
+    assert "ALPHA3-COMPATIBILITY NONE" in network
+    assert "ALPHA3-COMPATIBILITY NONE" in profiles

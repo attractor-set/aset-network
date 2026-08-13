@@ -21,23 +21,25 @@ PROOF
   BY DEF Init, Seed!Init, ProjectedRequestMeta, RequestProjection,
          ProjectedTerminalMeta, ProjectedConflicts
 
-THEOREM AdmitProjectionStep ==
-  \A o \in ObservationUniverse :
-    AdmitImport(o) =>
+THEOREM FreshProjectionStep ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    AdmitFresh(o, result) =>
       /\ ProjectedRequestMeta' =
            [x \in DOMAIN ProjectedRequestMeta \cup {o} |->
              IF x = o THEN RequestCell(o) ELSE ProjectedRequestMeta[x]]
       /\ UNCHANGED <<ProjectedTerminalMeta, ProjectedConflicts>>
 PROOF
-  BY DEF AdmitImport, ProjectedRequestMeta, RequestProjection,
+  BY DEF AdmitFresh, ProjectedRequestMeta, RequestProjection,
          ProjectedTerminalMeta, ProjectedConflicts, RequestCell
 
-THEOREM AdmitRefinesSeedRegisterRequest ==
-  \A o \in ObservationUniverse :
-    AdmitImport(o) => BridgeAdmitAsSeedRegister(o)
+THEOREM FreshRefinesSeedRegisterRequest ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    AdmitFresh(o, result) => BridgeFreshAsSeedRegister(o)
 PROOF
-  <1>1. SUFFICES ASSUME NEW o \in ObservationUniverse, AdmitImport(o)
-                  PROVE BridgeAdmitAsSeedRegister(o)
+  <1>1. SUFFICES ASSUME NEW o \in ObservationUniverse,
+                         NEW result \in ResultCodes,
+                         AdmitFresh(o, result)
+                  PROVE BridgeFreshAsSeedRegister(o)
     OBVIOUS
   <1>2. /\ BridgeBinding(o) \in BridgeBindings
          /\ o.target \in Contexts
@@ -45,20 +47,20 @@ PROOF
     BY <1>1, ObservationBridgeTyping
   <1>3. o \notin Seed!Requests
     BY <1>1, RequestProjectionDomain
-       DEF AdmitImport, Seed!Requests, ProjectedRequestMeta
+       DEF AdmitFresh, Seed!Requests, ProjectedRequestMeta
   <1>4. /\ ProjectedRequestMeta' =
               [x \in Seed!Requests \cup {o} |->
                 IF x = o
                 THEN [binding |-> BridgeBinding(o), previous |-> NoCommitmentValue]
                 ELSE ProjectedRequestMeta[x]]
          /\ UNCHANGED <<ProjectedTerminalMeta, ProjectedConflicts>>
-    BY <1>1, AdmitProjectionStep
+    BY <1>1, FreshProjectionStep
        DEF Seed!Requests, RequestCell
   <1>5. NoCommitmentValue = NoCommitmentValue \/ NoCommitmentValue \in {}
     OBVIOUS
   <1>6. QED
     BY <1>1, <1>2, <1>3, <1>4, <1>5
-       DEF BridgeAdmitAsSeedRegister, Seed!RegisterRequest
+       DEF BridgeFreshAsSeedRegister, Seed!RegisterRequest
 
 THEOREM SeedRegisterRequestIsSeedNext ==
   \A r \in ObservationUniverse,
@@ -69,25 +71,53 @@ THEOREM SeedRegisterRequestIsSeedNext ==
 PROOF
   BY DEF Seed!Next, Seed!RecognizedSeedTransition
 
-THEOREM AdmitImportRefinesSeedNext ==
-  \A o \in ObservationUniverse :
-    AdmitImport(o) => Seed!Next
+THEOREM FreshRefinesSeedNext ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    AdmitFresh(o, result) => Seed!Next
 PROOF
-  BY AdmitRefinesSeedRegisterRequest,
+  BY FreshRefinesSeedRegisterRequest,
      ObservationBridgeTyping,
      SeedRegisterRequestIsSeedNext
-     DEF BridgeAdmitAsSeedRegister
+     DEF BridgeFreshAsSeedRegister
 
-THEOREM NetworkActionRefinesSeedStep ==
-  NetworkAction => Seed!Next
+THEOREM ReplayStuttersSeedProjection ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    AdmitReplay(o, result) => UNCHANGED Seed!vars
 PROOF
-  BY AdmitImportRefinesSeedNext
-     DEF NetworkAction
+  BY DEF AdmitReplay, Seed!vars, ProjectedRequestMeta, RequestProjection,
+         ProjectedTerminalMeta, ProjectedConflicts
+
+THEOREM ConflictStuttersSeedProjection ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    RejectConflict(o, result) => UNCHANGED Seed!vars
+PROOF
+  BY DEF RejectConflict, Seed!vars, ProjectedRequestMeta, RequestProjection,
+         ProjectedTerminalMeta, ProjectedConflicts
+
+THEOREM ReplayRefinesSeedStutter ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    AdmitReplay(o, result) => [Seed!Next]_Seed!vars
+PROOF
+  BY ReplayStuttersSeedProjection
+     DEF Seed!vars
+
+THEOREM ConflictRefinesSeedStutter ==
+  \A o \in ObservationUniverse, result \in ResultCodes :
+    RejectConflict(o, result) => [Seed!Next]_Seed!vars
+PROOF
+  BY ConflictStuttersSeedProjection
+     DEF Seed!vars
+
+THEOREM NetworkActionRefinesSeedStepOrStutter ==
+  NetworkAction => [Seed!Next]_Seed!vars
+PROOF
+  BY FreshRefinesSeedNext, ReplayRefinesSeedStutter, ConflictRefinesSeedStutter
+     DEF NetworkAction, AdmitImport
 
 THEOREM BoxNetworkActionRefinesBoxSeedNext ==
   [NetworkAction]_vars => [Seed!Next]_Seed!vars
 PROOF
-  BY NetworkActionRefinesSeedStep
+  BY NetworkActionRefinesSeedStepOrStutter
      DEF vars, Seed!vars, ProjectedRequestMeta, RequestProjection,
          ProjectedTerminalMeta, ProjectedConflicts
 
