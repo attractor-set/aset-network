@@ -112,10 +112,10 @@ def test_alpha4_seed_binding_is_content_addressed_not_commit_authority() -> None
     assert "SEMANTIC-PRECEDENCE NONE" in binding
 
 
-def test_alpha3_is_history_only_while_reflection_theory_is_retained() -> None:
+def test_alpha3_is_history_reference_only() -> None:
     history = (ROOT / "history/REFERENCES.aset").read_text(encoding="utf-8")
     assert "STATE NETWORK-0.1.0-ALPHA.3" in history
     assert "COMPATIBILITY ASET-NETWORK-ALPHA4 NETWORK-0.1.0-ALPHA.3 NONE" in history
-    proof = ROOT / "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinementProofs.tla"
-    assert proof.is_file()
-    assert not any(path.startswith("extension/") for path in repository_paths())
+    paths = repository_paths()
+    assert not any(path.startswith("theory/") for path in paths)
+    assert not any(path.startswith("extension/") for path in paths)
