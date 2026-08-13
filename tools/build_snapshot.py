@@ -88,17 +88,17 @@ def main(argv: list[str] | None = None) -> int:
         finally:
             comparison.unlink(missing_ok=True)
         if rebuild_digest != digest:
-            print(f"NETWORK_RELEASE_SNAPSHOT_REBUILD_SHA256={rebuild_digest}")
-            print("NETWORK_RELEASE_SNAPSHOT_DETERMINISTIC_REBUILD=FAIL")
+            print(f"NETWORK_REPOSITORY_SNAPSHOT_REBUILD_SHA256={rebuild_digest}")
+            print("NETWORK_REPOSITORY_SNAPSHOT_DETERMINISTIC_REBUILD=FAIL")
             return 1
-        print("NETWORK_RELEASE_SNAPSHOT_DETERMINISTIC_REBUILD=PASS")
+        print("NETWORK_REPOSITORY_SNAPSHOT_DETERMINISTIC_REBUILD=PASS")
 
     checksum = ARCHIVE.with_suffix(ARCHIVE.suffix + ".sha256")
     checksum.write_text(f"{digest} {ARCHIVE.name}\n", encoding="utf-8", newline="\n")
-    print(f"NETWORK_RELEASE_SNAPSHOT_SOURCE_COMMIT={ref}")
-    print(f"NETWORK_RELEASE_SNAPSHOT_ARCHIVE={ARCHIVE}")
-    print(f"NETWORK_RELEASE_SNAPSHOT_SHA256={digest}")
-    print("NETWORK_RELEASE_SNAPSHOT=PASS")
+    print(f"NETWORK_REPOSITORY_SNAPSHOT_SOURCE_COMMIT={ref}")
+    print(f"NETWORK_REPOSITORY_SNAPSHOT_ARCHIVE={ARCHIVE}")
+    print(f"NETWORK_REPOSITORY_SNAPSHOT_SHA256={digest}")
+    print("NETWORK_REPOSITORY_SNAPSHOT=PASS")
     return 0
 
 
