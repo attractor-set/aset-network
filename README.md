@@ -91,6 +91,20 @@ Federation membership/routing and conditional liveness are separate optional pro
 
 Only direct repository relationships are listed here. Transitive relationships are discovered through their immediate parent repositories.
 
+## Independent assurance for external Alpha3 expressions
+
+The frozen Alpha3 Network→Seed refinement is retained as an independent formal oracle for external expressions of that exact Alpha3 subject. `tools/check_network_expression_assurance.py` does not import the historical Python reference oracle or implementation internals: it consumes a black-box adapter/transcript, checks the four frozen core observations, and then uses the pinned mechanically proved `NetworkExtensionRefinesSeedSafetySpec` / `NetworkProjectionMatchesSeedResolution` bridge to check fresh-admission Seed projection independently.
+
+The gate is intentionally fail-closed on subject identity. An implementation still bound to Network Alpha2 is **not** accepted as Alpha3 merely because its observable behavior looks similar; it must first declare and satisfy the exact frozen Alpha3 canon. This assurance is predecessor evidence and does not define the current Alpha4 representation.
+
+```bash
+python tools/check_network_expression_assurance.py \
+  --adapter-command 'python -m aset_network_python_sqlite.adapter' \
+  --output dist/network-expression-independent-assurance.json
+```
+
+The adapter protocol is `ASET-NETWORK-EXPRESSION-BLACKBOX-V1`: `describe` identifies the exact non-normative implementation subject, while `execute_case` returns only observed result/state data and may not self-declare conformance.
+
 ## Frozen Alpha3 upstream binding
 
 - Seed release: `seed-0.3.0-alpha.3`
