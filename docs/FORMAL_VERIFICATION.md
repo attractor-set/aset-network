@@ -1,47 +1,66 @@
 # Formal verification architecture
 
-The machine-readable canon is normative. TLA+ artifacts provide assurance and never override it.
+ASET Network Alpha4 is the current public representation. No single operational,
+relational, proof, binding or current-selection artifact has semantic precedence.
+The Network subject is expressed independently and related mechanically.
 
-## Current core chain
+## Current Alpha4 core chain
 
 ```text
-network-extension-model.json
+network/alpha4/NETWORK.aset
         |
-        | deterministic generation
-        v
-NetworkCanonProjection.tla
-        |
-        | TLAPS 3/3
-        v
-NetworkExtension.tla
-        |
-        +-- TLC minimal safety
-        +-- NetworkHistory.tla -> append-only trace
-        |
-        | TLAPS 35/35
-        v
-pinned SeedResolution.tla
+        +-------------------------------+
+        |                               |
+        v                               v
+restricted Forth                 NetworkRelations.tla
+operational expression           relational expression
+        |                               |
+        +-------------+-----------------+
+                      |
+                      v
+OperationalRelationalPairingProofs.tla
+                      |
+                      v
+SeedBoundaryProofs.tla
+                      |
+                      v
+content-addressed ASET Seed 0.4alpha boundary
 ```
 
-The projection profile is `ASET-NETWORK-CANON-TLA-PROJECTION-V3`. The handwritten Network model has exactly one variable, `imports`, and one state-changing action, `AdmitImport`.
+The current-selection pointer is `network/CURRENT.aset`. It is project metadata
+with `SEMANTIC-PRECEDENCE NONE`; promotion does not alter the Alpha4 subject or
+its paired expressions.
 
-## Profile assurance
+## Current Alpha4 profiles
 
-Federation lifecycle and liveness are separate optional profiles rather than Network-core semantics. Their current bounded assurance surfaces are:
+Dynamic, Federation and Liveness are separate optional profile subjects under
+`network/alpha4/profiles/`. Federation owns its profile-local lifecycle state and
+transitions. Dynamic and Liveness own no Network state or transitions but still
+have operational expressions because operational representation belongs to the
+semantic object rather than to a state machine.
 
-- `extension/canonical/profiles/federation/assurance/FederationProfile.tla` / `.cfg` — Federation Profile lifecycle safety;
-- `extension/canonical/profiles/liveness/` — independent Liveness Profile contract;
-- `extension/canonical/assurance/profile-compositions/federation-liveness/FederationCompositionLiveness.tla` / `.cfg` — bounded assurance for composing Federation and Liveness as peer profiles.
-
-`Resolve(e)` in the composition assurance is not a Network, Federation or Liveness transition. It is an assurance witness for the explicitly declared target-local Seed progress assumption. The composition does not establish a parent relation between profiles.
-
-## Reproducibility gates
+The profile proof runner checks operational/relational pairings and ownership
+boundaries. TLC independently checks Federation safety and the temporal
+Federation+Liveness progress composition.
 
 ```text
-python -m tools.generate_canon_tla_projection --check
+python -m tools.run_alpha4_network_tlaps --tlapm <tlapm>
+python -m tools.run_alpha4_network_profile_tlaps --tlapm <tlapm>
+python -m tools.run_alpha4_network_profile_tlc
+```
+
+## Frozen Alpha3 predecessor assurance
+
+`extension/canonical/**` is the byte-frozen Alpha3 predecessor representation.
+Its canon-to-TLA relation, Seed refinement, conformance cases and historical
+profile assurance remain reproducible regression evidence. They are not the
+current Network semantic surface and do not acquire precedence over Alpha4.
+
+The Alpha3 tools remain in CI specifically to detect predecessor drift:
+
+```text
 python -m tools.validate_extension
 python -m tools.run_conformance
-python -m tools.run_tlc all
+python -m tools.build_formal_relation --check
+python -m tools.build_canon_package --check
 ```
-
-The two TLAPS proof runners shown in the repository README reproduce the materialized canon and Seed refinement evidence. A proof runner must fail if the current proof source hash, pinned toolchain, theorem set, or recorded obligation count does not match the evidence.
