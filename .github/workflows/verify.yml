@@ -25,7 +25,7 @@ jobs:
       - run: python -m tools.bootstrap_tla
       - name: Validate minimal repository surface
         run: python -m tools.validate_repository_minimal
-      - name: Validate current Network Alpha4 representation
+      - name: Validate current Network Alpha4 three-way representation
         run: python -m tools.alpha4_network_gate
       - name: Verify ASET Seed 0.4alpha 3-way content binding
         shell: bash
@@ -58,9 +58,9 @@ jobs:
           test -x "$tlapm_bin"
           test "$("$tlapm_bin" --version)" = "4600b24"
           echo "TLAPM_BIN=$tlapm_bin" >> "$GITHUB_ENV"
-      - name: Prove Network Alpha4 paired semantics
+      - name: Prove Network Alpha4 operational-relational relation
         run: python -m tools.run_alpha4_network_tlaps --tlapm "$TLAPM_BIN"
-      - name: Prove Network Alpha4 profile pairing and boundaries
+      - name: Prove Network Alpha4 profile operational-relational relations and boundaries
         run: python -m tools.run_alpha4_network_profile_tlaps --tlapm "$TLAPM_BIN"
       - name: Check Network Alpha4 profile safety and liveness composition
         run: python -m tools.run_alpha4_network_profile_tlc

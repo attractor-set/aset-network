@@ -1,4 +1,5 @@
 ASET-NETWORK-PROFILE 1 ASET-NETWORK-DYNAMIC-ALPHA4 alpha4
+SEMANTIC-PRECEDENCE NONE
 PARENT-SUBJECT network/alpha4/NETWORK.aset
 PROFILE-KIND ACTIVATION-CONTRACT
 OPTIONAL TRUE
@@ -20,7 +21,10 @@ PREVIOUS-ALLOW-CARRIES-FORWARD NEVER
 OPERATIONAL network/alpha4/profiles/dynamic/operational/components.forth
 RELATIONAL network/alpha4/profiles/dynamic/formal/DynamicProfileRelations.tla
 FORMAL-REFLECTION network/alpha4/profiles/dynamic/formal/DynamicRestrictedOperationalSemantics.tla
+CAUSAL-MODEL network/alpha4/profiles/dynamic/causal/components.petri
 PAIR ASET-NETWORK-DYNAMIC-APPLICABILITY PROFILE-APPLICABLE? ProfileApplicable OperationalProfileApplicable ProfileApplicablePairing
 PAIR ASET-NETWORK-DYNAMIC-NETWORK-STUTTER PROFILE-NETWORK-STUTTER? DynamicProfileNetworkProjection OperationalDynamicProfileNetworkProjection DynamicProfileNetworkProjectionPairing
+CAUSAL-BIND ASET-NETWORK-DYNAMIC-APPLICABILITY PROFILE-APPLICABLE
+CAUSAL-BIND ASET-NETWORK-DYNAMIC-NETWORK-STUTTER PROFILE-NETWORK-STUTTER
 PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/dynamic/formal/DynamicOperationalRelationalPairingProofs.tla DynamicOperationalRelationalPairing
 PROOF BOUNDARY network/alpha4/profiles/dynamic/formal/DynamicProfileBoundaryProofs.tla DynamicProfilesPreserveNetworkAndLocalAuthority

@@ -8,7 +8,7 @@ The Network core owns one state structure, `IMPORTS`, and one transition, `ADMIT
 
 ## Active structure
 
-- `network/alpha4/` — the single active Network semantic line: subject, restricted-Forth operational expressions, independent TLA relations, pairing proofs, and optional Dynamic/Federation/Liveness profiles;
+- `network/alpha4/` — the single active Network semantic line: subject, independently authored restricted-Forth operational, TLA relational, and causal representations, pairwise congruence assurance, and optional Dynamic/Federation/Liveness profiles;
 - `upstream/ASET_SEED_ALPHA4_BINDING.aset` — content-addressed binding to the ASET Seed 0.4alpha three-way assurance release subject;
 - `theory/network-seed-reflection/formal/` — independent historical Network→Seed reflection theory for auditing expressions of the exact Alpha3 subject;
 - `history/REFERENCES.aset` — immutable identities of superseded public states; history is not active semantics.
@@ -21,7 +21,7 @@ The 0.1.0-alpha.4 representation claims no compatibility with the 0.1.0-alpha.3 
 
 ## Admission semantics
 
-`ADMIT-IMPORT` has three paired operational/relational outcomes:
+`ADMIT-IMPORT` has three operational/relational/causal outcomes checked by bounded three-way congruence:
 
 - fresh identifier → `IMPORT_ADMITTED`, state changes;
 - exact replay → `IDEMPOTENT_REPLAY`, state stutters;
@@ -31,11 +31,17 @@ Every outcome remains fail-closed at the Seed boundary. Network does not own `AL
 
 ## Optional profiles
 
-Dynamic adds no Network state or transitions and activates only from exact target-local Seed recognition. Federation owns only its profile-local lifecycle. Liveness adds conditional progress claims without requiring eventual `ALLOW`. Federation+Liveness transfers neither Authority nor state/transition ownership.
+Every active profile and active profile composition follows the same three-way assurance architecture as the Network core: independently authored operational, relational, and causal representations with semantic precedence `NONE`. Dynamic adds no Network state or transitions and its causal line expresses that preserved boundary. Federation owns only its profile-local lifecycle and has its own causal lifecycle representation. Liveness has a causal enabling representation for its conditional claims while temporal properties remain checked by TLA/TLAPS/TLC. Federation+Liveness has its own three-way composition assurance and transfers neither Authority nor state/transition ownership.
 
 Operational expression belongs to a semantic object, not specifically to a state machine or transition graph. State ownership and transition ownership are orthogonal to the existence of an operational expression.
 
-## Independent expression assurance
+## Three-way assurance
+
+The active Network core, Dynamic, Federation, Liveness, and Federation+Liveness composition each bind three independently authored representation lines: operational, relational, and causal. No representation is generated from another and semantic precedence is `NONE`. Bounded triangulation checks operational↔relational, operational↔causal, and relational↔causal observations. TLA/TLAPS/TLC remain the proof/model-checking machinery for relational safety and temporal claims; causal congruence is not described as an independent temporal proof.
+
+    python -m tools.alpha4_network_assurance
+
+## Independent historical expression assurance
 
 The historical reflection theory is source material, not a checked-in oracle dataset. It contains only TLA modules. The black-box oracle and its four bounded witnesses are generated deterministically from that theory plus exact identities in `history/REFERENCES.aset`.
 
