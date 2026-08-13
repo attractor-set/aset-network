@@ -9,11 +9,13 @@ The Network core owns one state structure, `IMPORTS`, and one transition, `ADMIT
 ## Active structure
 
 - `network/alpha4/` — the single active Network semantic line: subject, restricted-Forth operational expressions, independent TLA relations, pairing proofs, and optional Dynamic/Federation/Liveness profiles;
-- `upstream/ASET_SEED_ALPHA4_BINDING.aset` — content-addressed binding to the active ASET Seed 0.4alpha semantic sources;
+- `upstream/ASET_SEED_ALPHA4_BINDING.aset` — content-addressed binding to the ASET Seed 0.4alpha three-way assurance release subject;
 - `theory/network-seed-reflection/formal/` — independent historical Network→Seed reflection theory for auditing expressions of the exact Alpha3 subject;
 - `history/REFERENCES.aset` — immutable identities of superseded public states; history is not active semantics.
 
 There is no current-pointer file. Alpha4 is current because it is the only active semantic line under `network/`.
+
+The upstream release locator is `seed-0.4alpha-3way`. It is retrieval metadata only: exact upstream identity is established by the bound source SHA-256 values, and semantic precedence remains `NONE`. The bound Seed assurance surface includes independently authored operational, relational, and causal representations; Network does not inherit Seed recognition authority.
 
 The 0.1.0-alpha.4 representation claims no compatibility with the 0.1.0-alpha.3 canon.
 
@@ -69,7 +71,7 @@ The checker imports neither implementation internals nor a Python reference orac
     python -m tools.alpha4_network_gate
     python -m pytest -q
 
-Mechanical Alpha4 TLAPS/TLC and historical reflection TLAPS are executed by the repository verification workflow with pinned tooling and exact upstream subjects.
+Mechanical Alpha4 TLAPS/TLC and historical reflection TLAPS are executed by the repository verification workflow with pinned tooling and exact upstream subjects. The active Seed binding is verified against the exact `seed-0.4alpha-3way` release target.
 
 SHA-256 identifies exact bytes; semantic integrity is established by declared relations and proof obligations. Generated evidence does not acquire semantic precedence.
 

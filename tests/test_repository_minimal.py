@@ -27,12 +27,6 @@ def test_repository_surface_is_seed_style_minimal() -> None:
     validate_attribution()
 
 
-def test_legacy_public_surfaces_are_absent() -> None:
-    paths = repository_paths()
-    for name in ("assurance", "docs", "extension", "reference"):
-        assert not any(path == name or path.startswith(f"{name}/") for path in paths)
-
-
 def test_theory_contains_only_tla_sources_and_is_not_current_semantic_authority() -> None:
     paths = repository_paths()
     theory = sorted(path for path in paths if path.startswith("theory/network-seed-reflection/"))
@@ -46,5 +40,8 @@ def test_theory_contains_only_tla_sources_and_is_not_current_semantic_authority(
     active = (ROOT / "network/alpha4/NETWORK.aset").read_text(encoding="utf-8")
     assert "theory/network-seed-reflection" not in active
     oracle = build_oracle()
+    assert oracle["schema_version"] == 4
     assert oracle["normative"] is False
     assert oracle["normative_precedence"] == "NONE"
+    assert oracle["implementation_protocol"]["implementation_imports"] == "NONE"
+    assert oracle["implementation_protocol"]["self_declared_conformance"] == "ABSENT"

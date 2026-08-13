@@ -27,12 +27,15 @@ jobs:
         run: python -m tools.validate_repository_minimal
       - name: Validate current Network Alpha4 representation
         run: python -m tools.alpha4_network_gate
-      - name: Verify current ASET Seed 0.4alpha content binding
+      - name: Verify ASET Seed 0.4alpha 3-way content binding
         shell: bash
         run: |
           set -euo pipefail
+          seed_tag="seed-0.4alpha-3way"
+          seed_commit="0028f1d25a4f1d052a9b998baf402898446ac599"
           seed_alpha4_root="$RUNNER_TEMP/aset-seed-alpha4"
-          git clone --depth 1 --branch main https://github.com/attractor-set/aset-seed.git "$seed_alpha4_root"
+          git clone --depth 1 --branch "$seed_tag" https://github.com/attractor-set/aset-seed.git "$seed_alpha4_root"
+          test "$(git -C "$seed_alpha4_root" rev-parse HEAD)" = "$seed_commit"
           python -m tools.validate_alpha4_network --seed-root "$seed_alpha4_root"
       - run: python -m pytest -q
       - run: ruff format --check .

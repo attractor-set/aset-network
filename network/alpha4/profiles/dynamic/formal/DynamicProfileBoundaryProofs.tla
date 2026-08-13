@@ -9,7 +9,7 @@ THEOREM ApplicabilityRequiresExactTargetLocalAllow ==
 PROOF
   BY DEF ProfileApplicable
 
-THEOREM DynamicProfileAddsNoNetworkMutation ==
+THEOREM DynamicProfilePreservesNetworkState ==
   \A networkBefore, networkAfter :
     DynamicProfileNetworkProjection(networkBefore, networkAfter) =>
       networkAfter = networkBefore
@@ -18,8 +18,8 @@ PROOF
 
 THEOREM DynamicProfilesPreserveNetworkAndLocalAuthority ==
   /\ ApplicabilityRequiresExactTargetLocalAllow
-  /\ DynamicProfileAddsNoNetworkMutation
+  /\ DynamicProfilePreservesNetworkState
 PROOF
-  BY ApplicabilityRequiresExactTargetLocalAllow, DynamicProfileAddsNoNetworkMutation
+  BY ApplicabilityRequiresExactTargetLocalAllow, DynamicProfilePreservesNetworkState
 
 =============================================================================

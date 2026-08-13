@@ -14,7 +14,8 @@ BINDING = ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset"
 HISTORY = ROOT / "history/REFERENCES.aset"
 CITATION = ROOT / "CITATION.cff"
 
-EXPECTED_ALPHA4_BINDING_SHA256 = "2d725c2f81fa7cb00f7eb24253184e33dd46fac863aed4f489ffde95ad7d92fb"
+EXPECTED_ALPHA4_BINDING_SHA256 = "bb8a114b9e9762b6e20fef0395373c805ff4e8c46c2cde07df0c931acb2b9255"
+EXPECTED_SEED_ALPHA4_RELEASE_TAG = "seed-0.4alpha-3way"
 EXPECTED_ALPHA3_PACKAGE_DIGEST = (
     "sha256:82976c30880ed2a6c810b8f0aa5585dee5ab73fa12684a9d17784bac0a1bbbc7"
 )
@@ -66,7 +67,7 @@ def validate_network_surface() -> None:
         require(declaration in network, f"Network Alpha4 declaration missing: {declaration}")
     require(
         "ALLOW" not in network and "BLOCK" not in network,
-        "terminal recognition leaked into Network",
+        "Network contains terminal recognition state",
     )
 
     require(
@@ -84,7 +85,7 @@ def validate_network_surface() -> None:
     require(forth.count(";") == 3, "Network Alpha4 operational expression must have 3 words")
     require(
         "LOCAL-ALLOW!" not in forth and "LOCAL-BLOCK!" not in forth,
-        "Seed authority leaked",
+        "Network operational expression contains Seed-local authority operation",
     )
 
 
@@ -132,11 +133,29 @@ def parse_binding() -> dict[str, str]:
             require(path not in sources, f"duplicate bound source: {path}")
             require(re.fullmatch(r"sha256:[0-9a-f]{64}", digest) is not None, "bad digest")
             sources[path] = digest
-    require(len(sources) == 8, "Seed Alpha4 binding must cover exactly 8 semantic sources")
+    expected_sources = {
+        "seed/alpha4/SEED.aset",
+        "seed/alpha4/operational/components.forth",
+        "seed/alpha4/formal/RestrictedOperationalSemantics.tla",
+        "seed/alpha4/formal/ComponentRelations.tla",
+        "seed/alpha4/formal/OperationalRelationalPairingProofs.tla",
+        "seed/alpha4/formal/ComponentCompositionProofs.tla",
+        "seed/alpha4/causal/components.petri",
+        "theory/local-recognition/formal/LocalRecognitionAlgebra.tla",
+    }
+    require(set(sources) == expected_sources, "Seed Alpha4 bound source surface mismatch")
+    require(
+        f"RELEASE-TAG {EXPECTED_SEED_ALPHA4_RELEASE_TAG}" in binding_lines,
+        "Seed Alpha4 release locator mismatch",
+    )
     require(
         "REQUIRED-SEED-PAIR ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN "
         "ObserveUnknown ObserveUnknownPairing" in binding_lines,
         "Seed OBSERVE-UNKNOWN pairing requirement missing",
+    )
+    require(
+        "REQUIRED-SEED-CAUSAL-BIND ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN" in binding_lines,
+        "Seed OBSERVE-UNKNOWN causal binding requirement missing",
     )
     require(
         "NETWORK-PROJECTION ADMIT-IMPORT OBSERVE-UNKNOWN" in binding_lines,
@@ -159,6 +178,10 @@ def validate_seed_root(seed_root: Path, sources: dict[str, str]) -> None:
         "PAIR ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN ObserveUnknown "
         "ObserveUnknownPairing" in seed,
         "Seed Alpha4 OBSERVE-UNKNOWN pair unavailable",
+    )
+    require(
+        "CAUSAL-BIND ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN" in seed,
+        "Seed Alpha4 OBSERVE-UNKNOWN causal binding unavailable",
     )
 
 

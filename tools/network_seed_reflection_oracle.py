@@ -15,7 +15,7 @@ MAPPING = THEORY_ROOT / "formal/NetworkExtensionSeedRefinement.tla"
 PROOF = THEORY_ROOT / "formal/NetworkExtensionSeedRefinementProofs.tla"
 HISTORY = ROOT / "history/REFERENCES.aset"
 
-ASSURANCE_ID = "ASET-NETWORK-ALPHA3-EXPRESSION-INDEPENDENT-ASSURANCE-V3"
+ASSURANCE_ID = "ASET-NETWORK-ALPHA3-EXPRESSION-INDEPENDENT-ASSURANCE-V4"
 PROOF_PROFILE = "ASET-NETWORK-SEED-REFLECTION-TLAPS-V3"
 PROTOCOL = "ASET-NETWORK-EXPRESSION-BLACKBOX-V1"
 FINAL_THEOREMS = (
@@ -269,7 +269,7 @@ def build_oracle() -> dict[str, Any]:
     return {
         "assurance_id": ASSURANCE_ID,
         "document_type": "aset-network-generated-expression-independent-assurance-oracle",
-        "schema_version": 3,
+        "schema_version": 4,
         "normative": False,
         "normative_precedence": "NONE",
         "historical_subject": historical_subject(),
@@ -294,8 +294,8 @@ def build_oracle() -> dict[str, Any]:
             "protocol": PROTOCOL,
             "operations": ["describe", "execute_case"],
             "exact_historical_subject_required": True,
-            "implementation_imports_forbidden": True,
-            "self_declared_conformance_forbidden": True,
+            "implementation_imports": "NONE",
+            "self_declared_conformance": "ABSENT",
         },
         "cases": generate_cases(),
     }
