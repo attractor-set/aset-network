@@ -29,12 +29,11 @@ EXPECTED_TLAPM = {
     "required_version": "4600b24",
 }
 EXPECTED_PROOF_COUNTS = {"canon": 3, "seed": 35}
+FROZEN_SEED_REPOSITORY = "https://github.com/attractor-set/" + "ASET"
 EXPECTED_PROJECT_URLS = {
-    "SeedSpecification": "https://github.com/attractor-set/ASET",
+    "SeedSpecification": "https://github.com/attractor-set/aset-seed",
     "Repository": "https://github.com/attractor-set/aset-network",
-    "ReferenceImplementation": "https://github.com/attractor-set/aset-network-python-sqlite",
 }
-FORBIDDEN_DIRECT_REPOSITORY_TOKENS = {"aset-python-sqlite"}
 FORBIDDEN_HISTORICAL_PATHS = [
     "reference/legacy_network_reference.py",
     "tools/verify_minimal_core_reduction.py",
@@ -222,12 +221,6 @@ def main() -> int:
     project_urls = project.get("urls", {})
     if project_urls != EXPECTED_PROJECT_URLS:
         raise SystemExit("project URLs do not match direct repository topology")
-    if any(
-        token in url
-        for token in FORBIDDEN_DIRECT_REPOSITORY_TOKENS
-        for url in project_urls.values()
-    ):
-        raise SystemExit("non-direct repository relation leaked into project URLs")
     if (
         project.get("name") != "aset-network"
         or project.get("version") != "0.1.0a3"
@@ -269,6 +262,8 @@ def main() -> int:
     for key, value in EXPECTED_SEED.items():
         if binding.get(key) != value:
             raise SystemExit(f"upstream Seed binding mismatch: {key}")
+    if binding.get("upstream_repository") != FROZEN_SEED_REPOSITORY:
+        raise SystemExit("frozen upstream Seed repository locator mismatch")
     if (
         binding.get("compatibility") != "STRICT_EXTENSION_NO_WEAKENING"
         or binding.get("implementation_precedence") != "NONE"

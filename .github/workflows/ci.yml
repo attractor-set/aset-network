@@ -53,7 +53,7 @@ jobs:
           seed_commit="633c130187b2a2bb42f24cfd66662d475de385d2"
           seed_root="$RUNNER_TEMP/ASET-seed"
           git init "$seed_root"
-          git -C "$seed_root" remote add origin https://github.com/attractor-set/ASET.git
+          git -C "$seed_root" remote add origin https://github.com/attractor-set/aset-seed.git
           git -C "$seed_root" fetch --depth 1 origin "$seed_commit"
           git -C "$seed_root" checkout --detach FETCH_HEAD
           test "$(git -C "$seed_root" rev-parse HEAD)" = "$seed_commit"
@@ -65,7 +65,7 @@ jobs:
           assurance_commit="e89d984203a126f8bc62467224cdf6c5374dada7"
           assurance_root="$RUNNER_TEMP/ASET-assurance"
           git init "$assurance_root"
-          git -C "$assurance_root" remote add origin https://github.com/attractor-set/ASET.git
+          git -C "$assurance_root" remote add origin https://github.com/attractor-set/aset-seed.git
           git -C "$assurance_root" fetch --depth 1 origin "$assurance_commit"
           git -C "$assurance_root" checkout --detach FETCH_HEAD
           test "$(git -C "$assurance_root" rev-parse HEAD)" = "$assurance_commit"

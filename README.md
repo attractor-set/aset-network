@@ -20,8 +20,7 @@ Federation membership/routing and conditional liveness are separate optional pro
 
 ## Direct repository topology
 
-- Upstream specification: [ASET](https://github.com/attractor-set/ASET) — direct normative parent.
-- Downstream reference implementation: [ASET Network Python SQLite](https://github.com/attractor-set/aset-network-python-sqlite) — non-normative reference implementation of ASET Network.
+- Upstream specification: [ASET Seed](https://github.com/attractor-set/aset-seed) — direct normative parent.
 
 Only direct repository relationships are listed here. Transitive relationships are discovered through their immediate parent repositories.
 
@@ -94,11 +93,11 @@ Local proof gates with the pinned Seed checkout:
 
 ```bash
 python -m tools.run_canon_refinement_tlaps \
-  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm
+  --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
 
 python -m tools.run_seed_refinement_tlaps \
-  --tlapm ~/ASET/.tooling/tlapm/bin/tlapm \
-  --seed-root ~/ASET
+  --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm \
+  --seed-root ~/aset-seed
 ```
 
 Apache-2.0 licensed. No implementation has semantic precedence over the machine-readable canon.

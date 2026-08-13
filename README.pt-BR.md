@@ -6,8 +6,7 @@ ASET Network define a fronteira mínima e neutra de implementação pela qual ev
 
 ## Topologia direta dos repositórios
 
-- Especificação upstream: [ASET](https://github.com/attractor-set/ASET) — pai normativo direto.
-- Implementação de referência downstream: [ASET Network Python SQLite](https://github.com/attractor-set/aset-network-python-sqlite) — implementação de referência não normativa desta extensão.
+- Especificação upstream: [ASET Seed](https://github.com/attractor-set/aset-seed) — pai normativo direto.
 
 Somente relações diretas entre repositórios são listadas aqui. Relações transitivas são descobertas por meio de seus repositórios-pai imediatos.
 

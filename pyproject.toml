@@ -16,6 +16,5 @@ target-version = "py312"
 select = ["E", "F", "I", "UP", "B"]
 
 [project.urls]
-SeedSpecification = "https://github.com/attractor-set/ASET"
+SeedSpecification = "https://github.com/attractor-set/aset-seed"
 Repository = "https://github.com/attractor-set/aset-network"
-ReferenceImplementation = "https://github.com/attractor-set/aset-network-python-sqlite"

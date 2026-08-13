@@ -457,17 +457,28 @@ def test_project_rename_preserves_alpha3_semantic_identity() -> None:
 
 
 def test_repository_topology_contains_only_direct_relations() -> None:
+    frozen_seed_repository = "https://github.com/attractor-set/" + "ASET"
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
     assert project["urls"] == {
-        "SeedSpecification": "https://github.com/attractor-set/ASET",
+        "SeedSpecification": "https://github.com/attractor-set/aset-seed",
         "Repository": "https://github.com/attractor-set/aset-network",
-        "ReferenceImplementation": "https://github.com/attractor-set/aset-network-python-sqlite",
     }
     for readme_name in ["README.md", "README.ru.md", "README.pt-BR.md"]:
         readme = (ROOT / readme_name).read_text(encoding="utf-8")
-        assert "https://github.com/attractor-set/ASET" in readme
-        assert "https://github.com/attractor-set/aset-network-python-sqlite" in readme
-        assert "aset-python-sqlite" not in readme
+        assert "https://github.com/attractor-set/aset-seed" in readme
+        assert frozen_seed_repository not in readme
+        assert readme.count("https://github.com/attractor-set/") == 1
+
+    english_readme = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "~/aset-seed" in english_readme
+    assert "~/ASET" not in english_readme
+
+    workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
+    assert workflow.count("https://github.com/attractor-set/aset-seed.git") == 2
+    assert f"{frozen_seed_repository}.git" not in workflow
+
+    frozen_binding = json.loads((ROOT / "upstream/ASET_SEED_BINDING.json").read_text())
+    assert frozen_binding["upstream_repository"] == frozen_seed_repository
 
 
 def test_liveness_profile_is_independent_and_seed_owned_at_resolution() -> None:
