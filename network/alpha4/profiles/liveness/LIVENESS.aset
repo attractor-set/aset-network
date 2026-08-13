@@ -27,5 +27,12 @@ SEED-TERMINAL-RESULT ALLOW
 SEED-TERMINAL-RESULT BLOCK
 EVENTUAL-ALLOW-REQUIRED FALSE
 
-FORMAL network/alpha4/profiles/liveness/formal/LivenessContract.tla
+OPERATIONAL network/alpha4/profiles/liveness/operational/components.forth
+RELATIONAL network/alpha4/profiles/liveness/formal/LivenessContract.tla
+FORMAL-REFLECTION network/alpha4/profiles/liveness/formal/LivenessRestrictedOperationalSemantics.tla
+PAIR ASET-NETWORK-LIVENESS-DELIVERY-CLAIM EVENTUALLY-DELIVERED-CLAIM? EventuallyDeliveredClaim OperationalEventuallyDeliveredClaim EventuallyDeliveredClaimPairing
+PAIR ASET-NETWORK-LIVENESS-OBSERVATION-CLAIM EVENTUALLY-OBSERVED-CLAIM? EventuallyObservedClaim OperationalEventuallyObservedClaim EventuallyObservedClaimPairing
+PAIR ASET-NETWORK-LIVENESS-RESOLUTION-CLAIM EVENTUALLY-RESOLVED-CLAIM? EventuallyTargetLocalSeedResolvedClaim OperationalEventuallyTargetLocalSeedResolvedClaim EventuallyTargetLocalSeedResolvedClaimPairing
+PAIR ASET-NETWORK-LIVENESS-TERMINAL-RESULT RESOLVED-RESULT-PERMITTED? ResolvedResultPermitted OperationalResolvedResultPermitted ResolvedResultPermittedPairing
+PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/liveness/formal/LivenessOperationalRelationalPairingProofs.tla LivenessOperationalRelationalPairing
 PROOF BOUNDARY network/alpha4/profiles/liveness/formal/LivenessBoundaryProofs.tla LivenessPreservesOwnershipBoundary

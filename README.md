@@ -32,16 +32,44 @@ The Alpha4 candidate now carries its optional profile semantics under `network/a
 - `liveness/LIVENESS.aset` — conditional progress contract; adds no Network state or transitions and never requires eventual `ALLOW`;
 - `composition/federation-liveness/FEDERATION_LIVENESS.aset` — assurance-only capability composition with no profile parent relation, state/transition ownership transfer or Authority transfer.
 
-Federation has a paired Forth/TLA expression and a bounded TLC safety model. Dynamic, Liveness and the Federation+Liveness composition have explicit formal boundary proofs. The liveness progress harness treats target observation as an assurance witness for Network-owned `ADMIT-IMPORT` and terminal resolution as an assurance witness for Seed-owned resolution.
+Every Alpha4 profile semantic object now has paired operational and relational expressions. Federation pairs its lifecycle transition graph in Forth/TLA; Dynamic pairs its exact-binding activation relation; Liveness pairs its conditional claim/result predicates without adding a transition machine; and Federation+Liveness pairs its capability/boundary composition predicate. TLAPS proves the pairings and boundaries, while TLC remains responsible for Federation safety and the temporal Federation+Liveness progress model. The liveness progress harness treats target observation as an assurance witness for Network-owned `ADMIT-IMPORT` and terminal resolution as an assurance witness for Seed-owned resolution.
 
 Verify the profile layer locally:
 
 ```bash
 python -m tools.alpha4_network_profiles_gate
+python -m tools.alpha4_network_profile_paired_expression
 python -m pytest -q tests/test_alpha4_network_profiles.py
 python -m tools.run_alpha4_network_profile_tlaps --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
 python -m tools.run_alpha4_network_profile_tlc
 ```
+
+## Operational expressions are semantic-object based
+
+An operational expression belongs to a **semantic object**, not specifically to a state machine or transition graph. State ownership and transition ownership are therefore orthogonal to the existence of a restricted-Forth expression.
+
+The form of the operational expression follows the semantic object:
+
+- transition subjects use transition evaluators;
+- relational subjects use operational predicates;
+- property subjects use claim predicates;
+- trace subjects use finite-witness recognizers;
+- composition subjects use composition predicates.
+
+Dynamic and Liveness demonstrate the boundary directly: both own no Network state and define no Network transitions, yet both have restricted-Forth operational expressions paired with independent TLA relational expressions. Federation remains the stateful profile; its Forth expression evaluates its profile-owned lifecycle transition graph.
+
+```text
+semantic object
+    ├── operational expression   (restricted Forth)
+    └── relational expression    (TLA)
+             ↕
+          pairing
+
+state ownership        independent
+transition ownership   independent
+```
+
+Accordingly, `operational expression` does **not** imply `state ownership`, `transition ownership`, or state-machine semantics. The machine-readable profile contract enforces this with `OPERATIONAL-EXPRESSION-REQUIRES-STATE NEVER` and `OPERATIONAL-EXPRESSION-REQUIRES-TRANSITION NEVER`.
 
 ## Core rule
 

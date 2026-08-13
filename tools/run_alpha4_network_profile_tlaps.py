@@ -10,13 +10,17 @@ CORE_FORMAL = ROOT / "network/alpha4/formal"
 DYNAMIC_FORMAL = ROOT / "network/alpha4/profiles/dynamic/formal"
 FEDERATION_FORMAL = ROOT / "network/alpha4/profiles/federation/formal"
 LIVENESS_FORMAL = ROOT / "network/alpha4/profiles/liveness/formal"
+COMPOSITION_RELATIONAL = ROOT / "network/alpha4/profiles/composition/federation-liveness/formal"
 COMPOSITION_FORMAL = ROOT / "network/alpha4/profiles/composition/federation-liveness/assurance"
 
 MODULES = [
+    DYNAMIC_FORMAL / "DynamicOperationalRelationalPairingProofs.tla",
     DYNAMIC_FORMAL / "DynamicProfileBoundaryProofs.tla",
     FEDERATION_FORMAL / "FederationOperationalRelationalPairingProofs.tla",
     FEDERATION_FORMAL / "NetworkStutteringProofs.tla",
+    LIVENESS_FORMAL / "LivenessOperationalRelationalPairingProofs.tla",
     LIVENESS_FORMAL / "LivenessBoundaryProofs.tla",
+    COMPOSITION_RELATIONAL / "FederationLivenessOperationalRelationalPairingProofs.tla",
     COMPOSITION_FORMAL / "FederationLivenessContractProofs.tla",
 ]
 INCLUDE_DIRS = [
@@ -24,6 +28,7 @@ INCLUDE_DIRS = [
     DYNAMIC_FORMAL,
     FEDERATION_FORMAL,
     LIVENESS_FORMAL,
+    COMPOSITION_RELATIONAL,
     COMPOSITION_FORMAL,
 ]
 

@@ -25,7 +25,34 @@ O candidato Alpha4 agora possui uma superfície de perfis separada em `network/a
 - Liveness — apenas garantias condicionais de progresso, sem estado ou transições de Network e sem exigir `ALLOW` eventual;
 - Federation+Liveness — composição de assurance sem relação pai, transferência de estado, transições ou Authority.
 
-Federation possui expressão Forth/TLA pareada; as fronteiras dos perfis são verificadas por TLAPS e a composição de safety/liveness por um harness TLC separado.
+Cada objeto semântico de perfil Alpha4 possui agora expressões operacional e relacional pareadas. Federation pareia seu grafo de transições Forth/TLA; Dynamic pareia a relação de ativação por binding exato; Liveness pareia predicates condicionais de claim/result sem criar uma máquina de transições; e Federation+Liveness pareia o predicate de composição de capabilities/boundaries. TLAPS prova os pairings e as fronteiras, enquanto TLC continua responsável por safety de Federation e pelo progresso temporal Federation+Liveness.
+
+## Expressões operacionais pertencem ao objeto semântico
+
+Uma expressão operacional pertence ao **objeto semântico**, e não necessariamente a uma máquina de estados ou a um grafo de transições. Portanto, ownership de estado e ownership de transições são ortogonais à existência de uma expressão restricted-Forth.
+
+A forma da expressão operacional segue o tipo do objeto semântico:
+
+- subjects de transição usam evaluators de transição;
+- subjects relacionais usam predicates operacionais;
+- subjects de propriedade usam claim predicates;
+- subjects de trace usam reconhecedores de witnesses finitos;
+- subjects de composição usam composition predicates.
+
+Dynamic e Liveness demonstram diretamente essa fronteira: nenhum dos dois possui estado de Network nem define transições de Network, mas ambos possuem expressões operacionais restricted-Forth pareadas com expressões relacionais TLA independentes. Federation continua sendo o perfil stateful; sua expressão Forth avalia o lifecycle transition graph pertencente ao perfil.
+
+```text
+semantic object
+    ├── operational expression   (restricted Forth)
+    └── relational expression    (TLA)
+             ↕
+          pairing
+
+state ownership        independent
+transition ownership   independent
+```
+
+Consequentemente, `operational expression` não implica `state ownership`, `transition ownership` nem semântica de máquina de estados. O contrato machine-readable de perfis fixa isso por meio de `OPERATIONAL-EXPRESSION-REQUIRES-STATE NEVER` e `OPERATIONAL-EXPRESSION-REQUIRES-TRANSITION NEVER`.
 
 ## Regra central
 
