@@ -1,19 +1,18 @@
 from __future__ import annotations
 
-import json
-import tomllib
 from pathlib import Path
 
 from tools.validate_current_network import (
-    EXPECTED_ALPHA3_BINDING_SHA256,
     EXPECTED_ALPHA3_PACKAGE_DIGEST,
+    EXPECTED_ALPHA3_RELEASE_COMMIT,
     EXPECTED_ALPHA4_BINDING_SHA256,
     sha256,
     validate_current_pointer,
     validate_current_subjects,
-    validate_frozen_predecessor,
-    validate_project_metadata,
+    validate_history_boundary,
+    validate_project_identity,
 )
+from tools.validate_repository_minimal import repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -36,31 +35,31 @@ def test_promotion_does_not_grant_semantic_precedence() -> None:
     assert "SEMANTIC-PRECEDENCE NONE" in profiles
 
 
-def test_alpha3_remains_exact_frozen_predecessor() -> None:
-    validate_frozen_predecessor()
-    package = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text())
-    assert package["package_digest"] == EXPECTED_ALPHA3_PACKAGE_DIGEST
-    assert sha256(ROOT / "upstream/ASET_SEED_BINDING.json") == EXPECTED_ALPHA3_BINDING_SHA256
+def test_alpha3_is_historical_reference_not_active_semantic_surface() -> None:
+    validate_history_boundary()
+    history = (ROOT / "history/REFERENCES.aset").read_text(encoding="utf-8")
+    assert f"COMMIT {EXPECTED_ALPHA3_RELEASE_COMMIT}" in history
+    assert f"CANON-PACKAGE {EXPECTED_ALPHA3_PACKAGE_DIGEST}" in history
+    paths = repository_paths()
+    assert not any(path.startswith("extension/") for path in paths)
+    assert "upstream/ASET_SEED_BINDING.json" not in paths
     assert sha256(ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset") == EXPECTED_ALPHA4_BINDING_SHA256
 
 
-def test_project_metadata_promotes_to_alpha4() -> None:
-    validate_project_metadata()
-    metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    assert metadata["project"]["version"] == "0.1.0a4"
+def test_project_identity_is_seed_style_citation_and_notice() -> None:
+    validate_project_identity()
+    citation = (ROOT / "CITATION.cff").read_text(encoding="utf-8")
+    notice = (ROOT / "NOTICE").read_text(encoding="utf-8")
+    assert 'version: "0.1.0-alpha.4"' in citation
+    assert "Dzmitry Prychyna" in notice
+    assert "Attractor Set" in notice
 
 
-def test_active_project_docs_name_alpha4_as_current_not_candidate() -> None:
-    for relative in (
-        "PROJECT_IDENTITY.md",
-        "README.md",
-        "README.ru.md",
-        "README.pt-BR.md",
-        "docs/ARCHITECTURE.md",
-        "docs/FORMAL_VERIFICATION.md",
-        "CONTRIBUTING.md",
-    ):
-        text = (ROOT / relative).read_text(encoding="utf-8")
-        assert "Alpha4 candidate" not in text
-        assert "Alpha4-кандидат" not in text
-        assert "candidato Alpha4" not in text
+def test_single_active_readme_names_alpha4_as_current() -> None:
+    readmes = sorted(
+        path for path in repository_paths() if Path(path).name.lower().startswith("readme")
+    )
+    assert readmes == ["README.md"]
+    text = (ROOT / "README.md").read_text(encoding="utf-8")
+    assert "0.1.0-alpha.4 is the current public representation" in text
+    assert "candidate" not in text.lower()

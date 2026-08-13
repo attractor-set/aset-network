@@ -1,8 +1,6 @@
 from __future__ import annotations
 
 import hashlib
-import json
-import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -10,14 +8,18 @@ CURRENT = ROOT / "network/CURRENT.aset"
 NETWORK = ROOT / "network/alpha4/NETWORK.aset"
 PROFILES = ROOT / "network/alpha4/profiles/PROFILES.aset"
 ALPHA4_BINDING = ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset"
-ALPHA3_BINDING = ROOT / "upstream/ASET_SEED_BINDING.json"
-ALPHA3_PACKAGE = ROOT / "extension/canonical/CANON_PACKAGE.json"
+HISTORY = ROOT / "history/REFERENCES.aset"
+EXPRESSION_ORACLE = ROOT / "theory/network-seed-reflection/EXPRESSION_ASSURANCE.json"
+CITATION = ROOT / "CITATION.cff"
 
+EXPECTED_ALPHA4_BINDING_SHA256 = "2d725c2f81fa7cb00f7eb24253184e33dd46fac863aed4f489ffde95ad7d92fb"
 EXPECTED_ALPHA3_PACKAGE_DIGEST = (
     "sha256:82976c30880ed2a6c810b8f0aa5585dee5ab73fa12684a9d17784bac0a1bbbc7"
 )
-EXPECTED_ALPHA3_BINDING_SHA256 = "a40002343d3f2a4ed9af2d2bbefb9cfbee7282b62aefca04e6a5bbaadf433a68"
-EXPECTED_ALPHA4_BINDING_SHA256 = "2d725c2f81fa7cb00f7eb24253184e33dd46fac863aed4f489ffde95ad7d92fb"
+EXPECTED_ALPHA3_PACKAGE_SHA256 = (
+    "sha256:2ffdc36311eda6fe18d1ac896f8b4a532b52b3b7ccc58adc4c0560a1db5a6463"
+)
+EXPECTED_ALPHA3_RELEASE_COMMIT = "45cdac43e3d07989c21cbb3a46d82b1908354e27"
 
 
 def require(condition: bool, message: str) -> None:
@@ -41,8 +43,9 @@ def validate_current_pointer() -> None:
         "CURRENT-REPRESENTATION network/alpha4/NETWORK.aset",
         "CURRENT-PROFILES network/alpha4/profiles/PROFILES.aset",
         "CURRENT-UPSTREAM-BINDING upstream/ASET_SEED_ALPHA4_BINDING.aset",
-        "FROZEN-PREDECESSOR extension/canonical/CANON_PACKAGE.json",
-        "FROZEN-PREDECESSOR-COMPATIBILITY NONE",
+        "HISTORICAL-PREDECESSOR history/REFERENCES.aset NETWORK-0.1.0-ALPHA.3",
+        "INDEPENDENT-EXPRESSION-ORACLE theory/network-seed-reflection/EXPRESSION_ASSURANCE.json",
+        "HISTORICAL-COMPATIBILITY NONE",
         "REFERENCE-ORACLE-AUTHORITY NONE",
         "PROMOTION-SEMANTIC-DELTA NONE",
         "CHECK CURRENT tools/validate_current_network.py",
@@ -63,37 +66,46 @@ def validate_current_subjects() -> None:
     )
     require("SEMANTIC-PRECEDENCE NONE" in profiles, "profile registry gained precedence")
     require("ALPHA3-COMPATIBILITY NONE" in profiles, "profile compatibility boundary changed")
-
-
-def validate_frozen_predecessor() -> None:
-    package = json.loads(ALPHA3_PACKAGE.read_text(encoding="utf-8"))
-    require(
-        package["canon_id"] == "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3",
-        "Alpha3 predecessor canon identity drift",
-    )
-    require(
-        package["package_digest"] == EXPECTED_ALPHA3_PACKAGE_DIGEST,
-        "Alpha3 predecessor package digest drift",
-    )
-    require(sha256(ALPHA3_BINDING) == EXPECTED_ALPHA3_BINDING_SHA256, "Alpha3 binding drift")
     require(sha256(ALPHA4_BINDING) == EXPECTED_ALPHA4_BINDING_SHA256, "Alpha4 Seed binding drift")
 
 
-def validate_project_metadata() -> None:
-    metadata = tomllib.loads((ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-    require(metadata["project"]["name"] == "aset-network", "project name drift")
-    require(metadata["project"]["version"] == "0.1.0a4", "project version is not Alpha4")
+def validate_history_boundary() -> None:
+    history = HISTORY.read_text(encoding="utf-8")
+    required = (
+        "STATE NETWORK-0.1.0-ALPHA.3",
+        "TAG v0.1.0-alpha.3",
+        f"COMMIT {EXPECTED_ALPHA3_RELEASE_COMMIT}",
+        f"DIGEST NETWORK-0.1.0-ALPHA.3 CANON-PACKAGE {EXPECTED_ALPHA3_PACKAGE_DIGEST}",
+        f"DIGEST NETWORK-0.1.0-ALPHA.3 CANON-PACKAGE-BYTES {EXPECTED_ALPHA3_PACKAGE_SHA256}",
+        "RELATION ASET-NETWORK-ALPHA4 HISTORICAL_PREDECESSOR NETWORK-0.1.0-ALPHA.3",
+        "COMPATIBILITY ASET-NETWORK-ALPHA4 NETWORK-0.1.0-ALPHA.3 NONE",
+        (
+            "PROOF NETWORK-0.1.0-ALPHA.3 SEED-REFLECTION "
+            "ASET-NETWORK-SEED-REFINEMENT-TLAPS-V2 35 MECHANICALLY_PROVED"
+        ),
+    )
+    for marker in required:
+        require(marker in history, f"history reference missing: {marker}")
+    require(EXPRESSION_ORACLE.is_file(), "independent expression oracle profile missing")
+
+
+def validate_project_identity() -> None:
+    citation = CITATION.read_text(encoding="utf-8")
+    require('version: "0.1.0-alpha.4"' in citation, "citation version is not Alpha4")
+    require("family-names: Prychyna" in citation, "citation author family name drift")
+    require("given-names: Dzmitry" in citation, "citation author given name drift")
+    require("https://github.com/attractor-set/aset-network" in citation, "repository locator drift")
 
 
 def main() -> int:
     validate_current_pointer()
     validate_current_subjects()
-    validate_frozen_predecessor()
-    validate_project_metadata()
+    validate_history_boundary()
+    validate_project_identity()
     print("ASET_NETWORK_CURRENT_REPRESENTATION=ASET-NETWORK-ALPHA4")
     print("ASET_NETWORK_CURRENT_PROJECT_VERSION=0.1.0-alpha.4")
     print("ASET_NETWORK_CURRENT_POINTER_SEMANTIC_PRECEDENCE=NONE")
-    print("ASET_NETWORK_ALPHA3_PREDECESSOR=FROZEN")
+    print("ASET_NETWORK_ALPHA3_PREDECESSOR=HISTORICAL_REFERENCE")
     print("ASET_NETWORK_ALPHA3_COMPATIBILITY_INHERITED=false")
     print("ASET_NETWORK_REFERENCE_ORACLE_AUTHORITY=false")
     print("ASET_NETWORK_PROMOTION_SEMANTIC_DELTA=NONE")
