@@ -4,33 +4,64 @@ ASET Network 0.1.0-alpha.4 is the current public representation of the minimal c
 
 **Evidence may cross boundaries. Recognition does not.**
 
-The Network-owned core has one semantic state structure, `IMPORTS`, and one transition, `ADMIT-IMPORT`. A successful admission creates only target-local `UNKNOWN` evidence and never permits an effect; terminal `ALLOW` / `BLOCK` recognition remains Seed-owned.
+The Network core owns one state structure, `IMPORTS`, and one transition, `ADMIT-IMPORT`. Admission never grants terminal recognition or permission to execute an effect. Target-local Seed remains the recognition authority.
 
-Active structure:
+## Active structure
 
-- `network/alpha4/` — current Network subject, restricted-Forth operational expressions, independent TLA relational expressions, pairing proofs and optional Dynamic/Federation/Liveness profiles;
+- `network/alpha4/` — the single active Network semantic line: subject, restricted-Forth operational expressions, independent TLA relations, pairing proofs, and optional Dynamic/Federation/Liveness profiles;
 - `upstream/ASET_SEED_ALPHA4_BINDING.aset` — content-addressed binding to the active ASET Seed 0.4alpha semantic sources;
-- `theory/network-seed-reflection/` — retained Alpha3 Network→Seed theorem corpus used only as an independent black-box oracle for expressions of that exact historical subject;
-- `history/REFERENCES.aset` — immutable identities of superseded public states; history is not active semantics;
-- `tools/alpha4_network_gate.py` — complete current-representation gate;
-- `tools/validate_repository_minimal.py` — repository-surface minimality gate.
+- `theory/network-seed-reflection/formal/` — independent historical Network→Seed reflection theory for auditing expressions of the exact Alpha3 subject;
+- `history/REFERENCES.aset` — immutable identities of superseded public states; history is not active semantics.
+
+There is no current-pointer file. Alpha4 is current because it is the only active semantic line under `network/`.
 
 The 0.1.0-alpha.4 representation claims no compatibility with the 0.1.0-alpha.3 canon.
 
+## Admission semantics
+
+`ADMIT-IMPORT` has three paired operational/relational outcomes:
+
+- fresh identifier → `IMPORT_ADMITTED`, state changes;
+- exact replay → `IDEMPOTENT_REPLAY`, state stutters;
+- conflicting observation under an existing identifier → `IDENTIFIER_CONFLICT`, state stutters.
+
+Every outcome remains fail-closed at the Seed boundary. Network does not own `ALLOW` / `BLOCK` recognition and never permits the represented external effect by itself.
+
 ## Optional profiles
 
-Dynamic adds no Network state or transitions and activates only from exact target-local Seed recognition. Federation owns only its profile-local lifecycle. Liveness adds conditional progress claims without requiring eventual `ALLOW`. Federation+Liveness composition transfers neither Authority nor state/transition ownership. Every profile semantic object has paired operational and relational expressions; operational expression does not imply state-machine semantics.
+Dynamic adds no Network state or transitions and activates only from exact target-local Seed recognition. Federation owns only its profile-local lifecycle. Liveness adds conditional progress claims without requiring eventual `ALLOW`. Federation+Liveness transfers neither Authority nor state/transition ownership.
+
+Operational expression belongs to a semantic object, not specifically to a state machine or transition graph. State ownership and transition ownership are orthogonal to the existence of an operational expression.
 
 ## Independent expression assurance
 
-The retained Alpha3 theorem corpus is not a legacy semantic authority. It is an independent external oracle for a black-box expression that explicitly binds itself to the exact historical Alpha3 subject. The checker does not import implementation internals or a Python reference oracle. Fresh admissions must commute through the mechanically proved Network→Seed bridge as Seed `RegisterRequest` with `UNKNOWN` and `effect_permitted=false`.
+The historical reflection theory is source material, not a checked-in oracle dataset. It contains only TLA modules. The black-box oracle and its four bounded witnesses are generated deterministically from that theory plus exact identities in `history/REFERENCES.aset`.
 
-Run the black-box checker against a compatible external adapter:
+The generated assurance covers the complete historical admission surface:
 
-    python tools/check_network_expression_assurance.py \
-      --adapter-command 'python -m aset_network_python_sqlite.adapter'
+- fresh admission → proved Seed `RegisterRequest` refinement;
+- exact replay → proved Seed stutter;
+- identifier conflict → proved Seed stutter;
+- all observed outcomes remain `UNKNOWN` / `BLOCKED` with `effect_permitted=false`.
 
-An Alpha2-bound implementation is rejected; historical-subject identity is exact, not inferred from similar behavior.
+Generate the oracle artifact:
+
+    python -m tools.network_seed_reflection_oracle \
+      --output dist/network-seed-reflection-oracle.json
+
+Re-prove the reflection against the exact historical Seed subject:
+
+    python -m tools.run_network_seed_reflection_tlaps \
+      --tlapm <pinned-tlapm> \
+      --seed-root <exact-seed-0.3.0-alpha.3-checkout>
+
+Then audit any compatible external expression through the black-box protocol:
+
+    python -m tools.check_network_expression_assurance \
+      --proof-evidence dist/network-seed-reflection-proof.json \
+      --adapter-command '<external-adapter-command>'
+
+The checker imports neither implementation internals nor a Python reference oracle. An expression must explicitly bind itself to the exact historical subject; similar behavior is not treated as identity.
 
 ## Verification
 
@@ -38,8 +69,8 @@ An Alpha2-bound implementation is rejected; historical-subject identity is exact
     python -m tools.alpha4_network_gate
     python -m pytest -q
 
-For mechanical proofs, run the Alpha4 TLAPS/profile-TLC gates and `tools/run_network_seed_reflection_tlaps.py` with the pinned TLAPM and exact historical Seed checkout.
+Mechanical Alpha4 TLAPS/TLC and historical reflection TLAPS are executed by the repository verification workflow with pinned tooling and exact upstream subjects.
 
-SHA-256 identifies exact bytes; semantic integrity is established by declared congruence and proof obligations. Historical references do not acquire semantic precedence.
+SHA-256 identifies exact bytes; semantic integrity is established by declared relations and proof obligations. Generated evidence does not acquire semantic precedence.
 
 Copyright and attribution are in `NOTICE`. Licensing terms are in `LICENSE`.

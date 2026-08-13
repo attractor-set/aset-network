@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from tools.network_seed_reflection_oracle import build_oracle
 from tools.validate_repository_minimal import (
     repository_paths,
     validate_active_network_line,
@@ -32,11 +33,18 @@ def test_legacy_public_surfaces_are_absent() -> None:
         assert not any(path == name or path.startswith(f"{name}/") for path in paths)
 
 
-def test_retained_theory_is_not_current_semantic_authority() -> None:
-    current = (ROOT / "network/CURRENT.aset").read_text(encoding="utf-8")
-    profile = (ROOT / "theory/network-seed-reflection/EXPRESSION_ASSURANCE.json").read_text(
-        encoding="utf-8"
-    )
-    assert "REFERENCE-ORACLE-AUTHORITY NONE" in current
-    assert '"normative": false' in profile
-    assert '"normative_precedence": "NONE"' in profile
+def test_theory_contains_only_tla_sources_and_is_not_current_semantic_authority() -> None:
+    paths = repository_paths()
+    theory = sorted(path for path in paths if path.startswith("theory/network-seed-reflection/"))
+    assert theory == [
+        "theory/network-seed-reflection/formal/NetworkExtension.tla",
+        "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinement.tla",
+        "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinementProofs.tla",
+    ]
+    assert "network/CURRENT.aset" not in paths
+    assert not any(path.endswith(".json") for path in theory)
+    active = (ROOT / "network/alpha4/NETWORK.aset").read_text(encoding="utf-8")
+    assert "theory/network-seed-reflection" not in active
+    oracle = build_oracle()
+    assert oracle["normative"] is False
+    assert oracle["normative_precedence"] == "NONE"

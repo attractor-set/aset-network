@@ -73,11 +73,15 @@ jobs:
           git -C "$seed_root" checkout --detach FETCH_HEAD
           test "$(git -C "$seed_root" rev-parse HEAD)" = "$seed_commit"
           echo "SEED_ALPHA3_ROOT=$seed_root" >> "$GITHUB_ENV"
-      - name: Re-prove retained Network-to-Seed reflection
+      - name: Re-prove Network-to-Seed reflection theory
         run: |
           python -m tools.run_network_seed_reflection_tlaps \
             --tlapm "$TLAPM_BIN" \
             --seed-root "$SEED_ALPHA3_ROOT"
+      - name: Generate black-box oracle from proved reflection theory
+        run: |
+          python -m tools.network_seed_reflection_oracle \
+            --output dist/network-seed-reflection-oracle.json
       - name: Verify exact committed tree
         shell: bash
         run: |
@@ -87,13 +91,15 @@ jobs:
           test -z "$(git status --porcelain --untracked-files=all)"
       - name: Verify deterministic repository snapshot
         run: python -m tools.build_release --verify-determinism
-      - name: Upload retained reflection evidence
+      - name: Upload generated reflection evidence
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: aset-network-reflection-evidence-${{ github.sha }}
           if-no-files-found: warn
-          path: dist/network-seed-reflection-proof.json
+          path: |
+            dist/network-seed-reflection-proof.json
+            dist/network-seed-reflection-oracle.json
       - name: Upload deterministic repository snapshot
         uses: actions/upload-artifact@v4
         with:

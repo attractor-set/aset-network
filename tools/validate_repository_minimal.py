@@ -36,11 +36,6 @@ FORBIDDEN_ROOT_DIRS = {
     "standards",
 }
 EXPECTED_THEORY_FILES = {
-    "theory/network-seed-reflection/EXPRESSION_ASSURANCE.json",
-    "theory/network-seed-reflection/cases/NET-NEG-001.json",
-    "theory/network-seed-reflection/cases/NET-POS-001.json",
-    "theory/network-seed-reflection/cases/NET-POS-002.json",
-    "theory/network-seed-reflection/cases/NET-POS-003.json",
     "theory/network-seed-reflection/formal/NetworkExtension.tla",
     "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinement.tla",
     "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinementProofs.tla",
@@ -96,17 +91,10 @@ def validate_single_readme() -> None:
 def validate_active_network_line() -> None:
     network = ROOT / "network"
     children = {path.split("/", 2)[1] for path in repository_paths() if path.startswith("network/")}
-    require(
-        children == {"CURRENT.aset", "alpha4"},
-        "Network contains more than current Alpha4 line",
-    )
+    require(children == {"alpha4"}, "Network must contain exactly one active Alpha4 line")
     require((network / "alpha4/NETWORK.aset").is_file(), "current Alpha4 subject missing")
-    current = (network / "CURRENT.aset").read_text(encoding="utf-8")
-    require(
-        "CURRENT-REPRESENTATION network/alpha4/NETWORK.aset" in current,
-        "current pointer drift",
-    )
-    require("HISTORICAL-COMPATIBILITY NONE" in current, "historical compatibility boundary drift")
+    subject = (network / "alpha4/NETWORK.aset").read_text(encoding="utf-8")
+    require("ALPHA3-COMPATIBILITY NONE" in subject, "historical compatibility boundary drift")
 
 
 def validate_history_and_theory() -> None:

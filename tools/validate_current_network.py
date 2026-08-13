@@ -3,13 +3,13 @@ from __future__ import annotations
 import hashlib
 from pathlib import Path
 
+from tools.validate_repository_minimal import repository_paths
+
 ROOT = Path(__file__).resolve().parents[1]
-CURRENT = ROOT / "network/CURRENT.aset"
 NETWORK = ROOT / "network/alpha4/NETWORK.aset"
 PROFILES = ROOT / "network/alpha4/profiles/PROFILES.aset"
 ALPHA4_BINDING = ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset"
 HISTORY = ROOT / "history/REFERENCES.aset"
-EXPRESSION_ORACLE = ROOT / "theory/network-seed-reflection/EXPRESSION_ASSURANCE.json"
 CITATION = ROOT / "CITATION.cff"
 
 EXPECTED_ALPHA4_BINDING_SHA256 = "2d725c2f81fa7cb00f7eb24253184e33dd46fac863aed4f489ffde95ad7d92fb"
@@ -35,23 +35,11 @@ def lines(path: Path) -> list[str]:
     return [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
 
-def validate_current_pointer() -> None:
-    current = lines(CURRENT)
-    required = {
-        "ASET-NETWORK-CURRENT 1 ASET-NETWORK-ALPHA4 0.1.0-alpha.4",
-        "SEMANTIC-PRECEDENCE NONE",
-        "CURRENT-REPRESENTATION network/alpha4/NETWORK.aset",
-        "CURRENT-PROFILES network/alpha4/profiles/PROFILES.aset",
-        "CURRENT-UPSTREAM-BINDING upstream/ASET_SEED_ALPHA4_BINDING.aset",
-        "HISTORICAL-PREDECESSOR history/REFERENCES.aset NETWORK-0.1.0-ALPHA.3",
-        "INDEPENDENT-EXPRESSION-ORACLE theory/network-seed-reflection/EXPRESSION_ASSURANCE.json",
-        "HISTORICAL-COMPATIBILITY NONE",
-        "REFERENCE-ORACLE-AUTHORITY NONE",
-        "PROMOTION-SEMANTIC-DELTA NONE",
-        "CHECK CURRENT tools/validate_current_network.py",
-        "GATE tools/alpha4_network_gate.py",
-    }
-    require(set(current) == required, "current representation pointer mismatch")
+def validate_unique_current_line() -> None:
+    children = {path.split("/", 2)[1] for path in repository_paths() if path.startswith("network/")}
+    require(children == {"alpha4"}, f"Network active-line surface drift: {sorted(children)}")
+    require(NETWORK.is_file(), "Alpha4 subject missing")
+    require(PROFILES.is_file(), "Alpha4 profile registry missing")
 
 
 def validate_current_subjects() -> None:
@@ -75,6 +63,7 @@ def validate_history_boundary() -> None:
         "STATE NETWORK-0.1.0-ALPHA.3",
         "TAG v0.1.0-alpha.3",
         f"COMMIT {EXPECTED_ALPHA3_RELEASE_COMMIT}",
+        "IDENTITY NETWORK-0.1.0-ALPHA.3 CANON-ID ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3",
         f"DIGEST NETWORK-0.1.0-ALPHA.3 CANON-PACKAGE {EXPECTED_ALPHA3_PACKAGE_DIGEST}",
         f"DIGEST NETWORK-0.1.0-ALPHA.3 CANON-PACKAGE-BYTES {EXPECTED_ALPHA3_PACKAGE_SHA256}",
         "RELATION ASET-NETWORK-ALPHA4 HISTORICAL_PREDECESSOR NETWORK-0.1.0-ALPHA.3",
@@ -86,7 +75,6 @@ def validate_history_boundary() -> None:
     )
     for marker in required:
         require(marker in history, f"history reference missing: {marker}")
-    require(EXPRESSION_ORACLE.is_file(), "independent expression oracle profile missing")
 
 
 def validate_project_identity() -> None:
@@ -98,17 +86,15 @@ def validate_project_identity() -> None:
 
 
 def main() -> int:
-    validate_current_pointer()
+    validate_unique_current_line()
     validate_current_subjects()
     validate_history_boundary()
     validate_project_identity()
     print("ASET_NETWORK_CURRENT_REPRESENTATION=ASET-NETWORK-ALPHA4")
     print("ASET_NETWORK_CURRENT_PROJECT_VERSION=0.1.0-alpha.4")
-    print("ASET_NETWORK_CURRENT_POINTER_SEMANTIC_PRECEDENCE=NONE")
+    print("ASET_NETWORK_CURRENT_SELECTION=UNIQUE_ACTIVE_NETWORK_LINE")
     print("ASET_NETWORK_ALPHA3_PREDECESSOR=HISTORICAL_REFERENCE")
     print("ASET_NETWORK_ALPHA3_COMPATIBILITY_INHERITED=false")
-    print("ASET_NETWORK_REFERENCE_ORACLE_AUTHORITY=false")
-    print("ASET_NETWORK_PROMOTION_SEMANTIC_DELTA=NONE")
     print("ASET_NETWORK_CURRENT_VALIDATION=PASS")
     return 0
 

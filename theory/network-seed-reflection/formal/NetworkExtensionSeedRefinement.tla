@@ -26,12 +26,12 @@ Seed == INSTANCE SeedResolution
        terminalMeta <- ProjectedTerminalMeta,
        conflicts <- ProjectedConflicts
 
-BridgeAdmitAsSeedRegister(o) ==
+BridgeFreshAsSeedRegister(o) ==
   Seed!RegisterRequest(o, BridgeBinding(o), o.target, NoCommitmentValue)
 
 ProjectedSeedResolution(o) == Seed!ResolutionOf(o)
 ProjectedSeedEffectPermitted(o) == Seed!EffectPermitted(o)
-NetworkProjectedSeedResolution(o) == IF o \in imports THEN "UNKNOWN" ELSE "UNKNOWN"
+NetworkProjectedSeedResolution(o) == "UNKNOWN"
 NetworkProjectedSeedEffectPermitted(o) == FALSE
 
 BridgeProjectionWellFormed ==
