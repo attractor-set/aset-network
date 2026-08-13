@@ -9,7 +9,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DIST = ROOT / "dist"
-ARCHIVE = DIST / "ASET-Network-Extension-Repository-Snapshot.zip"
+ARCHIVE = DIST / "ASET-Network-Repository-Snapshot.zip"
 FIXED = (1980, 1, 1, 0, 0, 0)
 EXCLUDED_PARTS = {
     ".git",
@@ -36,10 +36,7 @@ def included(path: Path) -> bool:
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as stream:
-        while True:
-            chunk = stream.read(1024 * 1024)
-            if not chunk:
-                break
+        while chunk := stream.read(1024 * 1024):
             digest.update(chunk)
     return digest.hexdigest()
 
@@ -63,20 +60,11 @@ def committed_bytes(ref: str, path: Path) -> bytes:
 
 
 def build_archive(output: Path, ref: str) -> None:
-    with zipfile.ZipFile(
-        output,
-        "w",
-        compression=zipfile.ZIP_DEFLATED,
-        compresslevel=9,
-    ) as archive:
+    with zipfile.ZipFile(output, "w", compression=zipfile.ZIP_DEFLATED, compresslevel=9) as archive:
         for relative in sorted(
-            tracked_paths(ref),
-            key=lambda item: (Path("ASET-Network-Extension") / item).as_posix(),
+            tracked_paths(ref), key=lambda item: (Path("ASET-Network") / item).as_posix()
         ):
-            info = zipfile.ZipInfo(
-                (Path("ASET-Network-Extension") / relative).as_posix(),
-                FIXED,
-            )
+            info = zipfile.ZipInfo((Path("ASET-Network") / relative).as_posix(), FIXED)
             info.compress_type = zipfile.ZIP_DEFLATED
             info.external_attr = (stat.S_IFREG | 0o644) << 16
             archive.writestr(info, committed_bytes(ref, relative))
@@ -93,29 +81,24 @@ def main(argv: list[str] | None = None) -> int:
     digest = sha256_file(ARCHIVE)
 
     if args.verify_determinism:
-        comparison = DIST / ".ASET-Network-Extension-Repository-Snapshot.rebuild.zip"
+        comparison = DIST / ".ASET-Network-Repository-Snapshot.rebuild.zip"
         try:
             build_archive(comparison, ref)
             rebuild_digest = sha256_file(comparison)
         finally:
-            if comparison.exists():
-                comparison.unlink()
+            comparison.unlink(missing_ok=True)
         if rebuild_digest != digest:
-            print(f"INPI_DEPOSIT_REBUILD_SHA256={rebuild_digest}")
-            print("INPI_DEPOSIT_DETERMINISTIC_REBUILD=FAIL")
+            print(f"NETWORK_RELEASE_SNAPSHOT_REBUILD_SHA256={rebuild_digest}")
+            print("NETWORK_RELEASE_SNAPSHOT_DETERMINISTIC_REBUILD=FAIL")
             return 1
-        print("INPI_DEPOSIT_DETERMINISTIC_REBUILD=PASS")
+        print("NETWORK_RELEASE_SNAPSHOT_DETERMINISTIC_REBUILD=PASS")
 
     checksum = ARCHIVE.with_suffix(ARCHIVE.suffix + ".sha256")
-    checksum.write_text(
-        f"{digest} {ARCHIVE.name}\n",
-        encoding="utf-8",
-        newline="\n",
-    )
-    print(f"INPI_DEPOSIT_SOURCE_COMMIT={ref}")
-    print(f"INPI_DEPOSIT_ARCHIVE={ARCHIVE}")
-    print(f"INPI_DEPOSIT_SHA256={digest}")
-    print("INPI_DEPOSIT=PASS")
+    checksum.write_text(f"{digest} {ARCHIVE.name}\n", encoding="utf-8", newline="\n")
+    print(f"NETWORK_RELEASE_SNAPSHOT_SOURCE_COMMIT={ref}")
+    print(f"NETWORK_RELEASE_SNAPSHOT_ARCHIVE={ARCHIVE}")
+    print(f"NETWORK_RELEASE_SNAPSHOT_SHA256={digest}")
+    print("NETWORK_RELEASE_SNAPSHOT=PASS")
     return 0
 
 

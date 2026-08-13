@@ -9,6 +9,7 @@ from tools.alpha4_network_paired_expression import (
     relational_admit,
 )
 from tools.validate_alpha4_network import parse_binding, validate_network_surface
+from tools.validate_repository_minimal import repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -97,10 +98,10 @@ def test_alpha4_seed_binding_is_content_addressed_not_commit_authority() -> None
     assert "SEMANTIC-PRECEDENCE NONE" in binding
 
 
-def test_alpha3_canon_remains_frozen_predecessor() -> None:
-    package = (ROOT / "extension/canonical/CANON_PACKAGE.json").read_text(encoding="utf-8")
-    assert '"canon_id": "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"' in package
-    assert (
-        '"package_digest": '
-        '"sha256:82976c30880ed2a6c810b8f0aa5585dee5ab73fa12684a9d17784bac0a1bbbc7"'
-    ) in package
+def test_alpha3_is_history_only_while_reflection_theory_is_retained() -> None:
+    history = (ROOT / "history/REFERENCES.aset").read_text(encoding="utf-8")
+    assert "STATE NETWORK-0.1.0-ALPHA.3" in history
+    assert "COMPATIBILITY ASET-NETWORK-ALPHA4 NETWORK-0.1.0-ALPHA.3 NONE" in history
+    proof = ROOT / "theory/network-seed-reflection/formal/NetworkExtensionSeedRefinementProofs.tla"
+    assert proof.is_file()
+    assert not any(path.startswith("extension/") for path in repository_paths())

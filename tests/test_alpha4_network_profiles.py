@@ -15,6 +15,7 @@ from tools.alpha4_network_profiles_gate import (
     validate_registry,
     values,
 )
+from tools.validate_repository_minimal import repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
 PROFILES = ROOT / "network/alpha4/profiles"
@@ -99,8 +100,7 @@ def test_alpha4_profile_surface_does_not_name_python_oracles() -> None:
             assert "python-sqlite" not in text
 
 
-def test_alpha3_profile_surface_remains_present_as_frozen_predecessor() -> None:
-    alpha3 = ROOT / "extension/canonical/profiles"
-    assert (alpha3 / "dynamic/profile.json").is_file()
-    assert (alpha3 / "federation/profile.json").is_file()
-    assert (alpha3 / "liveness/profile.json").is_file()
+def test_no_historical_profile_surface_is_active() -> None:
+    assert not any(path.startswith("extension/canonical/profiles/") for path in repository_paths())
+    current = (ROOT / "network/CURRENT.aset").read_text(encoding="utf-8")
+    assert "HISTORICAL-COMPATIBILITY NONE" in current

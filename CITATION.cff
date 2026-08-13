@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: If you use ASET Network, cite the exact verified release.
+title: ASET Network
+type: software
+abstract: ASET Network 0.1.0-alpha.4 is the minimal cross-context evidence-admission layer for ASET Seed.
+authors:
+  - family-names: Prychyna
+    given-names: Dzmitry
+    alias: Attractor Set
+version: "0.1.0-alpha.4"
+license: Apache-2.0
+repository-code: https://github.com/attractor-set/aset-network

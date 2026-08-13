@@ -8,7 +8,7 @@ from pathlib import Path
 import pytest
 
 ROOT = Path(__file__).resolve().parents[1]
-SCRIPT = ROOT / "tools" / "check_network_expression_assurance.py"
+SCRIPT = ROOT / "tools/check_network_expression_assurance.py"
 SPEC = importlib.util.spec_from_file_location("network_expression_assurance", SCRIPT)
 assert SPEC and SPEC.loader
 MODULE = importlib.util.module_from_spec(SPEC)
@@ -17,7 +17,7 @@ SPEC.loader.exec_module(MODULE)
 
 def profile() -> dict:
     return json.loads(
-        (ROOT / "assurance/expression-independent/ASSURANCE_PROFILE.json").read_text(
+        (ROOT / "theory/network-seed-reflection/EXPRESSION_ASSURANCE.json").read_text(
             encoding="utf-8"
         )
     )
@@ -25,11 +25,8 @@ def profile() -> dict:
 
 def transcript() -> dict:
     p = profile()
-    conformance = json.loads(
-        (ROOT / p["subject"]["conformance_profile"]).read_text(encoding="utf-8")
-    )
     responses = {}
-    for entry in conformance["cases"]:
+    for entry in p["cases"]:
         case = json.loads((ROOT / entry["path"]).read_text(encoding="utf-8"))
         actual = copy.deepcopy(entry["expected"])
         final_state = copy.deepcopy(case["initial_state"])
@@ -42,14 +39,16 @@ def transcript() -> dict:
             "actual": actual,
             "final_state": final_state,
         }
+    subject = p["historical_subject"]
     return {
         "describe": {
             "protocol": p["implementation_protocol"]["protocol"],
             "implementation": {
                 "name": "aset-network-python-sqlite",
                 "normative": False,
-                "network_canon_id": p["subject"]["canon_id"],
-                "network_extension_version": p["subject"]["extension_version"],
+                "network_canon_id": subject["canon_id"],
+                "network_extension_version": subject["extension_version"],
+                "network_canon_package_digest": subject["canon_package_digest"],
             },
             "operations": ["describe", "execute_case"],
         },
@@ -57,7 +56,7 @@ def transcript() -> dict:
     }
 
 
-def test_profile_pins_frozen_mechanically_proved_oracle() -> None:
+def test_profile_pins_retained_mechanically_proved_oracle() -> None:
     p = profile()
     assert p["formal_oracle"]["profile"] == "ASET-NETWORK-SEED-REFINEMENT-TLAPS-V2"
     assert p["formal_oracle"]["status"] == "MECHANICALLY_PROVED"
@@ -86,6 +85,13 @@ def test_alpha2_bound_expression_is_rejected() -> None:
     bad = transcript()
     bad["describe"]["implementation"]["network_extension_version"] = "0.1.0-alpha.2"
     with pytest.raises(ValueError, match="not bound to Network 0.1.0-alpha.3"):
+        MODULE.check(ROOT, transcript=bad)
+
+
+def test_similar_alpha3_expression_with_wrong_package_is_rejected() -> None:
+    bad = transcript()
+    bad["describe"]["implementation"]["network_canon_package_digest"] = "sha256:" + "0" * 64
+    with pytest.raises(ValueError, match="exact Alpha3 canon package"):
         MODULE.check(ROOT, transcript=bad)
 
 

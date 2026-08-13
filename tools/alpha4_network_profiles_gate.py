@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import re
 from collections import deque
 from pathlib import Path
@@ -301,59 +300,6 @@ def validate_composition() -> None:
     )
 
 
-def validate_alpha3_profile_vocabulary_projection() -> None:
-    alpha3 = ROOT / "extension/canonical/profiles"
-    dynamic = json.loads((alpha3 / "dynamic/profile.json").read_text(encoding="utf-8"))
-    federation = json.loads((alpha3 / "federation/profile.json").read_text(encoding="utf-8"))
-    liveness = json.loads((alpha3 / "liveness/profile.json").read_text(encoding="utf-8"))
-    liveness_scope = json.loads((alpha3 / "liveness/scope.json").read_text(encoding="utf-8"))
-
-    require(
-        dynamic["core_boundary"]["network_state_fields_added"] == [],
-        "Alpha3 dynamic predecessor unexpectedly adds state",
-    )
-    require(
-        dynamic["core_boundary"]["network_transition_kinds_added"] == [],
-        "Alpha3 dynamic predecessor unexpectedly adds transitions",
-    )
-
-    semantics = federation["profile_semantics"]
-    alpha3_states = {
-        value.upper().replace("_", "-") for value in semantics["profile_owned_state_fields"]
-    }
-    alpha3_transitions = {
-        value.replace("_", "-") for value in semantics["profile_owned_transition_kinds"]
-    }
-    require(alpha3_states == FEDERATION_STATES, "Alpha3/Alpha4 federation state vocabulary drift")
-    require(
-        alpha3_transitions == FEDERATION_TRANSITIONS,
-        "Alpha3/Alpha4 federation transition vocabulary drift",
-    )
-    require(
-        {value.replace("_", "-") for value in federation["provided_capabilities"]}
-        == FEDERATION_CAPABILITIES,
-        "Alpha3/Alpha4 federation capability drift",
-    )
-
-    require(liveness_scope["state_ownership"] == [], "Alpha3 liveness unexpectedly owns state")
-    require(
-        liveness_scope["transition_ownership"] == [],
-        "Alpha3 liveness unexpectedly owns transitions",
-    )
-    require(
-        {
-            value.replace("_", "-")
-            for value in liveness["composition_semantics"]["required_profile_capabilities"]
-        }
-        == FEDERATION_CAPABILITIES,
-        "Alpha3/Alpha4 liveness capability drift",
-    )
-    require(
-        set(liveness["resolution_semantics"]["terminal_local_results"]) == {"ALLOW", "BLOCK"},
-        "Alpha3/Alpha4 liveness terminal-result drift",
-    )
-
-
 def main() -> int:
     validate_registry()
     dynamic_checks, applicable = validate_dynamic()
@@ -361,7 +307,6 @@ def main() -> int:
     states, edges = bounded_federation_check()
     validate_liveness()
     validate_composition()
-    validate_alpha3_profile_vocabulary_projection()
     print("ALPHA4_NETWORK_PROFILES=dynamic,federation,liveness")
     print("ALPHA4_DYNAMIC_STATE_FIELDS_ADDED=0 TRANSITIONS_ADDED=0")
     print(f"ALPHA4_DYNAMIC_BOUNDED_CASES={dynamic_checks} APPLICABLE={applicable} PASS")
@@ -377,7 +322,6 @@ def main() -> int:
     print("ALPHA4_PROFILE_OPERATIONAL_RELATIONAL_PAIRING=REQUIRED")
     print("ALPHA4_PROFILE_OPERATIONAL_EXPRESSION_REQUIRES_STATE=false")
     print("ALPHA4_PROFILE_OPERATIONAL_EXPRESSION_REQUIRES_TRANSITION=false")
-    print("ALPHA3_PROFILE_VOCABULARY_PROJECTION=PASS")
     print("ALPHA4_NETWORK_PROFILES_GATE=PASS")
     return 0
 

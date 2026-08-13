@@ -1,9 +1,0 @@
-{
-  "invariants_digest": "sha256:cc08858254cc47c60bd8287bd927db17bcc44f05e40a5e82075e1c2359587fb6",
-  "parent_contract_digest": "sha256:725946f92b6ebe12b805169f45d6a39d66b882ad4dc23120a9733780aea1b9d3",
-  "profile_digest": "sha256:e28f121b5994137da54c2fe850fdb46f866e30c917a48b4453cf36a7adb1cb40",
-  "profile_id": "aset-network-federation",
-  "profile_version": "v1",
-  "requirements_digest": "sha256:c03ae9ccddb066c83c8d35929e259c1c917d302597768179ac0cb944c27f0a3c",
-  "scope_digest": "sha256:13b00b21c04132841acc42727235cc4b91193a440db5f16fc9fd76e1593d887c"
-}
