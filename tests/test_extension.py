@@ -474,7 +474,7 @@ def test_repository_topology_contains_only_direct_relations() -> None:
     assert "~/ASET" not in english_readme
 
     workflow = (ROOT / ".github/workflows/ci.yml").read_text(encoding="utf-8")
-    assert workflow.count("https://github.com/attractor-set/aset-seed.git") == 2
+    assert workflow.count("https://github.com/attractor-set/aset-seed.git") == 3
     assert f"{frozen_seed_repository}.git" not in workflow
 
     frozen_binding = json.loads((ROOT / "upstream/ASET_SEED_BINDING.json").read_text())

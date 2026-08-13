@@ -1,0 +1,28 @@
+ASET-NETWORK 1 ASET-NETWORK-ALPHA4 alpha4
+SEMANTIC-PRECEDENCE NONE
+ALPHA3-COMPATIBILITY NONE
+
+UPSTREAM-SUBJECT ASET-SEED-0.4-ALPHA
+UPSTREAM-BINDING upstream/ASET_SEED_ALPHA4_BINDING.aset
+
+STATE IMPORTS SET-OF-EXACT-IMPORT-OBSERVATIONS
+TRANSITION ADMIT-IMPORT
+
+OPERATIONAL network/alpha4/operational/components.forth
+RELATIONAL network/alpha4/formal/NetworkRelations.tla
+FORMAL-REFLECTION network/alpha4/formal/RestrictedOperationalSemantics.tla
+
+PAIR ASET-NETWORK-COMPONENT-ADMIT-FRESH ADMIT-IMPORT AdmitFresh OperationalAdmitFresh AdmitFreshPairing
+PAIR ASET-NETWORK-COMPONENT-ADMIT-REPLAY ADMIT-IMPORT AdmitReplay OperationalAdmitReplay AdmitReplayPairing
+PAIR ASET-NETWORK-COMPONENT-REJECT-CONFLICT ADMIT-IMPORT RejectConflict OperationalRejectConflict RejectConflictPairing
+
+SEED-PROJECTION ADMIT-IMPORT OBSERVE-UNKNOWN
+SEED-RECOGNITION-OWNER TARGET-LOCAL-SEED
+EFFECT-PERMITTED-BY-NETWORK NEVER
+
+PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/formal/OperationalRelationalPairingProofs.tla OperationalRelationalPairing
+PROOF SEED_BOUNDARY network/alpha4/formal/SeedBoundaryProofs.tla NetworkAdmissionPreservesSeedRecognitionBoundary
+
+CHECK BINDING tools/validate_alpha4_network.py
+CHECK PAIRED_EXPRESSION tools/alpha4_network_paired_expression.py
+GATE tools/alpha4_network_gate.py

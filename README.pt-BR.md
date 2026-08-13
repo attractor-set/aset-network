@@ -1,8 +1,14 @@
 # ASET Network
 
-Status: **0.1.0-alpha.3 / núcleo mínimo de admissão**
+Status: **candidato Alpha4 paired-admission / evidência predecessora Alpha3 congelada**
 
 ASET Network define a fronteira mínima e neutra de implementação pela qual evidência externa se torna candidata local para resolução pelo ASET Seed.
+
+## Alpha4 paired admission
+
+A superfície candidata Alpha4 fica em `network/alpha4/` e define um único subject pertencente ao Network: observações de importação exatas e a única operação `ADMIT-IMPORT`. A expressão restricted-Forth e uma expressão relacional TLA+ independente são ligadas por uma prova de pairing. `SeedBoundaryProofs.tla` fixa a fronteira: uma admissão aceita projeta somente `UNKNOWN` no Seed local do alvo e nunca autoriza um efeito por si só.
+
+`upstream/ASET_SEED_ALPHA4_BINDING.aset` liga o Network à superfície semântica atual do ASET Seed 0.4alpha por SHA-256 de conteúdo, e não por uma implementação privilegiada. O `extension/canonical/**` existente permanece como evidência predecessora Alpha3 byte-frozen durante a migração.
 
 ## Topologia direta dos repositórios
 

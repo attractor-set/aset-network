@@ -1,8 +1,14 @@
 # ASET Network
 
-Статус: **0.1.0-alpha.3 / минимальное ядро admission**
+Статус: **Alpha4 paired-admission candidate / Alpha3 frozen predecessor evidence**
 
 ASET Network задаёт минимальную технологически нейтральную границу, через которую чужой evidence становится локальным кандидатом для ASET Seed.
+
+## Alpha4 paired admission
+
+Кандидатная Alpha4-поверхность находится в `network/alpha4/` и задаёт один Network-owned subject: точные import observations и единственную операцию `ADMIT-IMPORT`. Restricted-Forth expression и независимая TLA+ relational expression связываются отдельным pairing proof. `SeedBoundaryProofs.tla` фиксирует границу: успешная admission проецируется только в target-local Seed `UNKNOWN` и никогда сама не разрешает effect.
+
+`upstream/ASET_SEED_ALPHA4_BINDING.aset` связывает Network с текущей семантической поверхностью ASET Seed 0.4alpha по SHA-256 содержимого, а не через привилегированную реализацию. Существующий `extension/canonical/**` остаётся byte-frozen Alpha3 predecessor evidence на время миграции.
 
 ## Прямая топология репозиториев
 
