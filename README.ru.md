@@ -16,6 +16,17 @@ ASET Network задаёт минимальную технологически н
 
 Здесь перечисляются только непосредственные связи между репозиториями. Транзитивные связи обнаруживаются через их непосредственные родительские репозитории.
 
+## Опциональные профили Alpha4
+
+Alpha4-кандидат теперь содержит отдельную профильную поверхность `network/alpha4/profiles/`, не изменяя `network/alpha4/NETWORK.aset`:
+
+- Dynamic — точная активация через локальный Seed `ALLOW`, без нового состояния и переходов Network;
+- Federation — собственный жизненный цикл федерации: 5 полей состояния и 6 переходов, которые доказуемо stutter относительно Network `IMPORTS`;
+- Liveness — только условные гарантии прогресса, без состояния и переходов Network и без требования eventual `ALLOW`;
+- Federation+Liveness — assurance-композиция без parent relation, передачи состояния, переходов или Authority.
+
+Профиль Federation имеет paired Forth/TLA expression; границы профилей проверяются TLAPS, а safety/liveness-композиция — отдельным TLC harness.
+
 ## Центральное правило
 
 **Evidence may cross boundaries. Recognition does not.**

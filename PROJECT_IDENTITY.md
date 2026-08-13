@@ -14,3 +14,5 @@ A project rename does not grant semantic precedence, modify ASET Seed, or alter 
 ## Alpha4 semantic evolution
 
 `network/alpha4/**` is the candidate successor representation. It introduces paired operational and relational expressions for the same minimal admission subject and binds that subject content-addressedly to ASET Seed 0.4alpha. This is an explicit semantic evolution and does not rewrite the frozen Alpha3 package or its evidence.
+
+`network/alpha4/profiles/**` carries the optional Dynamic, Federation and Liveness profile semantics for the Alpha4 candidate. The profiles remain separate from the core subject: Dynamic and Liveness add no Network state or transitions, Federation owns only its profile-local lifecycle, and profile composition transfers no Authority or parent relation.
