@@ -16,6 +16,17 @@ A superfície candidata Alpha4 fica em `network/alpha4/` e define um único subj
 
 Somente relações diretas entre repositórios são listadas aqui. Relações transitivas são descobertas por meio de seus repositórios-pai imediatos.
 
+## Perfis opcionais Alpha4
+
+O candidato Alpha4 agora possui uma superfície de perfis separada em `network/alpha4/profiles/`, sem alterar `network/alpha4/NETWORK.aset`:
+
+- Dynamic — ativação exata por `ALLOW` do Seed local, sem novo estado ou transições de Network;
+- Federation — ciclo de vida próprio da federação, com 5 campos de estado e 6 transições que comprovadamente fazem stutter sobre `IMPORTS`;
+- Liveness — apenas garantias condicionais de progresso, sem estado ou transições de Network e sem exigir `ALLOW` eventual;
+- Federation+Liveness — composição de assurance sem relação pai, transferência de estado, transições ou Authority.
+
+Federation possui expressão Forth/TLA pareada; as fronteiras dos perfis são verificadas por TLAPS e a composição de safety/liveness por um harness TLC separado.
+
 ## Regra central
 
 **Evidence may cross boundaries. Recognition does not.**

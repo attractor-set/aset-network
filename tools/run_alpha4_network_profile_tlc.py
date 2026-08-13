@@ -1,0 +1,79 @@
+from __future__ import annotations
+
+import argparse
+import os
+import shutil
+import subprocess
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+CORE_FORMAL = ROOT / "network/alpha4/formal"
+FEDERATION_FORMAL = ROOT / "network/alpha4/profiles/federation/formal"
+FEDERATION_ASSURANCE = ROOT / "network/alpha4/profiles/federation/assurance"
+LIVENESS_FORMAL = ROOT / "network/alpha4/profiles/liveness/formal"
+COMPOSITION_ASSURANCE = ROOT / "network/alpha4/profiles/composition/federation-liveness/assurance"
+DEFAULT_JAR = ROOT / ".tooling/tla2tools.jar"
+META = ROOT / ".tooling/tlc-alpha4-profiles"
+
+MODELS = {
+    "federation": {
+        "cwd": FEDERATION_ASSURANCE,
+        "module": "FederationProfile.tla",
+        "config": "FederationProfile.cfg",
+    },
+    "federation-liveness": {
+        "cwd": COMPOSITION_ASSURANCE,
+        "module": "FederationLivenessProgress.tla",
+        "config": "FederationLivenessProgress.cfg",
+    },
+}
+LIBRARIES = [CORE_FORMAL, FEDERATION_FORMAL, LIVENESS_FORMAL]
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("model", choices=[*MODELS, "all"], nargs="?", default="all")
+    parser.add_argument("--jar", type=Path)
+    args = parser.parse_args()
+    jar = (args.jar or Path(os.environ.get("TLA2TOOLS_JAR", DEFAULT_JAR))).expanduser().resolve()
+    if not jar.is_file():
+        raise SystemExit(
+            f"tla2tools.jar not found: {jar}; run python -m tools.bootstrap_tla "
+            "or set TLA2TOOLS_JAR"
+        )
+
+    selected = list(MODELS) if args.model == "all" else [args.model]
+    META.mkdir(parents=True, exist_ok=True)
+    library = os.pathsep.join(str(path) for path in LIBRARIES)
+    for name in selected:
+        model = MODELS[name]
+        model_dir = META / name
+        if model_dir.exists():
+            shutil.rmtree(model_dir)
+        command = [
+            "java",
+            "-XX:+UseParallelGC",
+            f"-DTLA-Library={library}",
+            "-cp",
+            str(jar),
+            "tlc2.TLC",
+            "-workers",
+            "1",
+            "-metadir",
+            str(model_dir),
+            "-config",
+            str(model["config"]),
+            str(model["module"]),
+        ]
+        print(f"ALPHA4_NETWORK_PROFILE_TLC_MODEL={name.upper()}")
+        result = subprocess.run(command, cwd=model["cwd"], check=False)
+        if result.returncode:
+            print(f"ALPHA4_NETWORK_PROFILE_TLC_{name.upper()}=FAIL")
+            return result.returncode
+        print(f"ALPHA4_NETWORK_PROFILE_TLC_{name.upper()}=PASS")
+    print("ALPHA4_NETWORK_PROFILE_TLC=PASS")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

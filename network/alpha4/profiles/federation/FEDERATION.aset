@@ -1,0 +1,45 @@
+ASET-NETWORK-PROFILE 1 ASET-NETWORK-FEDERATION-ALPHA4 alpha4
+PARENT-SUBJECT network/alpha4/NETWORK.aset
+ACTIVATION-CONTRACT network/alpha4/profiles/dynamic/DYNAMIC.aset
+PROFILE-KIND STATEFUL-CAPABILITY
+OPTIONAL TRUE
+NORMATIVE-WHEN-CLAIMED TRUE
+
+STATE FEDERATION-ID
+STATE FEDERATION-EPOCH
+STATE MEMBERS
+STATE ROUTES
+STATE EXPORTS
+
+TRANSITION FEDERATION-GENESIS
+TRANSITION MEMBER-JOIN
+TRANSITION ROUTE-GRANT
+TRANSITION EXPORT-ARTIFACT
+TRANSITION SUSPEND-ROUTE
+TRANSITION MEMBER-WITHDRAW
+
+CAPABILITY RETAINED-EXPORT
+CAPABILITY DELIVERY
+CAPABILITY TARGET-OBSERVATION
+
+INVARIANT ROUTE-ENDPOINTS-DISTINCT
+INVARIANT ACTIVE-ROUTE-MEMBERS-ACTIVE
+INVARIANT MEMBER-WITHDRAWAL-REQUIRES-NO-ACTIVE-ROUTE
+INVARIANT EXPORT-PRESERVES-EXACT-ROUTE-BINDING
+INVARIANT NETWORK-IMPORTS-STUTTER-ON-PROFILE-TRANSITION
+INVARIANT AUTHORITY-INHERITANCE NEVER
+
+OPERATIONAL network/alpha4/profiles/federation/operational/components.forth
+RELATIONAL network/alpha4/profiles/federation/formal/FederationRelations.tla
+FORMAL-REFLECTION network/alpha4/profiles/federation/formal/FederationRestrictedOperationalSemantics.tla
+
+PAIR ASET-NETWORK-FEDERATION-GENESIS FEDERATION-GENESIS FederationGenesis OperationalFederationGenesis FederationGenesisPairing
+PAIR ASET-NETWORK-MEMBER-JOIN MEMBER-JOIN MemberJoin OperationalMemberJoin MemberJoinPairing
+PAIR ASET-NETWORK-ROUTE-GRANT ROUTE-GRANT RouteGrant OperationalRouteGrant RouteGrantPairing
+PAIR ASET-NETWORK-EXPORT-ARTIFACT EXPORT-ARTIFACT ExportArtifact OperationalExportArtifact ExportArtifactPairing
+PAIR ASET-NETWORK-SUSPEND-ROUTE SUSPEND-ROUTE SuspendRoute OperationalSuspendRoute SuspendRoutePairing
+PAIR ASET-NETWORK-MEMBER-WITHDRAW MEMBER-WITHDRAW MemberWithdraw OperationalMemberWithdraw MemberWithdrawPairing
+
+PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/federation/formal/FederationOperationalRelationalPairingProofs.tla FederationOperationalRelationalPairing
+PROOF NETWORK_STUTTER network/alpha4/profiles/federation/formal/NetworkStutteringProofs.tla FederationTransitionsStutterOnNetworkImports
+ASSURANCE SAFETY network/alpha4/profiles/federation/assurance/FederationProfile.tla network/alpha4/profiles/federation/assurance/FederationProfile.cfg

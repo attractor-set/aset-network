@@ -23,6 +23,26 @@ python -m tools.alpha4_network_gate
 python -m pytest -q tests/test_alpha4_network.py
 ```
 
+## Alpha4 optional profiles
+
+The Alpha4 candidate now carries its optional profile semantics under `network/alpha4/profiles/` without changing `network/alpha4/NETWORK.aset`:
+
+- `dynamic/DYNAMIC.aset` — exact target-local Seed `ALLOW` activation contract; adds no Network state or transitions;
+- `federation/FEDERATION.aset` — profile-local federation lifecycle with five owned state fields and six transitions, all specified to stutter on Network `IMPORTS`;
+- `liveness/LIVENESS.aset` — conditional progress contract; adds no Network state or transitions and never requires eventual `ALLOW`;
+- `composition/federation-liveness/FEDERATION_LIVENESS.aset` — assurance-only capability composition with no profile parent relation, state/transition ownership transfer or Authority transfer.
+
+Federation has a paired Forth/TLA expression and a bounded TLC safety model. Dynamic, Liveness and the Federation+Liveness composition have explicit formal boundary proofs. The liveness progress harness treats target observation as an assurance witness for Network-owned `ADMIT-IMPORT` and terminal resolution as an assurance witness for Seed-owned resolution.
+
+Verify the profile layer locally:
+
+```bash
+python -m tools.alpha4_network_profiles_gate
+python -m pytest -q tests/test_alpha4_network_profiles.py
+python -m tools.run_alpha4_network_profile_tlaps --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
+python -m tools.run_alpha4_network_profile_tlc
+```
+
 ## Core rule
 
 **Evidence may cross boundaries. Recognition does not.**
@@ -63,7 +83,7 @@ The exact descriptor is `upstream/ASET_SEED_BINDING.json`. Network may strengthe
 
 The Python implementations under `reference/` are non-normative conformance oracles.
 
-## Federation Profile
+## Frozen Alpha3 Federation Profile
 
 `ASET-NETWORK-FEDERATION-PROFILE-V1` is an optional dynamic profile with its own lifecycle state and transitions:
 
@@ -78,11 +98,11 @@ MEMBER_WITHDRAW
 
 All Federation-owned artifacts live under `extension/canonical/profiles/federation/`. The profile has a native non-normative oracle at `reference/profiles/federation.py` and an independent 10-case conformance surface. Federation transitions stutter with respect to Network admission state. Terminal recognition and liveness are not Federation operations.
 
-## Dynamic profiles
+## Frozen Alpha3 Dynamic profiles
 
 `ASET-NETWORK-DYNAMIC-PROFILES-V1` adds no Network state and no Network transitions. `ProfileDefinition` and `ProfileBinding` are immutable content-addressed evidence. Applicability is derived only from target-local Seed `ALLOW` on the exact projected binding. Availability, verification or remote recognition never activates a profile.
 
-## Liveness Profile
+## Frozen Alpha3 Liveness Profile
 
 `ASET-NETWORK-LIVENESS-V1` is an independent optional dynamic profile. It owns no Network state and no transition kinds. It declares conditional progress guarantees and the capabilities required from a separately composed profile. The currently checked composition pairs it with `ASET-NETWORK-FEDERATION-PROFILE-V1`; that pairing is assurance evidence, not a parent/child relationship.
 
