@@ -52,14 +52,16 @@ Restricted Forth is an operational representation of a semantic object, not a pr
 
 The optional `ASET-NETWORK-FEDERATION-PROFILE-V1` owns state `{federation_id, federation_epoch, members, routes, exports}` and transitions `{FEDERATION_GENESIS, MEMBER_JOIN, ROUTE_GRANT, EXPORT_ARTIFACT, SUSPEND_ROUTE, MEMBER_WITHDRAW}`.
 
-`imports` stays in Network. Terminal recognition stays in the pinned target-local Seed. The frozen Alpha3 predecessor profile has its own non-normative executable oracle and native conformance cases; Alpha4 instead uses paired operational/relational expressions and does not derive semantic authority from that historical oracle.
+`imports` stays in Network. Terminal recognition stays in the target-local ASET Seed 0.4alpha subject selected through the content-addressed Alpha4 binding. The frozen Alpha3 predecessor profile has its own non-normative executable oracle and native conformance cases; Alpha4 instead uses paired operational/relational expressions and does not derive semantic authority from that historical oracle.
 
 Federation safety is checked by the profile-local assurance module `profiles/federation/assurance/FederationProfile.tla`. `ASET-NETWORK-LIVENESS-V1` is a separate profile with no state or transition ownership. Their compatibility is checked by the separate assurance relation under `assurance/profile-compositions/federation-liveness/`; target-local resolution remains an external Seed-owned progress assumption.
 
-## Evidence history
+## Frozen Alpha3 evidence history
 
-`history` remains a separate normative append-only trace rather than transition-enabling semantic state. It never confers Authority.
+The Alpha3 `history` trace remains frozen predecessor evidence rather than current transition-enabling semantic state. It never confers Authority over Alpha4.
 
 ## Profile directory boundary
 
-Every optional profile is a separate canonical entity under `extension/canonical/profiles/<profile>/`. Core protocol, conformance and formal directories contain core artifacts only. Cross-profile assurance belongs under `extension/canonical/assurance/profile-compositions/` and MUST NOT be used to imply profile inheritance.
+Current optional profile subjects live under `network/alpha4/profiles/<profile>/`. Their operational and relational expressions remain profile-local, and cross-profile assurance cannot imply profile inheritance, state ownership transfer or Authority transfer.
+
+`extension/canonical/profiles/**` and `extension/canonical/assurance/profile-compositions/**` are frozen Alpha3 predecessor surfaces retained only for regression and historical evidence.

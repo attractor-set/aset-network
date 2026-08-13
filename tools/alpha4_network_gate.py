@@ -6,6 +6,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = [
+    [sys.executable, "-m", "tools.validate_current_network"],
     [sys.executable, "-m", "tools.validate_alpha4_network"],
     [sys.executable, "-m", "tools.alpha4_network_paired_expression"],
     [sys.executable, "-m", "tools.alpha4_network_profiles_gate"],

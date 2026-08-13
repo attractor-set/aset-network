@@ -1,12 +1,12 @@
 # ASET Network
 
-Status: **Alpha4 paired-admission candidate / Alpha3 frozen predecessor evidence**
+Status: **Alpha4 current public representation / Alpha3 frozen predecessor evidence**
 
 ASET Network is the minimal implementation-neutral boundary by which foreign evidence becomes a target-local candidate for ASET Seed resolution.
 
 ## Alpha4 paired admission
 
-The candidate Alpha4 surface is additive and lives under `network/alpha4/`. It reduces the Network-owned semantic subject to exact import observations plus the single `ADMIT-IMPORT` operation, expressed twice and checked for congruence:
+The current Alpha4 surface lives under `network/alpha4/`. `network/CURRENT.aset` selects it as the current project representation without granting semantic precedence. It reduces the Network-owned semantic subject to exact import observations plus the single `ADMIT-IMPORT` operation, expressed twice and checked for congruence:
 
 - `network/alpha4/operational/components.forth` — restricted operational expression;
 - `network/alpha4/formal/NetworkRelations.tla` — independent relational expression;
@@ -14,9 +14,9 @@ The candidate Alpha4 surface is additive and lives under `network/alpha4/`. It r
 - `network/alpha4/formal/SeedBoundaryProofs.tla` — proof that accepted admission projects only to target-local Seed `UNKNOWN` and never permits an effect;
 - `upstream/ASET_SEED_ALPHA4_BINDING.aset` — content-addressed binding to the active ASET Seed 0.4alpha semantic sources.
 
-The existing `extension/canonical/**` Alpha3 package remains byte-frozen predecessor evidence during this migration. The Alpha4 candidate does not inherit Alpha3 compatibility claims and does not make the historical Python core oracle authoritative.
+The existing `extension/canonical/**` Alpha3 package remains byte-frozen predecessor evidence and regression material. The current Alpha4 representation does not inherit Alpha3 compatibility claims and does not make the historical Python core oracle authoritative.
 
-Verify the candidate locally:
+Verify the current representation locally:
 
 ```bash
 python -m tools.alpha4_network_gate
@@ -25,7 +25,7 @@ python -m pytest -q tests/test_alpha4_network.py
 
 ## Alpha4 optional profiles
 
-The Alpha4 candidate now carries its optional profile semantics under `network/alpha4/profiles/` without changing `network/alpha4/NETWORK.aset`:
+The current Alpha4 representation carries its optional profile semantics under `network/alpha4/profiles/` without changing `network/alpha4/NETWORK.aset`:
 
 - `dynamic/DYNAMIC.aset` — exact target-local Seed `ALLOW` activation contract; adds no Network state or transitions;
 - `federation/FEDERATION.aset` — profile-local federation lifecycle with five owned state fields and six transitions, all specified to stutter on Network `IMPORTS`;
@@ -136,35 +136,36 @@ All Federation-owned artifacts live under `extension/canonical/profiles/federati
 
 ## Formal assurance state
 
-The current proof chain has two mechanically proved TLAPS relations:
+The current Alpha4 assurance chain is the paired-expression architecture under `network/alpha4/**`:
 
-1. machine canon -> `NetworkExtension.tla` behavioral equivalence;
-2. minimal Network -> pinned `SeedResolution.tla` refinement.
+1. the restricted-Forth core expression is paired with the independent TLA relational core;
+2. `SeedBoundaryProofs.tla` proves the target-local Seed recognition boundary;
+3. Dynamic, Federation, Liveness and Federation+Liveness each carry independent operational/relational assurance appropriate to their semantic object;
+4. Federation safety and Federation+Liveness temporal progress are checked with TLC.
 
-The materialized core results are canon equivalence `3/3` and minimal Network -> Seed `35/35`. Federation lifecycle safety is profile-local assurance under `extension/canonical/profiles/federation/assurance/`. Liveness is a separate optional profile under `extension/canonical/profiles/liveness/`. Their bounded composition assurance lives separately under `extension/canonical/assurance/profile-compositions/federation-liveness/`; it treats `Resolve(e)` only as a witness of target-local Seed progress and creates no parent relation or transferred ownership between profiles.
+`python -m tools.alpha4_network_gate` is the primary current-representation gate. The frozen Alpha3 canon/refinement tools remain regression gates for predecessor evidence only; they do not define the current Network representation.
 
 ## Validation
 
-Non-TLAPS validation:
+Current Alpha4 representation:
 
 ```bash
-python -m tools.generate_canon_tla_projection --check
+python -m tools.validate_current_network
+python -m tools.alpha4_network_gate
+python -m tools.validate_alpha4_network --seed-root ~/aset-seed
+python -m tools.run_alpha4_network_tlaps --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
+python -m tools.run_alpha4_network_profile_tlaps --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
+python -m tools.run_alpha4_network_profile_tlc
+python -m pytest -q
+```
+
+Frozen Alpha3 predecessor regression:
+
+```bash
 python -m tools.validate_extension
 python -m tools.run_conformance
-python -m pytest -q
-python -m tools.bootstrap_tla
-python -m tools.run_tlc all
+python -m tools.build_formal_relation --check
+python -m tools.build_canon_package --check
 ```
 
-Local proof gates with the pinned Seed checkout:
-
-```bash
-python -m tools.run_canon_refinement_tlaps \
-  --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
-
-python -m tools.run_seed_refinement_tlaps \
-  --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm \
-  --seed-root ~/aset-seed
-```
-
-Apache-2.0 licensed. No implementation has semantic precedence over the machine-readable canon.
+Apache-2.0 licensed. No implementation, current-selection pointer or frozen predecessor artifact has semantic precedence over the Alpha4 semantic subjects and their mechanically paired expressions.

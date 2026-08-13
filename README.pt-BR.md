@@ -1,14 +1,14 @@
 # ASET Network
 
-Status: **candidato Alpha4 paired-admission / evidência predecessora Alpha3 congelada**
+Status: **representação pública atual Alpha4 / evidência predecessora Alpha3 congelada**
 
 ASET Network define a fronteira mínima e neutra de implementação pela qual evidência externa se torna candidata local para resolução pelo ASET Seed.
 
 ## Alpha4 paired admission
 
-A superfície candidata Alpha4 fica em `network/alpha4/` e define um único subject pertencente ao Network: observações de importação exatas e a única operação `ADMIT-IMPORT`. A expressão restricted-Forth e uma expressão relacional TLA+ independente são ligadas por uma prova de pairing. `SeedBoundaryProofs.tla` fixa a fronteira: uma admissão aceita projeta somente `UNKNOWN` no Seed local do alvo e nunca autoriza um efeito por si só.
+A superfície Alpha4 atual fica em `network/alpha4/`. `network/CURRENT.aset` a seleciona como a representação atual do projeto sem adquirir precedência semântica. Ela define um único subject pertencente ao Network: observações de importação exatas e a única operação `ADMIT-IMPORT`. A expressão restricted-Forth e uma expressão relacional TLA+ independente são ligadas por uma prova de pairing. `SeedBoundaryProofs.tla` fixa a fronteira: uma admissão aceita projeta somente `UNKNOWN` no Seed local do alvo e nunca autoriza um efeito por si só.
 
-`upstream/ASET_SEED_ALPHA4_BINDING.aset` liga o Network à superfície semântica atual do ASET Seed 0.4alpha por SHA-256 de conteúdo, e não por uma implementação privilegiada. O `extension/canonical/**` existente permanece como evidência predecessora Alpha3 byte-frozen durante a migração.
+`upstream/ASET_SEED_ALPHA4_BINDING.aset` liga o Network à superfície semântica atual do ASET Seed 0.4alpha por SHA-256 de conteúdo, e não por uma implementação privilegiada. O `extension/canonical/**` existente permanece como evidência predecessora Alpha3 byte-frozen e material de regressão.
 
 ## Topologia direta dos repositórios
 
@@ -18,7 +18,7 @@ Somente relações diretas entre repositórios são listadas aqui. Relações tr
 
 ## Perfis opcionais Alpha4
 
-O candidato Alpha4 agora possui uma superfície de perfis separada em `network/alpha4/profiles/`, sem alterar `network/alpha4/NETWORK.aset`:
+A representação Alpha4 atual possui uma superfície de perfis separada em `network/alpha4/profiles/`, sem alterar `network/alpha4/NETWORK.aset`:
 
 - Dynamic — ativação exata por `ALLOW` do Seed local, sem novo estado ou transições de Network;
 - Federation — ciclo de vida próprio da federação, com 5 campos de estado e 6 transições que comprovadamente fazem stutter sobre `IMPORTS`;
@@ -87,8 +87,6 @@ As transições de Federation são stutter em relação ao estado de admission d
 
 ## Verificação formal
 
-A cadeia TLAPS do core contém canon->`NetworkExtension.tla` `3/3` e minimal Network->Seed `35/35`. A safety da Federation é assurance local ao perfil em `extension/canonical/profiles/federation/assurance/`. Liveness é um perfil separado em `extension/canonical/profiles/liveness/`. A assurance da composição fica em `extension/canonical/assurance/profile-compositions/federation-liveness/` e não cria relação parent/child nem transfere ownership.
+A cadeia de assurance Alpha4 atual vive em `network/alpha4/**`: pairing Forth/TLA do core, prova da fronteira com Seed, pairings/fronteiras locais dos perfis e TLC para safety de Federation e progresso temporal Federation+Liveness. O gate principal da representação atual é `python -m tools.alpha4_network_gate`.
 
-A compatibilidade histórica de releases antigos da Network fica preservada no histórico Git e em tags imutáveis, não no canon package ou release gate atual.
-
-A fonte normativa permanece `extension/canonical/`; `reference/` é apenas um oracle executável não normativo.
+`extension/canonical/**` e as ferramentas Alpha3 associadas de proof/conformance permanecem como evidência regressiva do predecessor congelado. Elas não definem mais a representação atual do Network. `reference/` continua sendo apenas um oracle histórico não normativo.

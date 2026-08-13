@@ -439,19 +439,22 @@ def test_full_local_non_tlaps_validation_stack() -> None:
         assert r.returncode == 0, r.stdout + r.stderr
 
 
-def test_release_metadata_matches_alpha3_minimal_admission() -> None:
+def test_project_metadata_promotes_alpha4_while_alpha3_package_remains_frozen() -> None:
     project = tomllib.loads((ROOT / "pyproject.toml").read_text())["project"]
+    package = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text())
     assert project["name"] == "aset-network"
-    assert project["version"] == "0.1.0a3"
+    assert project["version"] == "0.1.0a4"
     assert project["description"] == (
         "Minimal cross-context evidence admission semantics for ASET Seed"
     )
+    assert package["extension_version"] == "0.1.0-alpha.3"
 
 
 def test_project_rename_preserves_alpha3_semantic_identity() -> None:
     identity = (ROOT / "PROJECT_IDENTITY.md").read_text(encoding="utf-8")
     package = json.loads((ROOT / "extension/canonical/CANON_PACKAGE.json").read_text())
-    assert "Semantic delta: **NONE**" in identity
+    assert "Semantic delta of promotion: **NONE**" in identity
+    assert "frozen alpha.3 canonical package" in identity
     assert package["canon_id"] == "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
     assert package["extension_id"] == "ASET-NETWORK-EXTENSION"
 

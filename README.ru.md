@@ -1,14 +1,14 @@
 # ASET Network
 
-Статус: **Alpha4 paired-admission candidate / Alpha3 frozen predecessor evidence**
+Статус: **Alpha4 current public representation / Alpha3 frozen predecessor evidence**
 
 ASET Network задаёт минимальную технологически нейтральную границу, через которую чужой evidence становится локальным кандидатом для ASET Seed.
 
 ## Alpha4 paired admission
 
-Кандидатная Alpha4-поверхность находится в `network/alpha4/` и задаёт один Network-owned subject: точные import observations и единственную операцию `ADMIT-IMPORT`. Restricted-Forth expression и независимая TLA+ relational expression связываются отдельным pairing proof. `SeedBoundaryProofs.tla` фиксирует границу: успешная admission проецируется только в target-local Seed `UNKNOWN` и никогда сама не разрешает effect.
+Текущая Alpha4-поверхность находится в `network/alpha4/`. `network/CURRENT.aset` выбирает её как текущую репрезентацию проекта, не получая semantic precedence. Она задаёт один Network-owned subject: точные import observations и единственную операцию `ADMIT-IMPORT`. Restricted-Forth expression и независимая TLA+ relational expression связываются отдельным pairing proof. `SeedBoundaryProofs.tla` фиксирует границу: успешная admission проецируется только в target-local Seed `UNKNOWN` и никогда сама не разрешает effect.
 
-`upstream/ASET_SEED_ALPHA4_BINDING.aset` связывает Network с текущей семантической поверхностью ASET Seed 0.4alpha по SHA-256 содержимого, а не через привилегированную реализацию. Существующий `extension/canonical/**` остаётся byte-frozen Alpha3 predecessor evidence на время миграции.
+`upstream/ASET_SEED_ALPHA4_BINDING.aset` связывает Network с текущей семантической поверхностью ASET Seed 0.4alpha по SHA-256 содержимого, а не через привилегированную реализацию. Существующий `extension/canonical/**` остаётся byte-frozen Alpha3 predecessor evidence и regression material.
 
 ## Прямая топология репозиториев
 
@@ -18,7 +18,7 @@ ASET Network задаёт минимальную технологически н
 
 ## Опциональные профили Alpha4
 
-Alpha4-кандидат теперь содержит отдельную профильную поверхность `network/alpha4/profiles/`, не изменяя `network/alpha4/NETWORK.aset`:
+Текущая Alpha4-репрезентация содержит отдельную профильную поверхность `network/alpha4/profiles/`, не изменяя `network/alpha4/NETWORK.aset`:
 
 - Dynamic — точная активация через локальный Seed `ALLOW`, без нового состояния и переходов Network;
 - Federation — собственный жизненный цикл федерации: 5 полей состояния и 6 переходов, которые доказуемо stutter относительно Network `IMPORTS`;
@@ -87,8 +87,6 @@ Federation-переходы являются stutter относительно ad
 
 ## Формальная проверка
 
-Текущая core TLAPS-цепочка содержит canon->`NetworkExtension.tla` `3/3` и minimal Network->Seed `35/35`. Federation safety является profile-local assurance под `extension/canonical/profiles/federation/assurance/`. Liveness — отдельный профиль под `extension/canonical/profiles/liveness/`. Assurance их композиции вынесен в `extension/canonical/assurance/profile-compositions/federation-liveness/` и не создаёт parent/child отношения или переноса ownership.
+Текущая Alpha4 assurance-цепочка находится в `network/alpha4/**`: core Forth/TLA pairing, Seed-boundary proof, profile-local pairings/boundaries и TLC для Federation safety и Federation+Liveness temporal progress. Основной gate текущей репрезентации — `python -m tools.alpha4_network_gate`.
 
-Историческая совместимость старых релизов Network сохраняется Git history и immutable tags, а не переносится в текущий canon package и release gate.
-
-Нормативным источником остаётся `extension/canonical/`; `reference/` — только ненормативный executable oracle.
+`extension/canonical/**` и связанные Alpha3 proof/conformance tools сохраняются как frozen predecessor regression evidence. Они больше не определяют текущую Network-репрезентацию. `reference/` остаётся только ненормативным историческим oracle.

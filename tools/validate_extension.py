@@ -223,11 +223,10 @@ def main() -> int:
         raise SystemExit("project URLs do not match direct repository topology")
     if (
         project.get("name") != "aset-network"
-        or project.get("version") != "0.1.0a3"
         or project.get("description")
         != "Minimal cross-context evidence admission semantics for ASET Seed"
     ):
-        raise SystemExit("project metadata does not match renamed alpha.3 project identity")
+        raise SystemExit("project metadata does not match ASET Network repository identity")
     if package["extension_version"] != "0.1.0-alpha.3" or package["canon_id"] != (
         "ASET-NETWORK-EXTENSION-CANON-0.1-ALPHA3"
     ):
@@ -432,15 +431,15 @@ def main() -> int:
     print(f"OK: package files={len(package['files'])}")
     print(f"OK: package digest={package['package_digest']}")
     print("OK: Seed compatibility binding exact")
-    print("OK: normative Network core state_fields=1 transition_kinds=1")
-    print("OK: canon-to-TLA alpha.3 relation exact")
+    print("OK: frozen Alpha3 core state_fields=1 transition_kinds=1")
+    print("OK: frozen Alpha3 canon-to-TLA relation exact")
     print(f"OK: canon TLAPS status={canon_evidence['status']}")
     print(f"OK: Seed TLAPS status={seed_evidence['status']}")
-    print("OK: current canonical surface contains no historical compatibility artifacts")
-    print("OK: federation profile is self-contained")
-    print("OK: liveness profile is independent")
-    print("OK: federation+liveness composition is explicit assurance")
-    print("OK: dynamic profiles add no Network state or transitions")
+    print("OK: frozen Alpha3 canonical surface contains no historical compatibility artifacts")
+    print("OK: frozen Alpha3 federation profile is self-contained")
+    print("OK: frozen Alpha3 liveness profile is independent")
+    print("OK: frozen Alpha3 federation+liveness composition is explicit assurance")
+    print("OK: frozen Alpha3 dynamic profiles add no Network state or transitions")
     print("OK: schemas valid")
     print("OK: core conformance cases=4")
     print("OK: dynamic-profile conformance cases=8")
