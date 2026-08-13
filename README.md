@@ -1,8 +1,27 @@
 # ASET Network
 
-Status: **0.1.0-alpha.3 / minimal admission core**
+Status: **Alpha4 paired-admission candidate / Alpha3 frozen predecessor evidence**
 
 ASET Network is the minimal implementation-neutral boundary by which foreign evidence becomes a target-local candidate for ASET Seed resolution.
+
+## Alpha4 paired admission
+
+The candidate Alpha4 surface is additive and lives under `network/alpha4/`. It reduces the Network-owned semantic subject to exact import observations plus the single `ADMIT-IMPORT` operation, expressed twice and checked for congruence:
+
+- `network/alpha4/operational/components.forth` — restricted operational expression;
+- `network/alpha4/formal/NetworkRelations.tla` — independent relational expression;
+- `network/alpha4/formal/OperationalRelationalPairingProofs.tla` — pairing proof;
+- `network/alpha4/formal/SeedBoundaryProofs.tla` — proof that accepted admission projects only to target-local Seed `UNKNOWN` and never permits an effect;
+- `upstream/ASET_SEED_ALPHA4_BINDING.aset` — content-addressed binding to the active ASET Seed 0.4alpha semantic sources.
+
+The existing `extension/canonical/**` Alpha3 package remains byte-frozen predecessor evidence during this migration. The Alpha4 candidate does not inherit Alpha3 compatibility claims and does not make the historical Python core oracle authoritative.
+
+Verify the candidate locally:
+
+```bash
+python -m tools.alpha4_network_gate
+python -m pytest -q tests/test_alpha4_network.py
+```
 
 ## Core rule
 
@@ -24,7 +43,7 @@ Federation membership/routing and conditional liveness are separate optional pro
 
 Only direct repository relationships are listed here. Transitive relationships are discovered through their immediate parent repositories.
 
-## Upstream binding
+## Frozen Alpha3 upstream binding
 
 - Seed release: `seed-0.3.0-alpha.3`
 - Seed commit: `633c130187b2a2bb42f24cfd66662d475de385d2`
@@ -34,7 +53,7 @@ Only direct repository relationships are listed here. Transitive relationships a
 
 The exact descriptor is `upstream/ASET_SEED_BINDING.json`. Network may strengthen Seed constraints but may not weaken or supersede them.
 
-## Normative surfaces
+## Frozen Alpha3 surfaces
 
 - `extension/canonical/source/network-extension-model.json` — minimal admission canon.
 - `extension/canonical/protocol/` — core wire objects only.

@@ -23,6 +23,14 @@ jobs:
           java-version: "21"
       - run: python -m pip install -r requirements-ci.txt
       - run: python -m tools.bootstrap_tla
+      - run: python -m tools.alpha4_network_gate
+      - name: Verify current ASET Seed 0.4alpha content binding
+        shell: bash
+        run: |
+          set -euo pipefail
+          seed_alpha4_root="$RUNNER_TEMP/aset-seed-alpha4"
+          git clone --depth 1 --branch main https://github.com/attractor-set/aset-seed.git "$seed_alpha4_root"
+          python -m tools.validate_alpha4_network --seed-root "$seed_alpha4_root"
       - run: python -m tools.validate_extension
       - run: python -m tools.run_conformance
       - run: python -m pytest -q
@@ -46,6 +54,8 @@ jobs:
           test -x "$tlapm_bin"
           test "$("$tlapm_bin" --version)" = "4600b24"
           echo "TLAPM_BIN=$tlapm_bin" >> "$GITHUB_ENV"
+      - name: Prove Network Alpha4 paired semantics
+        run: python -m tools.run_alpha4_network_tlaps --tlapm "$TLAPM_BIN"
       - name: Fetch pinned ASET Seed
         shell: bash
         run: |

@@ -10,3 +10,7 @@ The project and repository are named **ASET Network**.
 The active alpha.3 canonical package and its assurance evidence were created under the historical **ASET Network Extension** identity. Their machine identifiers, document types, file paths, digests, and proof evidence are intentionally preserved unchanged by this rename. They remain exact evidence for that semantic subject until a later representation supersedes them.
 
 A project rename does not grant semantic precedence, modify ASET Seed, or alter any Network transition, state field, invariant, conformance case, or proof claim.
+
+## Alpha4 semantic evolution
+
+`network/alpha4/**` is the candidate successor representation. It introduces paired operational and relational expressions for the same minimal admission subject and binds that subject content-addressedly to ASET Seed 0.4alpha. This is an explicit semantic evolution and does not rewrite the frozen Alpha3 package or its evidence.
