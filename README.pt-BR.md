@@ -25,7 +25,9 @@ O candidato Alpha4 agora possui uma superfície de perfis separada em `network/a
 - Liveness — apenas garantias condicionais de progresso, sem estado ou transições de Network e sem exigir `ALLOW` eventual;
 - Federation+Liveness — composição de assurance sem relação pai, transferência de estado, transições ou Authority.
 
-Federation possui expressão Forth/TLA pareada; as fronteiras dos perfis são verificadas por TLAPS e a composição de safety/liveness por um harness TLC separado.
+Cada objeto semântico de perfil Alpha4 possui agora expressões operacional e relacional pareadas. Federation pareia seu grafo de transições Forth/TLA; Dynamic pareia a relação de ativação por binding exato; Liveness pareia predicates condicionais de claim/result sem criar uma máquina de transições; e Federation+Liveness pareia o predicate de composição de capabilities/boundaries. TLAPS prova os pairings e as fronteiras, enquanto TLC continua responsável por safety de Federation e pelo progresso temporal Federation+Liveness.
+
+A expressão operacional é baseada no objeto semântico, não em transições. Um perfil não precisa possuir estado ou transições para ter uma expressão restricted-Forth: relações, predicates, witnesses finitos e composições de assurance podem ter counterparts operacionais sem se tornarem máquinas de transição nem adquirirem ownership de estado.
 
 ## Regra central
 

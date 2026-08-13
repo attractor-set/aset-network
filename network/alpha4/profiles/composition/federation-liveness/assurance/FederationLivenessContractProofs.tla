@@ -1,24 +1,20 @@
 ------------- MODULE FederationLivenessContractProofs -------------
-EXTENDS LivenessContract, TLAPS
-
-FederationCapabilities == {"RETAINED_EXPORT", "DELIVERY", "TARGET_OBSERVATION"}
-ProfileParentRelation == FALSE
-StateOwnershipTransferred == FALSE
-TransitionOwnershipTransferred == FALSE
-AuthorityTransferred == FALSE
+EXTENDS FederationLivenessCompositionRelations, TLAPS
 
 THEOREM FederationProvidesRequiredLivenessCapabilities ==
-  RequiredCapabilities \subseteq FederationCapabilities
+  ProvidesRequiredCapabilities(FederationCapabilities)
 PROOF
-  BY DEF RequiredCapabilities, FederationCapabilities
+  BY DEF ProvidesRequiredCapabilities, RequiredCapabilities, FederationCapabilities
 
 THEOREM CompositionTransfersNoOwnership ==
-  /\ ProfileParentRelation = FALSE
-  /\ StateOwnershipTransferred = FALSE
-  /\ TransitionOwnershipTransferred = FALSE
-  /\ AuthorityTransferred = FALSE
+  CompositionBoundaryPreserved(
+    ProfileParentRelation,
+    StateOwnershipTransferred,
+    TransitionOwnershipTransferred,
+    AuthorityTransferred)
 PROOF
-  BY DEF ProfileParentRelation,
+  BY DEF CompositionBoundaryPreserved,
+         ProfileParentRelation,
          StateOwnershipTransferred,
          TransitionOwnershipTransferred,
          AuthorityTransferred

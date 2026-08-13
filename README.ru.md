@@ -25,7 +25,9 @@ Alpha4-кандидат теперь содержит отдельную про�
 - Liveness — только условные гарантии прогресса, без состояния и переходов Network и без требования eventual `ALLOW`;
 - Federation+Liveness — assurance-композиция без parent relation, передачи состояния, переходов или Authority.
 
-Профиль Federation имеет paired Forth/TLA expression; границы профилей проверяются TLAPS, а safety/liveness-композиция — отдельным TLC harness.
+Теперь каждый семантический объект профилей Alpha4 имеет paired operational/relational expressions. Federation связывает Forth/TLA для transition graph; Dynamic — для relation точной активации; Liveness — для условных claim/result predicates без создания собственной transition machine; Federation+Liveness — для predicate композиции capabilities/boundaries. TLAPS доказывает pairing и границы, а TLC по-прежнему отвечает за Federation safety и temporal Federation+Liveness progress.
+
+Operational expression определяется семантическим объектом, а не наличием transitions. Профилю не требуется владеть state или transitions, чтобы иметь restricted-Forth expression: relations, predicates, конечные witnesses и assurance-композиции могут иметь operational counterparts, не превращаясь в transition machine и не приобретая state ownership.
 
 ## Центральное правило
 

@@ -26,12 +26,26 @@ def test_alpha4_profile_registry_is_separate_from_core_subject() -> None:
     assert "profiles/" not in core
     registry = (PROFILES / "PROFILES.aset").read_text(encoding="utf-8")
     assert "PARENT-SUBJECT network/alpha4/NETWORK.aset" in registry
+    assert "INVARIANT PROFILE-OPERATIONAL-RELATIONAL-PAIRING REQUIRED" in registry
+    assert "INVARIANT OPERATIONAL-EXPRESSION-SUBJECT SEMANTIC-OBJECT" in registry
+    assert "INVARIANT OPERATIONAL-EXPRESSION-REQUIRES-STATE NEVER" in registry
+    assert "INVARIANT OPERATIONAL-EXPRESSION-REQUIRES-TRANSITION NEVER" in registry
 
 
 def test_alpha4_dynamic_profile_adds_no_network_state_or_transition() -> None:
     checks, applicable = validate_dynamic()
     assert checks == 6
     assert applicable == 1
+
+
+def test_operational_expression_is_independent_of_state_and_transition_ownership() -> None:
+    dynamic = lines(PROFILES / "dynamic/DYNAMIC.aset")
+    liveness = lines(PROFILES / "liveness/LIVENESS.aset")
+
+    for profile in (dynamic, liveness):
+        assert "STATE-ADDED NONE" in profile
+        assert "TRANSITION-ADDED NONE" in profile
+        assert any(line.startswith("OPERATIONAL ") for line in profile)
 
 
 def test_alpha4_federation_owns_exact_profile_surface() -> None:

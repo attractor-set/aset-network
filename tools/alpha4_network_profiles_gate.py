@@ -82,6 +82,26 @@ def validate_registry() -> None:
         "INVARIANT PROFILE-COMPOSITION-PARENT-RELATION NEVER" in registry,
         "composition boundary missing",
     )
+    require(
+        "INVARIANT PROFILE-OPERATIONAL-RELATIONAL-PAIRING REQUIRED" in registry,
+        "profile pairing invariant missing",
+    )
+    require(
+        "INVARIANT OPERATIONAL-EXPRESSION-SUBJECT SEMANTIC-OBJECT" in registry,
+        "operational expression subject invariant missing",
+    )
+    require(
+        "INVARIANT OPERATIONAL-EXPRESSION-REQUIRES-STATE NEVER" in registry,
+        "operational expression must not require state ownership",
+    )
+    require(
+        "INVARIANT OPERATIONAL-EXPRESSION-REQUIRES-TRANSITION NEVER" in registry,
+        "operational expression must not require transition ownership",
+    )
+    require(
+        "CHECK PROFILE-PAIRING tools/alpha4_network_profile_paired_expression.py" in registry,
+        "profile pairing gate missing",
+    )
 
 
 def validate_dynamic() -> tuple[int, int]:
@@ -93,6 +113,22 @@ def validate_dynamic() -> tuple[int, int]:
     require(
         "ACTIVATION TARGET-LOCAL-SEED-ALLOW EXACT-PROFILE-BINDING" in dynamic,
         "dynamic activation rule mismatch",
+    )
+    require(
+        "OPERATIONAL network/alpha4/profiles/dynamic/operational/components.forth" in dynamic,
+        "dynamic operational expression missing",
+    )
+    require(
+        (
+            "FORMAL-REFLECTION network/alpha4/profiles/dynamic/formal/"
+            "DynamicRestrictedOperationalSemantics.tla"
+        )
+        in dynamic,
+        "dynamic formal reflection missing",
+    )
+    require(
+        any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in dynamic),
+        "dynamic pairing proof missing",
     )
 
     checks = 0
@@ -127,6 +163,10 @@ def validate_federation_surface() -> None:
     require(
         "INVARIANT AUTHORITY-INHERITANCE NEVER" in federation,
         "federation authority boundary missing",
+    )
+    require(
+        any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in federation),
+        "federation pairing proof missing",
     )
 
     source = FEDERATION_FORTH.read_text(encoding="utf-8")
@@ -193,6 +233,22 @@ def validate_liveness() -> None:
         "Seed terminal result contract mismatch",
     )
     require("EVENTUAL-ALLOW-REQUIRED FALSE" in liveness, "liveness must not require eventual ALLOW")
+    require(
+        "OPERATIONAL network/alpha4/profiles/liveness/operational/components.forth" in liveness,
+        "liveness operational expression missing",
+    )
+    require(
+        (
+            "FORMAL-REFLECTION network/alpha4/profiles/liveness/formal/"
+            "LivenessRestrictedOperationalSemantics.tla"
+        )
+        in liveness,
+        "liveness formal reflection missing",
+    )
+    require(
+        any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in liveness),
+        "liveness pairing proof missing",
+    )
 
 
 def validate_composition() -> None:
@@ -222,6 +278,26 @@ def validate_composition() -> None:
     require(
         "TARGET-LOCAL-RESOLUTION-WITNESS ASSURANCE-WITNESS-FOR-SEED-RESOLUTION" in composition,
         "Seed resolution ownership mismatch",
+    )
+    require(
+        (
+            "OPERATIONAL network/alpha4/profiles/composition/federation-liveness/"
+            "operational/components.forth"
+        )
+        in composition,
+        "composition operational expression missing",
+    )
+    require(
+        (
+            "FORMAL-REFLECTION network/alpha4/profiles/composition/federation-liveness/formal/"
+            "FederationLivenessRestrictedOperationalSemantics.tla"
+        )
+        in composition,
+        "composition formal reflection missing",
+    )
+    require(
+        any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in composition),
+        "composition pairing proof missing",
     )
 
 
@@ -298,6 +374,9 @@ def main() -> int:
     print("ALPHA4_LIVENESS_STATE_FIELDS_ADDED=0 TRANSITIONS_ADDED=0")
     print("ALPHA4_LIVENESS_TERMINAL_RESULTS=ALLOW,BLOCK EVENTUAL_ALLOW_REQUIRED=false")
     print("ALPHA4_FEDERATION_LIVENESS_PARENT_RELATION=false AUTHORITY_TRANSFER=false")
+    print("ALPHA4_PROFILE_OPERATIONAL_RELATIONAL_PAIRING=REQUIRED")
+    print("ALPHA4_PROFILE_OPERATIONAL_EXPRESSION_REQUIRES_STATE=false")
+    print("ALPHA4_PROFILE_OPERATIONAL_EXPRESSION_REQUIRES_TRANSITION=false")
     print("ALPHA3_PROFILE_VOCABULARY_PROJECTION=PASS")
     print("ALPHA4_NETWORK_PROFILES_GATE=PASS")
     return 0

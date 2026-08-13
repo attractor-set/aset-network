@@ -32,12 +32,15 @@ The Alpha4 candidate now carries its optional profile semantics under `network/a
 - `liveness/LIVENESS.aset` — conditional progress contract; adds no Network state or transitions and never requires eventual `ALLOW`;
 - `composition/federation-liveness/FEDERATION_LIVENESS.aset` — assurance-only capability composition with no profile parent relation, state/transition ownership transfer or Authority transfer.
 
-Federation has a paired Forth/TLA expression and a bounded TLC safety model. Dynamic, Liveness and the Federation+Liveness composition have explicit formal boundary proofs. The liveness progress harness treats target observation as an assurance witness for Network-owned `ADMIT-IMPORT` and terminal resolution as an assurance witness for Seed-owned resolution.
+Every Alpha4 profile semantic object now has paired operational and relational expressions. Federation pairs its lifecycle transition graph in Forth/TLA; Dynamic pairs its exact-binding activation relation; Liveness pairs its conditional claim/result predicates without adding a transition machine; and Federation+Liveness pairs its capability/boundary composition predicate. TLAPS proves the pairings and boundaries, while TLC remains responsible for Federation safety and the temporal Federation+Liveness progress model. The liveness progress harness treats target observation as an assurance witness for Network-owned `ADMIT-IMPORT` and terminal resolution as an assurance witness for Seed-owned resolution.
+
+Operational expression is semantic-object based, not transition based. A profile does not need to own state or transitions to have a restricted-Forth expression: relations, predicates, finite witnesses and assurance compositions may all have operational counterparts without becoming transition machines or acquiring state ownership.
 
 Verify the profile layer locally:
 
 ```bash
 python -m tools.alpha4_network_profiles_gate
+python -m tools.alpha4_network_profile_paired_expression
 python -m pytest -q tests/test_alpha4_network_profiles.py
 python -m tools.run_alpha4_network_profile_tlaps --tlapm ~/aset-seed/.tooling/tlapm/bin/tlapm
 python -m tools.run_alpha4_network_profile_tlc

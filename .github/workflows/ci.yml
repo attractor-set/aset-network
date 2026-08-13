@@ -56,7 +56,7 @@ jobs:
           echo "TLAPM_BIN=$tlapm_bin" >> "$GITHUB_ENV"
       - name: Prove Network Alpha4 paired semantics
         run: python -m tools.run_alpha4_network_tlaps --tlapm "$TLAPM_BIN"
-      - name: Prove Network Alpha4 profile boundaries
+      - name: Prove Network Alpha4 profile pairing and boundaries
         run: python -m tools.run_alpha4_network_profile_tlaps --tlapm "$TLAPM_BIN"
       - name: Check Network Alpha4 profile safety and liveness composition
         run: python -m tools.run_alpha4_network_profile_tlc

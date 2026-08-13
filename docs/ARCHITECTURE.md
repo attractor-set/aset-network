@@ -44,11 +44,15 @@ For assurance, an admitted observation maps to a fresh target-local Seed request
 
 Dynamic profile definitions are immutable evidence. Exact `ProfileBinding` values project to Seed `ResolutionBinding`; applicability is derived from target-local `ALLOW`. Profiles have no universal install/enable/disable state machine and cannot weaken parent semantics.
 
+## Operational-expression boundary
+
+Restricted Forth is an operational representation of a semantic object, not a privilege of stateful transition systems. State ownership and transition ownership are independent of whether an operational expression exists. Transition subjects may use transition evaluators; relation subjects may use predicates; property/trace subjects may use finite witness recognizers; assurance compositions may use composition predicates. None of those operational forms creates state, transitions or Authority that the subject does not already own.
+
 ## Federation Profile
 
 The optional `ASET-NETWORK-FEDERATION-PROFILE-V1` owns state `{federation_id, federation_epoch, members, routes, exports}` and transitions `{FEDERATION_GENESIS, MEMBER_JOIN, ROUTE_GRANT, EXPORT_ARTIFACT, SUSPEND_ROUTE, MEMBER_WITHDRAW}`.
 
-`imports` stays in Network. Terminal recognition stays in the pinned target-local Seed. The profile has its own executable oracle and native conformance cases; it does not depend on a historical Network release model.
+`imports` stays in Network. Terminal recognition stays in the pinned target-local Seed. The frozen Alpha3 predecessor profile has its own non-normative executable oracle and native conformance cases; Alpha4 instead uses paired operational/relational expressions and does not derive semantic authority from that historical oracle.
 
 Federation safety is checked by the profile-local assurance module `profiles/federation/assurance/FederationProfile.tla`. `ASET-NETWORK-LIVENESS-V1` is a separate profile with no state or transition ownership. Their compatibility is checked by the separate assurance relation under `assurance/profile-compositions/federation-liveness/`; target-local resolution remains an external Seed-owned progress assumption.
 

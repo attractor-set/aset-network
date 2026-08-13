@@ -17,5 +17,10 @@ ACTIVATION-BY-VERIFICATION NEVER
 ACTIVATION-BY-REMOTE-RECOGNITION NEVER
 PREVIOUS-ALLOW-CARRIES-FORWARD NEVER
 
-FORMAL network/alpha4/profiles/dynamic/formal/DynamicProfileRelations.tla
+OPERATIONAL network/alpha4/profiles/dynamic/operational/components.forth
+RELATIONAL network/alpha4/profiles/dynamic/formal/DynamicProfileRelations.tla
+FORMAL-REFLECTION network/alpha4/profiles/dynamic/formal/DynamicRestrictedOperationalSemantics.tla
+PAIR ASET-NETWORK-DYNAMIC-APPLICABILITY PROFILE-APPLICABLE? ProfileApplicable OperationalProfileApplicable ProfileApplicablePairing
+PAIR ASET-NETWORK-DYNAMIC-NETWORK-STUTTER PROFILE-NETWORK-STUTTER? DynamicProfileNetworkProjection OperationalDynamicProfileNetworkProjection DynamicProfileNetworkProjectionPairing
+PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/dynamic/formal/DynamicOperationalRelationalPairingProofs.tla DynamicOperationalRelationalPairing
 PROOF BOUNDARY network/alpha4/profiles/dynamic/formal/DynamicProfileBoundaryProofs.tla DynamicProfilesPreserveNetworkAndLocalAuthority
