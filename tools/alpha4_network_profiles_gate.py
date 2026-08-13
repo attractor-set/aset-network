@@ -82,8 +82,16 @@ def validate_registry() -> None:
         "composition boundary missing",
     )
     require(
-        "INVARIANT PROFILE-OPERATIONAL-RELATIONAL-PAIRING REQUIRED" in registry,
-        "profile pairing invariant missing",
+        "INVARIANT PROFILE-ASSURANCE-REPRESENTATIONS OPERATIONAL,RELATIONAL,CAUSAL" in registry,
+        "profile assurance representation invariant missing",
+    )
+    require(
+        "INVARIANT PROFILE-THREE-WAY-CONGRUENCE REQUIRED" in registry,
+        "profile three-way congruence invariant missing",
+    )
+    require(
+        "INVARIANT PROFILE-SEMANTIC-PRECEDENCE NONE" in registry,
+        "profile semantic precedence invariant missing",
     )
     require(
         "INVARIANT OPERATIONAL-EXPRESSION-SUBJECT SEMANTIC-OBJECT" in registry,
@@ -98,8 +106,13 @@ def validate_registry() -> None:
         "operational expression must not require transition ownership",
     )
     require(
-        "CHECK PROFILE-PAIRING tools/alpha4_network_profile_paired_expression.py" in registry,
-        "profile pairing gate missing",
+        "CHECK PROFILE-OPERATIONAL-RELATIONAL tools/alpha4_network_profile_paired_expression.py"
+        in registry,
+        "profile operational-relational gate missing",
+    )
+    require(
+        "CHECK PROFILE-TRIANGULATION tools/alpha4_network_triangulated_expression.py" in registry,
+        "profile triangulation gate missing",
     )
 
 
@@ -124,6 +137,18 @@ def validate_dynamic() -> tuple[int, int]:
         )
         in dynamic,
         "dynamic formal reflection missing",
+    )
+    require(
+        "SEMANTIC-PRECEDENCE NONE" in dynamic,
+        "dynamic semantic precedence drift",
+    )
+    require(
+        "CAUSAL-MODEL network/alpha4/profiles/dynamic/causal/components.petri" in dynamic,
+        "dynamic causal representation missing",
+    )
+    require(
+        len([line for line in dynamic if line.startswith("CAUSAL-BIND ")]) == 2,
+        "dynamic causal binding count mismatch",
     )
     require(
         any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in dynamic),
@@ -162,6 +187,15 @@ def validate_federation_surface() -> None:
     require(
         "INVARIANT AUTHORITY-INHERITANCE NEVER" in federation,
         "federation authority boundary missing",
+    )
+    require("SEMANTIC-PRECEDENCE NONE" in federation, "federation semantic precedence drift")
+    require(
+        "CAUSAL-MODEL network/alpha4/profiles/federation/causal/components.petri" in federation,
+        "federation causal representation missing",
+    )
+    require(
+        len([line for line in federation if line.startswith("CAUSAL-BIND ")]) == 6,
+        "federation causal binding count mismatch",
     )
     require(
         any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in federation),
@@ -244,6 +278,15 @@ def validate_liveness() -> None:
         in liveness,
         "liveness formal reflection missing",
     )
+    require("SEMANTIC-PRECEDENCE NONE" in liveness, "liveness semantic precedence drift")
+    require(
+        "CAUSAL-MODEL network/alpha4/profiles/liveness/causal/components.petri" in liveness,
+        "liveness causal representation missing",
+    )
+    require(
+        len([line for line in liveness if line.startswith("CAUSAL-BIND ")]) == 4,
+        "liveness causal binding count mismatch",
+    )
     require(
         any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in liveness),
         "liveness pairing proof missing",
@@ -300,6 +343,19 @@ def validate_composition() -> None:
         in composition,
         "composition formal reflection missing",
     )
+    require("SEMANTIC-PRECEDENCE NONE" in composition, "composition semantic precedence drift")
+    require(
+        (
+            "CAUSAL-MODEL network/alpha4/profiles/composition/federation-liveness/"
+            "causal/components.petri"
+        )
+        in composition,
+        "composition causal representation missing",
+    )
+    require(
+        len([line for line in composition if line.startswith("CAUSAL-BIND ")]) == 6,
+        "composition causal binding count mismatch",
+    )
     require(
         any(line.startswith("PROOF OPERATIONAL_RELATIONAL_PAIRING ") for line in composition),
         "composition pairing proof missing",
@@ -325,7 +381,9 @@ def main() -> int:
     print("ALPHA4_LIVENESS_STATE_FIELDS_ADDED=0 TRANSITIONS_ADDED=0")
     print("ALPHA4_LIVENESS_TERMINAL_RESULTS=ALLOW,BLOCK EVENTUAL_ALLOW_REQUIRED=false")
     print("ALPHA4_FEDERATION_LIVENESS_PARENT_RELATION=false AUTHORITY_TRANSFER=false")
-    print("ALPHA4_PROFILE_OPERATIONAL_RELATIONAL_PAIRING=REQUIRED")
+    print("ALPHA4_PROFILE_ASSURANCE_REPRESENTATIONS=OPERATIONAL,RELATIONAL,CAUSAL")
+    print("ALPHA4_PROFILE_THREE_WAY_CONGRUENCE=REQUIRED")
+    print("ALPHA4_PROFILE_SEMANTIC_PRECEDENCE=NONE")
     print("ALPHA4_PROFILE_OPERATIONAL_EXPRESSION_REQUIRES_STATE=false")
     print("ALPHA4_PROFILE_OPERATIONAL_EXPRESSION_REQUIRES_TRANSITION=false")
     print("ALPHA4_NETWORK_PROFILES_GATE=PASS")

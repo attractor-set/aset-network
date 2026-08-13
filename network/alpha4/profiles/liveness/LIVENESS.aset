@@ -1,4 +1,5 @@
 ASET-NETWORK-PROFILE 1 ASET-NETWORK-LIVENESS-ALPHA4 alpha4
+SEMANTIC-PRECEDENCE NONE
 PARENT-SUBJECT network/alpha4/NETWORK.aset
 ACTIVATION-CONTRACT network/alpha4/profiles/dynamic/DYNAMIC.aset
 PROFILE-KIND CONDITIONAL-PROGRESS-CONTRACT
@@ -30,9 +31,14 @@ EVENTUAL-ALLOW-REQUIRED FALSE
 OPERATIONAL network/alpha4/profiles/liveness/operational/components.forth
 RELATIONAL network/alpha4/profiles/liveness/formal/LivenessContract.tla
 FORMAL-REFLECTION network/alpha4/profiles/liveness/formal/LivenessRestrictedOperationalSemantics.tla
+CAUSAL-MODEL network/alpha4/profiles/liveness/causal/components.petri
 PAIR ASET-NETWORK-LIVENESS-DELIVERY-CLAIM EVENTUALLY-DELIVERED-CLAIM? EventuallyDeliveredClaim OperationalEventuallyDeliveredClaim EventuallyDeliveredClaimPairing
 PAIR ASET-NETWORK-LIVENESS-OBSERVATION-CLAIM EVENTUALLY-OBSERVED-CLAIM? EventuallyObservedClaim OperationalEventuallyObservedClaim EventuallyObservedClaimPairing
 PAIR ASET-NETWORK-LIVENESS-RESOLUTION-CLAIM EVENTUALLY-RESOLVED-CLAIM? EventuallyTargetLocalSeedResolvedClaim OperationalEventuallyTargetLocalSeedResolvedClaim EventuallyTargetLocalSeedResolvedClaimPairing
 PAIR ASET-NETWORK-LIVENESS-TERMINAL-RESULT RESOLVED-RESULT-PERMITTED? ResolvedResultPermitted OperationalResolvedResultPermitted ResolvedResultPermittedPairing
+CAUSAL-BIND ASET-NETWORK-LIVENESS-DELIVERY-CLAIM EVENTUALLY-DELIVERED-CLAIM
+CAUSAL-BIND ASET-NETWORK-LIVENESS-OBSERVATION-CLAIM EVENTUALLY-OBSERVED-CLAIM
+CAUSAL-BIND ASET-NETWORK-LIVENESS-RESOLUTION-CLAIM EVENTUALLY-RESOLVED-CLAIM
+CAUSAL-BIND ASET-NETWORK-LIVENESS-TERMINAL-RESULT RESOLVED-RESULT-PERMITTED
 PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/liveness/formal/LivenessOperationalRelationalPairingProofs.tla LivenessOperationalRelationalPairing
 PROOF BOUNDARY network/alpha4/profiles/liveness/formal/LivenessBoundaryProofs.tla LivenessPreservesOwnershipBoundary

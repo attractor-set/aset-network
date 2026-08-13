@@ -29,6 +29,8 @@ def test_alpha4_network_surface_is_minimal() -> None:
     assert "STATE IMPORTS SET-OF-EXACT-IMPORT-OBSERVATIONS" in network
     assert "TRANSITION ADMIT-IMPORT" in network
     assert "TARGET-LOCAL-SEED" in network
+    assert "CAUSAL-MODEL network/alpha4/causal/components.petri" in network
+    assert network.count("CAUSAL-BIND ") == 3
 
 
 def test_alpha4_operational_vocabulary_is_exact() -> None:

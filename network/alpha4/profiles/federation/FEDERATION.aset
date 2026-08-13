@@ -1,4 +1,5 @@
 ASET-NETWORK-PROFILE 1 ASET-NETWORK-FEDERATION-ALPHA4 alpha4
+SEMANTIC-PRECEDENCE NONE
 PARENT-SUBJECT network/alpha4/NETWORK.aset
 ACTIVATION-CONTRACT network/alpha4/profiles/dynamic/DYNAMIC.aset
 PROFILE-KIND STATEFUL-CAPABILITY
@@ -32,6 +33,7 @@ INVARIANT AUTHORITY-INHERITANCE NEVER
 OPERATIONAL network/alpha4/profiles/federation/operational/components.forth
 RELATIONAL network/alpha4/profiles/federation/formal/FederationRelations.tla
 FORMAL-REFLECTION network/alpha4/profiles/federation/formal/FederationRestrictedOperationalSemantics.tla
+CAUSAL-MODEL network/alpha4/profiles/federation/causal/components.petri
 
 PAIR ASET-NETWORK-FEDERATION-GENESIS FEDERATION-GENESIS FederationGenesis OperationalFederationGenesis FederationGenesisPairing
 PAIR ASET-NETWORK-MEMBER-JOIN MEMBER-JOIN MemberJoin OperationalMemberJoin MemberJoinPairing
@@ -39,6 +41,13 @@ PAIR ASET-NETWORK-ROUTE-GRANT ROUTE-GRANT RouteGrant OperationalRouteGrant Route
 PAIR ASET-NETWORK-EXPORT-ARTIFACT EXPORT-ARTIFACT ExportArtifact OperationalExportArtifact ExportArtifactPairing
 PAIR ASET-NETWORK-SUSPEND-ROUTE SUSPEND-ROUTE SuspendRoute OperationalSuspendRoute SuspendRoutePairing
 PAIR ASET-NETWORK-MEMBER-WITHDRAW MEMBER-WITHDRAW MemberWithdraw OperationalMemberWithdraw MemberWithdrawPairing
+
+CAUSAL-BIND ASET-NETWORK-FEDERATION-GENESIS FEDERATION-GENESIS
+CAUSAL-BIND ASET-NETWORK-MEMBER-JOIN MEMBER-JOIN
+CAUSAL-BIND ASET-NETWORK-ROUTE-GRANT ROUTE-GRANT
+CAUSAL-BIND ASET-NETWORK-EXPORT-ARTIFACT EXPORT-ARTIFACT
+CAUSAL-BIND ASET-NETWORK-SUSPEND-ROUTE SUSPEND-ROUTE
+CAUSAL-BIND ASET-NETWORK-MEMBER-WITHDRAW MEMBER-WITHDRAW
 
 PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/federation/formal/FederationOperationalRelationalPairingProofs.tla FederationOperationalRelationalPairing
 PROOF NETWORK_STUTTER network/alpha4/profiles/federation/formal/NetworkStutteringProofs.tla FederationTransitionsStutterOnNetworkImports

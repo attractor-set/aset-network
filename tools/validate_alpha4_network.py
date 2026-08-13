@@ -62,6 +62,7 @@ def validate_network_surface() -> None:
         "SEED-PROJECTION ADMIT-IMPORT OBSERVE-UNKNOWN",
         "SEED-RECOGNITION-OWNER TARGET-LOCAL-SEED",
         "EFFECT-PERMITTED-BY-NETWORK NEVER",
+        "CAUSAL-MODEL network/alpha4/causal/components.petri",
     )
     for declaration in required:
         require(declaration in network, f"Network Alpha4 declaration missing: {declaration}")
@@ -86,6 +87,15 @@ def validate_network_surface() -> None:
     require(
         "LOCAL-ALLOW!" not in forth and "LOCAL-BLOCK!" not in forth,
         "Network operational expression contains Seed-local authority operation",
+    )
+    causal = ROOT / "network/alpha4/causal/components.petri"
+    require(causal.is_file(), "Network causal representation missing")
+    causal_text = causal.read_text(encoding="utf-8")
+    require("SEMANTIC-PRECEDENCE NONE" in causal_text, "Network causal precedence drift")
+    require(causal_text.count("TRANSITION ") == 3, "Network causal component count drift")
+    require(
+        len([line for line in network if line.startswith("CAUSAL-BIND ")]) == 3,
+        "Network causal binding count drift",
     )
 
 

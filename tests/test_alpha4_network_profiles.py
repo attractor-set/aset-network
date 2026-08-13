@@ -27,7 +27,9 @@ def test_alpha4_profile_registry_is_separate_from_core_subject() -> None:
     assert "profiles/" not in core
     registry = (PROFILES / "PROFILES.aset").read_text(encoding="utf-8")
     assert "PARENT-SUBJECT network/alpha4/NETWORK.aset" in registry
-    assert "INVARIANT PROFILE-OPERATIONAL-RELATIONAL-PAIRING REQUIRED" in registry
+    assert "INVARIANT PROFILE-ASSURANCE-REPRESENTATIONS OPERATIONAL,RELATIONAL,CAUSAL" in registry
+    assert "INVARIANT PROFILE-THREE-WAY-CONGRUENCE REQUIRED" in registry
+    assert "INVARIANT PROFILE-SEMANTIC-PRECEDENCE NONE" in registry
     assert "INVARIANT OPERATIONAL-EXPRESSION-SUBJECT SEMANTIC-OBJECT" in registry
     assert "INVARIANT OPERATIONAL-EXPRESSION-REQUIRES-STATE NEVER" in registry
     assert "INVARIANT OPERATIONAL-EXPRESSION-REQUIRES-TRANSITION NEVER" in registry
@@ -47,6 +49,9 @@ def test_operational_expression_is_independent_of_state_and_transition_ownership
         assert "STATE-ADDED NONE" in profile
         assert "TRANSITION-ADDED NONE" in profile
         assert any(line.startswith("OPERATIONAL ") for line in profile)
+        assert any(line.startswith("RELATIONAL ") for line in profile)
+        assert any(line.startswith("CAUSAL-MODEL ") for line in profile)
+        assert "SEMANTIC-PRECEDENCE NONE" in profile
 
 
 def test_alpha4_federation_owns_exact_profile_surface() -> None:
