@@ -44,22 +44,72 @@ operational↔causal, and relational↔causal observations. TLA/TLAPS/TLC remain
 the proof/model-checking machinery for relational safety and temporal claims;
 causal congruence is not described as an independent temporal proof.
 
+Network extends the exact Seed subject representation-by-representation rather
+than restating Seed semantics: operational `OBSERVE-UNKNOWN` binds only to accepted `ADMIT-FRESH` /
+`ADMIT-REPLAY` branches, relational `ObserveUnknown` binds only to
+`AdmitFresh` / `AdmitReplay`, and the causal `OBSERVE-UNKNOWN` boundary binds
+only to the corresponding accepted causal branches. `REJECT-CONFLICT` does not
+claim a Seed transition. The three bindings are checked independently and Seed
+redefinition is not admitted.
+
 Dynamic adds no Network state or transitions. Federation owns only its
 profile-local lifecycle. Liveness adds no state or transition ownership and
 keeps temporal claims in the relational proof surface. Federation+Liveness is
 an explicit composition subject and transfers neither Authority nor
 state/transition ownership.
 
-Verify the active repository surface:
+## Release materialization
+
+English and Python are downstream release companions, not additional assurance
+representations. The Network English companion extends the exact Seed English
+companion. The Network Python companion loads and verifies the exact Seed Python
+companion bytes and delegates accepted imports to Seed `OBSERVE-UNKNOWN`; it does
+not contain a second Seed recognition engine. Both companions have semantic
+precedence `NONE`.
+
+The release builder materializes `formal/AssembledNetwork.tla` after source
+assurance. A separate post-build TLAPS verifier proves that the assembled Network
+accepted-import projection is compatible with the exact released Seed
+`ObserveUnknown` relation for the same evidence digest, while rejected imports
+claim no Seed transition. It runs against the exact released
+`ComponentRelations.tla` in an isolated temporary directory and verifies that
+neither release tree changes during proof execution. The generated Python extension is then checked through
+an independent bounded air-gap over the same 446 Network assurance cases before
+release admission.
 
 ```text
-python -m tools.alpha4_network_gate
-python -m pytest -q
+source Forth / TLA / Petri
+          |
+          v
+   three-way assurance
+          |
+          v
+    source TLAPS/TLC
+          |
+          v
+         build
+          |
+          v
+ AssembledNetwork.tla
+          |
+          v
+ post-build exact-Seed TLAPS
+          |
+       +--+--+
+       |     |
+    English Python
+       |     |
+       |   air-gap
+       +--+--+
+          |
+          v
+   release admission
 ```
 
-Mechanical Alpha4 TLAPS/TLC are executed by the repository verification
-workflow with pinned tooling. The active Seed binding is checked against the
-exact `seed-0.4alpha-3way` release target.
+Verify the active source surface with `python -m tools.alpha4_network_gate`.
+The complete release gate is `tools.alpha4_network_release_gate.py`; CI supplies
+the exact immutable Seed source, release tree, companion tree, and pinned TLAPM.
+The Seed release bytes remain those published under `seed-0.4alpha-3way`.
 
 Historical identities remain in `history/REFERENCES.aset`; historical
 executable theory, generated oracles, and predecessor-specific assurance tools
