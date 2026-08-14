@@ -14,7 +14,7 @@ BINDING = ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset"
 HISTORY = ROOT / "history/REFERENCES.aset"
 CITATION = ROOT / "CITATION.cff"
 
-EXPECTED_ALPHA4_BINDING_SHA256 = "bb8a114b9e9762b6e20fef0395373c805ff4e8c46c2cde07df0c931acb2b9255"
+EXPECTED_ALPHA4_BINDING_SHA256 = "21fedbba98b1c36d96dba2072ccaf2e088348be13a1c9ea8d5e3bdf7616d27a4"
 EXPECTED_SEED_ALPHA4_RELEASE_TAG = "seed-0.4alpha-3way"
 EXPECTED_ALPHA3_PACKAGE_DIGEST = (
     "sha256:82976c30880ed2a6c810b8f0aa5585dee5ab73fa12684a9d17784bac0a1bbbc7"
@@ -57,6 +57,9 @@ def validate_network_surface() -> None:
         "SEMANTIC-PRECEDENCE NONE",
         "ALPHA3-COMPATIBILITY NONE",
         "UPSTREAM-SUBJECT ASET-SEED-0.4-ALPHA",
+        "SEED-EXTENSION-BIND OPERATIONAL OBSERVE-UNKNOWN ADMIT-FRESH,ADMIT-REPLAY",
+        "SEED-EXTENSION-BIND RELATIONAL ObserveUnknown AdmitFresh,AdmitReplay",
+        "SEED-EXTENSION-BIND CAUSAL OBSERVE-UNKNOWN ADMIT-FRESH,ADMIT-REPLAY",
         "STATE IMPORTS SET-OF-EXACT-IMPORT-OBSERVATIONS",
         "TRANSITION ADMIT-IMPORT",
         "SEED-PROJECTION ADMIT-IMPORT OBSERVE-UNKNOWN",
@@ -158,6 +161,25 @@ def parse_binding() -> dict[str, str]:
         f"RELEASE-TAG {EXPECTED_SEED_ALPHA4_RELEASE_TAG}" in binding_lines,
         "Seed Alpha4 release locator mismatch",
     )
+    for declaration in (
+        "RELEASE-TREE sha256:136e174a987ee961877472eecac3903e4f1e54a68059815e9b84e8fb966e00cc",
+        "PROFILE-TREE sha256:fb75339485027ad1529714e1793669c4850390fe54a586864772a13ab90c094e",
+        (
+            "COMPANION ENGLISH en/Seed.md "
+            "sha256:8d44ddd7d244b385de5e37bd9429f9509680775593330a258f97ff178c5fb7b9"
+        ),
+        (
+            "COMPANION PYTHON python/aset_seed_alpha4.py "
+            "sha256:fb71c154b8e6ee05986b6d203852ea1a964176ecb4e9753a51119dcbb9332071"
+        ),
+        "ASSURANCE-BASE OPERATIONAL seed/alpha4/operational/components.forth OBSERVE-UNKNOWN",
+        "ASSURANCE-BASE RELATIONAL seed/alpha4/formal/ComponentRelations.tla ObserveUnknown",
+        "ASSURANCE-BASE CAUSAL seed/alpha4/causal/components.petri OBSERVE-UNKNOWN",
+    ):
+        require(
+            declaration in binding_lines,
+            f"Seed extension binding declaration missing: {declaration}",
+        )
     require(
         "REQUIRED-SEED-PAIR ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN "
         "ObserveUnknown ObserveUnknownPairing" in binding_lines,
@@ -216,8 +238,10 @@ def main() -> int:
     if args.seed_root is not None:
         validate_seed_root(args.seed_root.resolve(), sources)
         print("ALPHA4_NETWORK_SEED_CONTENT_BINDING=PASS")
+        print("ALPHA4_NETWORK_SEED_ASSURANCE_BINDINGS=OPERATIONAL,RELATIONAL,CAUSAL")
     else:
         print("ALPHA4_NETWORK_SEED_CONTENT_BINDING=DECLARED")
+        print("ALPHA4_NETWORK_SEED_ASSURANCE_BINDINGS=DECLARED")
     print("ALPHA4_NETWORK_SINGLE_STATE=IMPORTS")
     print("ALPHA4_NETWORK_SINGLE_TRANSITION=ADMIT-IMPORT")
     print("ALPHA4_NETWORK_TERMINAL_RECOGNITION_STATE=ABSENT")

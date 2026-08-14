@@ -107,6 +107,17 @@ def test_alpha4_seed_binding_is_content_addressed_not_commit_authority() -> None
     assert "CONTENT-ADDRESSED" in binding
     assert "RELEASE-TAG seed-0.4alpha-3way" in binding
     assert "REQUIRED-SEED-CAUSAL-BIND ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN" in binding
+    assert (
+        "ASSURANCE-BASE OPERATIONAL seed/alpha4/operational/components.forth OBSERVE-UNKNOWN"
+        in binding
+    )
+    assert (
+        "ASSURANCE-BASE RELATIONAL seed/alpha4/formal/ComponentRelations.tla ObserveUnknown"
+        in binding
+    )
+    assert "ASSURANCE-BASE CAUSAL seed/alpha4/causal/components.petri OBSERVE-UNKNOWN" in binding
+    assert "COMPANION ENGLISH en/Seed.md" in binding
+    assert "COMPANION PYTHON python/aset_seed_alpha4.py" in binding
     assert "seed/alpha4/binding/graph.cddl" not in binding
     assert "COMMIT" not in binding
     assert "SEMANTIC-PRECEDENCE NONE" in binding
