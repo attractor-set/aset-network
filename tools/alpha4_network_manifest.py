@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 from collections import Counter
 from dataclasses import dataclass
 from pathlib import Path
@@ -561,6 +562,120 @@ DERIVERS = (
 )
 
 
+def _strip_tla_comments(source: str) -> str:
+    out: list[str] = []
+    index = 0
+    block_depth = 0
+    in_string = False
+    while index < len(source):
+        if block_depth:
+            if source.startswith("(*", index):
+                block_depth += 1
+                index += 2
+            elif source.startswith("*)", index):
+                block_depth -= 1
+                index += 2
+            elif source[index] == "\n":
+                out.append("\n")
+                index += 1
+            else:
+                index += 1
+            continue
+
+        if in_string:
+            char = source[index]
+            out.append(char)
+            if char == "\\" and index + 1 < len(source):
+                out.append(source[index + 1])
+                index += 2
+            else:
+                if char == '"':
+                    in_string = False
+                index += 1
+            continue
+
+        if source.startswith("(*", index):
+            block_depth = 1
+            index += 2
+            continue
+        if source.startswith("\\*", index):
+            while index < len(source) and source[index] != "\n":
+                index += 1
+            continue
+        char = source[index]
+        out.append(char)
+        if char == '"':
+            in_string = True
+        index += 1
+
+    if block_depth:
+        raise ManifestError("unterminated TLA block comment in canonical scope")
+    if in_string:
+        raise ManifestError("unterminated TLA string in canonical scope")
+    return "".join(out)
+
+
+def _canonical_tla_scope_sha256(path: Path) -> str:
+    source = path.read_text(encoding="utf-8").replace("\r\n", "\n").replace("\r", "\n")
+    uncommented = _strip_tla_comments(source)
+    canonical = "\n".join(line.strip() for line in uncommented.splitlines() if line.strip())
+    return "sha256:" + hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
+EXPECTED_RELATIONAL_SCOPE_SHA256 = {
+    "network": ("sha256:b9131fcf4c369b721dd42f034513d162230660519bf6ed26f9407b4e32649cdb"),
+    "dynamic": ("sha256:b3092c0b7b9e7dd9fbae3c358e327318749026c4a6fc5d1272243204c7fa77ce"),
+    "federation": ("sha256:61c35ce0bb26e41291e2602a9831a59e4900c5fb437b0a89f40f83e617749b64"),
+    "liveness": ("sha256:7889274f51a93f273c014473e532ea853696479710774cd7b5394caf693e6165"),
+    "federation-liveness": (
+        "sha256:5d28ff45e3919d656311586731855d06284bdfea14e2a37f5156c28f6fa5e036"
+    ),
+}
+
+EXPECTED_FORMAL_REFLECTION_SCOPE_SHA256 = {
+    "network": ("sha256:bf1f919b0b38b8a5c2564de2e795bedcdd35efd7580e36b02e9845bb58da7675"),
+    "dynamic": ("sha256:896bdfde2f3d718f2ea2ca60c3c4878d0eaaa1f33920a0a14290dfb55d72c3f0"),
+    "federation": ("sha256:fd383161e69b7aeb935c43e1dde22047e150e816e8768f8c4c575855837b69cf"),
+    "liveness": ("sha256:df8b2743bd1917647ee88d8a445818226058bfdd239fc4258f4fa4721447acc4"),
+    "federation-liveness": (
+        "sha256:a2928d06f7495c972748d9a812f9b6055e8f21a1374f4bf2f6f2112f677da13d"
+    ),
+}
+
+EXPECTED_PROOF_SCOPE_SHA256 = {
+    ("network", "OPERATIONAL_RELATIONAL_PAIRING"): (
+        "sha256:b41437ac70756fc117ba13c9e54260db56dd6042920bef98a82e7b46bcfa683a"
+    ),
+    ("network", "SEED_BOUNDARY"): (
+        "sha256:12d5da90ac3d32eda384e34f3a5c3e508b2180366bd525d64a80cdaffcd941ec"
+    ),
+    ("dynamic", "OPERATIONAL_RELATIONAL_PAIRING"): (
+        "sha256:7e1c168fae31f264c201d20c6d5a20718788dfbc3474d260b07e239f0a2c3bad"
+    ),
+    ("dynamic", "BOUNDARY"): (
+        "sha256:2d7394fe8ba527a5866747a35d532a2f54df79c957c3d6c9e7cc49c30ee66ba6"
+    ),
+    ("federation", "OPERATIONAL_RELATIONAL_PAIRING"): (
+        "sha256:e92229c0a75f01aee9c31131b97c8416e4585198e46081c04546b75a9f6dc4e2"
+    ),
+    ("federation", "NETWORK_STUTTER"): (
+        "sha256:78c435a803bd20b0eb9d00e96c7849266f273af0d694dcdf1d7483bebb250885"
+    ),
+    ("liveness", "OPERATIONAL_RELATIONAL_PAIRING"): (
+        "sha256:2cf561898d8e750cb8c395f2d4c1d6bf2626b2176b6accce982fe2cfc79c3a90"
+    ),
+    ("liveness", "BOUNDARY"): (
+        "sha256:8b9c4b6cef4dc225937553d458c2a14a7ff800c23ba21890a0171044a5c491b6"
+    ),
+    ("federation-liveness", "OPERATIONAL_RELATIONAL_PAIRING"): (
+        "sha256:6cd3405923872d261a4947810bbeed5b19e6e3e50748e3c5fcec26ec85164665"
+    ),
+    ("federation-liveness", "CONTRACT"): (
+        "sha256:f4238ff97bf7cb4d37a1b910fd964ebcccaa05283f87afa5d6c6add3cf33894a"
+    ),
+}
+
+
 def _read_tokens(path: Path) -> list[list[str]]:
     result: list[list[str]] = []
     for raw in path.read_text(encoding="utf-8").splitlines():
@@ -664,10 +779,25 @@ def _parse_subject(root: Path, name: str, schema: SubjectSchema) -> SubjectBindi
     for relative in (*sources.values(), *(item.module for item in proofs)):
         bound = root / relative
         require(bound.is_file(), f"{name}: bound file missing: {relative}")
+    require(
+        _canonical_tla_scope_sha256(root / sources["RELATIONAL"])
+        == EXPECTED_RELATIONAL_SCOPE_SHA256[name],
+        f"{name}: relational canonical scope drift",
+    )
+    require(
+        _canonical_tla_scope_sha256(root / sources["FORMAL-REFLECTION"])
+        == EXPECTED_FORMAL_REFLECTION_SCOPE_SHA256[name],
+        f"{name}: formal reflection canonical scope drift",
+    )
     for proof in proofs:
         require(
             _theorem_present(root / proof.module, proof.final_theorem),
             f"{name}: final theorem missing: {proof.final_theorem}",
+        )
+        require(
+            _canonical_tla_scope_sha256(root / proof.module)
+            == EXPECTED_PROOF_SCOPE_SHA256[(name, proof.proof_id)],
+            f"{name}: proof canonical scope drift: {proof.proof_id}",
         )
     for pair in pairs:
         relational_text = (root / sources["RELATIONAL"]).read_text(encoding="utf-8")
@@ -719,6 +849,19 @@ def main() -> int:
         print(f"ALPHA4_NETWORK_MANIFEST_SUBJECTS={len(plan.subjects)}/{len(plan.subjects)} PASS")
         print(f"ALPHA4_NETWORK_MANIFEST_PAIRS={pairs}/{pairs} PASS")
         print(f"ALPHA4_NETWORK_MANIFEST_PROOFS={proofs}/{proofs} PASS")
+        print(
+            "ALPHA4_NETWORK_RELATIONAL_CANONICAL_SCOPES="
+            f"{len(EXPECTED_RELATIONAL_SCOPE_SHA256)}/{len(EXPECTED_RELATIONAL_SCOPE_SHA256)} PASS"
+        )
+        print(
+            "ALPHA4_NETWORK_FORMAL_REFLECTION_CANONICAL_SCOPES="
+            f"{len(EXPECTED_FORMAL_REFLECTION_SCOPE_SHA256)}/"
+            f"{len(EXPECTED_FORMAL_REFLECTION_SCOPE_SHA256)} PASS"
+        )
+        print(
+            "ALPHA4_NETWORK_PROOF_CANONICAL_SCOPES="
+            f"{len(EXPECTED_PROOF_SCOPE_SHA256)}/{len(EXPECTED_PROOF_SCOPE_SHA256)} PASS"
+        )
         print(f"ALPHA4_NETWORK_MANIFEST_EXPECTED_TLAPS_OBLIGATIONS={obligations}")
         print("ALPHA4_NETWORK_BINDING_PLAN=PASS")
         return 0

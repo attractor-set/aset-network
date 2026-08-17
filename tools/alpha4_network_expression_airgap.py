@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import ast
+import builtins
+import io
 import itertools
 import json
 from collections import deque
@@ -13,6 +16,41 @@ from tools.alpha4_network_seed_extension import parse_seed_binding, sha256, tree
 ROOT = Path(__file__).resolve().parents[1]
 
 
+_ALLOWED_DIRECT_IMPORTS = frozenset({"hashlib"})
+_ALLOWED_FROM_IMPORTS = {
+    "pathlib": frozenset({"Path"}),
+    "typing": frozenset({"Any"}),
+}
+_FILESYSTEM_INSPECTION_METHODS = frozenset(
+    {
+        "absolute",
+        "cwd",
+        "exists",
+        "expanduser",
+        "glob",
+        "group",
+        "home",
+        "is_block_device",
+        "is_char_device",
+        "is_dir",
+        "is_fifo",
+        "is_file",
+        "is_mount",
+        "is_socket",
+        "is_symlink",
+        "iterdir",
+        "lstat",
+        "owner",
+        "readlink",
+        "resolve",
+        "rglob",
+        "samefile",
+        "stat",
+        "walk",
+    }
+)
+
+
 class NetworkExpressionAirgapError(RuntimeError):
     pass
 
@@ -22,10 +60,193 @@ def require(condition: bool, message: str) -> None:
         raise NetworkExpressionAirgapError(message)
 
 
-def execute(path: Path) -> dict[str, Any]:
-    namespace: dict[str, Any] = {"__file__": str(path)}
+def _validate_companion_ast(
+    source: str, *, allowed_imports: frozenset[str], allow_seed_loader: bool
+) -> None:
+    tree = ast.parse(source)
+    parents: dict[ast.AST, ast.AST] = {}
+    for parent in ast.walk(tree):
+        for child in ast.iter_child_nodes(parent):
+            parents[child] = parent
+
+    def enclosing_function(node: ast.AST) -> str | None:
+        current = node
+        while current in parents:
+            current = parents[current]
+            if isinstance(current, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                return current.name
+        return None
+
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                require(
+                    alias.asname is None
+                    and alias.name in allowed_imports
+                    and alias.name in _ALLOWED_DIRECT_IMPORTS,
+                    f"air-gap companion import forbidden: {alias.name}",
+                )
+        elif isinstance(node, ast.ImportFrom):
+            module = node.module or ""
+            imported = {alias.name for alias in node.names}
+            require(node.level == 0, "air-gap companion relative import forbidden")
+            if module == "__future__":
+                require(
+                    imported == {"annotations"}
+                    and all(alias.asname is None for alias in node.names),
+                    "air-gap companion future import drift",
+                )
+            else:
+                require(
+                    module in allowed_imports
+                    and module in _ALLOWED_FROM_IMPORTS
+                    and imported <= _ALLOWED_FROM_IMPORTS[module]
+                    and all(alias.asname is None for alias in node.names),
+                    f"air-gap companion import forbidden: {module}",
+                )
+        elif isinstance(node, ast.Name) and node.id == "__builtins__":
+            raise NetworkExpressionAirgapError("air-gap companion accesses __builtins__")
+        elif isinstance(node, ast.Attribute) and node.attr.startswith("_"):
+            raise NetworkExpressionAirgapError(
+                f"air-gap companion private attribute forbidden: {node.attr}"
+            )
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+            if node.func.id in {
+                "__import__",
+                "breakpoint",
+                "delattr",
+                "dir",
+                "eval",
+                "getattr",
+                "globals",
+                "help",
+                "input",
+                "locals",
+                "setattr",
+                "type",
+                "vars",
+            }:
+                raise NetworkExpressionAirgapError(
+                    f"air-gap companion dynamic capability forbidden: {node.func.id}"
+                )
+            if node.func.id in {"exec", "compile"}:
+                require(
+                    allow_seed_loader and enclosing_function(node) == "_load_seed_base",
+                    f"air-gap companion {node.func.id} permitted only for exact Seed base loader",
+                )
+        elif isinstance(node, ast.Call) and isinstance(node.func, ast.Attribute):
+            require(
+                node.func.attr not in _FILESYSTEM_INSPECTION_METHODS,
+                f"air-gap companion filesystem inspection forbidden: {node.func.attr}",
+            )
+            require(
+                node.func.attr
+                not in {
+                    "write_text",
+                    "write_bytes",
+                    "unlink",
+                    "rename",
+                    "replace",
+                    "mkdir",
+                    "touch",
+                    "chmod",
+                    "symlink_to",
+                    "hardlink_to",
+                },
+                f"air-gap companion filesystem mutation forbidden: {node.func.attr}",
+            )
+        elif isinstance(node, ast.Constant) and isinstance(node.value, str):
+            lowered = node.value.lower()
+            require(
+                not any(
+                    marker in lowered for marker in ("tools.", "tools/", ".tla", ".forth", ".petri")
+                ),
+                "air-gap companion embeds repository semantic-source locator",
+            )
+
+
+def execute(
+    path: Path,
+    allowed_root: Path,
+    *,
+    allowed_imports: frozenset[str],
+    allow_seed_loader: bool,
+) -> dict[str, Any]:
     source = path.read_text(encoding="utf-8")
-    exec(compile(source, str(path), "exec"), namespace)
+    _validate_companion_ast(
+        source, allowed_imports=allowed_imports, allow_seed_loader=allow_seed_loader
+    )
+    allowed_root = allowed_root.resolve()
+    original_io_open = io.open
+
+    def guarded_open(file: object, *args: object, **kwargs: object):
+        if isinstance(file, int):
+            return original_io_open(file, *args, **kwargs)
+        mode = kwargs.get("mode", args[0] if args else "r")
+        require(
+            isinstance(mode, str) and not any(flag in mode for flag in "wax+"),
+            "air-gap companion file access must be read-only",
+        )
+        candidate = Path(file).resolve()  # type: ignore[arg-type]
+        require(
+            candidate == allowed_root or allowed_root in candidate.parents,
+            f"air-gap companion file access escaped materialized profile tree: {candidate}",
+        )
+        return original_io_open(file, *args, **kwargs)
+
+    original_import = builtins.__import__
+
+    def guarded_import(
+        name: str,
+        globals: dict[str, Any] | None = None,
+        locals: dict[str, Any] | None = None,
+        fromlist: tuple[str, ...] = (),
+        level: int = 0,
+    ) -> Any:
+        requested = set(fromlist or ())
+        if level != 0:
+            raise ImportError("air-gap companion relative import forbidden")
+        if name == "__future__":
+            if requested != {"annotations"}:
+                raise ImportError("air-gap companion future import drift")
+        elif name in _ALLOWED_DIRECT_IMPORTS:
+            if name not in allowed_imports or requested:
+                raise ImportError(f"air-gap companion import forbidden: {name}")
+        elif name in _ALLOWED_FROM_IMPORTS:
+            if (
+                name not in allowed_imports
+                or not requested
+                or not requested <= _ALLOWED_FROM_IMPORTS[name]
+            ):
+                raise ImportError(f"air-gap companion import forbidden: {name}")
+        else:
+            raise ImportError(f"air-gap companion import forbidden: {name}")
+        return original_import(name, globals, locals, fromlist, level)
+
+    safe_builtins = dict(vars(builtins))
+    safe_builtins["__import__"] = guarded_import
+    safe_builtins["open"] = guarded_open
+
+    def guarded_exec(
+        code: object,
+        globals_dict: dict[str, Any] | None = None,
+        locals_dict: dict[str, Any] | None = None,
+    ) -> None:
+        target_globals = {} if globals_dict is None else globals_dict
+        target_globals.setdefault("__builtins__", safe_builtins)
+        exec(code, target_globals, locals_dict)
+
+    safe_builtins["exec"] = guarded_exec
+    namespace: dict[str, Any] = {
+        "__file__": str(path),
+        "__name__": "aset_network_alpha4_airgap_subject",
+        "__builtins__": safe_builtins,
+    }
+    io.open = guarded_open  # type: ignore[assignment]
+    try:
+        exec(compile(source, str(path), "exec"), namespace)
+    finally:
+        io.open = original_io_open  # type: ignore[assignment]
     return namespace
 
 
@@ -115,6 +336,86 @@ def _check_core(network: dict[str, Any], seed: dict[str, Any]) -> int:
                 require(actual_seed == seed_before, "rejected Network import changed Seed state")
             cases += 1
     return cases
+
+
+def _check_core_identity_sensitivity(network: dict[str, Any], seed: dict[str, Any]) -> int:
+    admit = network["admit_import"]
+    make_seed_state = seed["state"]
+    base = {
+        "import_id": "i0",
+        "source_context": "s0",
+        "target_context": "t0",
+        "evidence_digest": "sha256:" + "0" * 64,
+    }
+    replacements = {
+        "import_id": "i1",
+        "source_context": "s1",
+        "target_context": "t1",
+        "evidence_digest": "sha256:" + "1" * 64,
+    }
+    checks = 0
+    for field, replacement in replacements.items():
+        candidate = {**base, field: replacement}
+        state = [dict(base)]
+        seed_before = make_seed_state("subject-1", "authority-1")
+        actual_state, _, actual_result = admit(state, candidate, seed_before)
+        expected_state, expected_result = _core_expected(state, candidate)
+        require(
+            actual_state == expected_state,
+            f"core identity sensitivity state mismatch: {field}",
+        )
+        for key, value in expected_result.items():
+            require(
+                actual_result.get(key) == value,
+                f"core identity sensitivity result mismatch: {field}:{key}",
+            )
+        checks += 1
+
+    first = {**base, "import_id": "i1"}
+    state = [first, dict(base)]
+    seed_before = make_seed_state("subject-1", "authority-1")
+    actual_state, _, actual_result = admit(state, dict(base), seed_before)
+    require(actual_state == state, "core second-position replay changed state")
+    require(actual_result.get("code") == "IDEMPOTENT_REPLAY", "core second-position replay missed")
+    return checks + 1
+
+
+def _check_composition_identity_sensitivity(network: dict[str, Any]) -> int:
+    delivery = network["delivery_witness"]
+    export = "e0"
+    sets = (set(), {"e0"}, {"e1"}, {"e0", "e1"})
+    checks = 0
+    for exported, delivered in itertools.product(sets, repeat=2):
+        require(
+            delivery(exported, delivered, export) == (export in exported and export in delivered),
+            "composition foreign-export identity sensitivity mismatch",
+        )
+        checks += 1
+    return checks
+
+
+def _check_federation_identity_sensitivity(network: dict[str, Any]) -> int:
+    checks = 0
+    empty = network["federation_state"]()
+    created = network["federation_genesis"](empty, "f1", "e1")
+    require(created["federation_id"] == "f1", "federation id identity lost")
+    checks += 1
+    require(created["federation_epoch"] == "e1", "federation epoch identity lost")
+    checks += 1
+    joined = network["member_join"](created, "B")
+    require(
+        joined["members"].get("B") == "ACTIVE" and "A" not in joined["members"],
+        "member identity lost",
+    )
+    checks += 1
+    joined_a = network["member_join"](joined, "A")
+    granted = network["route_grant"](joined_a, "B", "A")
+    require(granted["routes"].get(("B", "A")) == "ACTIVE", "route endpoint identity lost")
+    checks += 1
+    exported = network["export_artifact"](granted, "B", "A", "x1")
+    require(("B", "A", "x1") in exported["exports"], "artifact identity lost")
+    checks += 1
+    return checks
 
 
 def _check_dynamic(network: dict[str, Any]) -> int:
@@ -346,8 +647,13 @@ def check_airgap(profiles_root: Path) -> dict[str, Any]:
     require(network_path.is_file(), "Network Python companion missing")
     require(seed_path.is_file(), "exact Seed Python base missing")
     require(sha256(seed_path) == binding.companions["PYTHON"][1], "Seed Python base bytes mismatch")
-    seed = execute(seed_path)
-    network = execute(network_path)
+    seed = execute(seed_path, profiles_root, allowed_imports=frozenset(), allow_seed_loader=False)
+    network = execute(
+        network_path,
+        profiles_root,
+        allowed_imports=frozenset({"hashlib", "pathlib", "typing"}),
+        allow_seed_loader=True,
+    )
     require(
         network.get("BASE_SEED_EXPRESSION_SHA256") == sha256(seed_path),
         "Network Python base binding mismatch",
@@ -357,11 +663,19 @@ def check_airgap(profiles_root: Path) -> dict[str, Any]:
     federation_states, federation_edges = _check_federation(network)
     liveness = _check_liveness(network)
     composition = _check_composition(network)
+    core_identity = _check_core_identity_sensitivity(network, seed)
+    composition_identity = _check_composition_identity_sensitivity(network)
+    federation_identity = _check_federation_identity_sensitivity(network)
     total = core + dynamic + federation_edges + liveness + composition
+    sensitivity = core_identity + composition_identity + federation_identity
     require(
         (core, dynamic, federation_states, federation_edges, liveness, composition, total)
         == (272, 10, 20, 25, 51, 88, 446),
-        "Network Python air-gap coverage drift",
+        "Network Python air-gap structural coverage drift",
+    )
+    require(
+        (core_identity, composition_identity, federation_identity, sensitivity) == (5, 16, 5, 26),
+        "Network Python air-gap identity sensitivity drift",
     )
     after = tree_digest(profiles_root)
     require(after == before, "Network profile tree changed during air-gap verification")
@@ -373,6 +687,8 @@ def check_airgap(profiles_root: Path) -> dict[str, Any]:
             "network_semantic_source": "NONE",
             "release_profile_generator": "NONE",
             "triangulated_expression_checker": "NONE",
+            "companion_import_surface": "RESTRICTED",
+            "companion_file_access": "MATERIALIZED_PROFILE_TREE_READ_ONLY",
         },
         "profile_tree_digest": before,
         "inputs": {
@@ -393,6 +709,11 @@ def check_airgap(profiles_root: Path) -> dict[str, Any]:
             "liveness_cases": liveness,
             "composition_cases": composition,
             "total_cases": total,
+            "core_identity_sensitivity_cases": core_identity,
+            "composition_identity_sensitivity_cases": composition_identity,
+            "federation_identity_sensitivity_cases": federation_identity,
+            "sensitivity_cases": sensitivity,
+            "grand_total_cases": total + sensitivity,
         },
         "profile_tree_unchanged": True,
         "status": "PASS",
@@ -424,6 +745,12 @@ def main() -> int:
         print(f"ALPHA4_NETWORK_PYTHON_AIRGAP_LIVENESS={coverage['liveness_cases']}/51 PASS")
         print(f"ALPHA4_NETWORK_PYTHON_AIRGAP_COMPOSITION={coverage['composition_cases']}/88 PASS")
         print(f"ALPHA4_NETWORK_PYTHON_AIRGAP_TOTAL={coverage['total_cases']}/446 PASS")
+        print(
+            "ALPHA4_NETWORK_PYTHON_AIRGAP_IDENTITY_SENSITIVITY="
+            f"{coverage['sensitivity_cases']}/26 PASS"
+        )
+        print(f"ALPHA4_NETWORK_PYTHON_AIRGAP_GRAND_TOTAL={coverage['grand_total_cases']}/472 PASS")
+        print("ALPHA4_NETWORK_PYTHON_COMPANION_RUNTIME_ISOLATION=PASS")
         print("ALPHA4_NETWORK_PYTHON_SEED_BASE=EXACT")
         print("ALPHA4_NETWORK_PYTHON_SEMANTIC_SOURCE_DEPENDENCY=NONE")
         print("ALPHA4_NETWORK_PYTHON_GENERATOR_DEPENDENCY=NONE")

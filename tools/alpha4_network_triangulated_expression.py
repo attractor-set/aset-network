@@ -33,6 +33,7 @@ from tools.alpha4_network_paired_expression import (
 )
 from tools.alpha4_network_relational_expression import (
     federation_relational_edges_from_source,
+    relational_exact_observation_from_source,
     validate_all_relational_sources,
     validate_federation_identity_guards,
 )
@@ -191,23 +192,29 @@ def _interface_validator_independence() -> int:
         "target_context": "t0",
         "evidence_digest": "sha256:" + "0" * 64,
     }
-    invalid = [
-        {**valid, "evidence_digest": "NOT-A-SHA256"},
-        {key: value for key, value in valid.items() if key != "source_context"},
-        {**valid, "extra": "x"},
-    ]
-    require(
-        exact_observation(valid) and causal_exact_observation(valid),
-        "valid interface record rejected",
+    cases: list[tuple[dict[str, object], bool]] = [(valid, True)]
+    for field in tuple(valid):
+        cases.append(({key: value for key, value in valid.items() if key != field}, False))
+    cases.extend(
+        [
+            ({**valid, "extra": "x"}, False),
+            ({**valid, "import_id": ""}, False),
+            ({**valid, "source_context": 1}, False),
+            ({**valid, "target_context": None}, False),
+            ({**valid, "evidence_digest": "NOT-A-SHA256"}, False),
+            ({**valid, "evidence_digest": "sha256:" + "g" * 64}, False),
+            ({**valid, "evidence_digest": "sha256:" + "0" * 63}, False),
+        ]
     )
-    checks = 1
-    for value in invalid:
+    for value, expected in cases:
+        operational = exact_observation(value)
+        relational = relational_exact_observation_from_source(value)
+        causal = causal_exact_observation(value)
         require(
-            exact_observation(value) == causal_exact_observation(value) is False,
-            "operational/causal interface validators disagree",
+            operational == relational == causal == expected,
+            "operational/relational/causal interface validators disagree",
         )
-        checks += 1
-    return checks
+    return len(cases)
 
 
 def _core_triangulation(net: CausalNet) -> tuple[int, int]:

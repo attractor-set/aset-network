@@ -6,7 +6,10 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
-from tools.alpha4_network_relational_expression import relational_admit_from_source
+from tools.alpha4_network_relational_expression import (
+    relational_admit_from_source,
+    relational_exact_observation_from_source,
+)
 
 ROOT = Path(__file__).resolve().parents[1]
 FORTH = ROOT / "network/alpha4/operational/components.forth"
@@ -97,7 +100,7 @@ def operational_admit(
 def relational_admit(
     imports: list[dict[str, Any]], observation: dict[str, Any]
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    if not exact_observation(observation):
+    if not relational_exact_observation_from_source(observation):
         return deepcopy(imports), _result(False, "INVALID_IMPORT", False)
     return relational_admit_from_source(imports, observation)
 
