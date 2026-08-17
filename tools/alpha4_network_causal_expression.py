@@ -1,13 +1,31 @@
 from __future__ import annotations
 
+import re
 from copy import deepcopy
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from tools.alpha4_network_paired_expression import exact_observation
+from tools.alpha4_network_manifest import parse_network_manifests
 
 ROOT = Path(__file__).resolve().parents[1]
+
+CAUSAL_OBSERVATION_FIELDS = {
+    "import_id",
+    "source_context",
+    "target_context",
+    "evidence_digest",
+}
+
+
+def causal_exact_observation(value: dict[str, Any]) -> bool:
+    if set(value) != CAUSAL_OBSERVATION_FIELDS:
+        return False
+    if not all(
+        isinstance(value[field], str) and value[field] for field in CAUSAL_OBSERVATION_FIELDS
+    ):
+        return False
+    return re.fullmatch(r"sha256:[0-9a-f]{64}", value["evidence_digest"]) is not None
 
 
 class CausalExpressionError(RuntimeError):
@@ -392,16 +410,15 @@ def _manifest_causal_bindings(path: Path) -> tuple[str, dict[str, str]]:
 
 
 def load_causal_nets(root: Path = ROOT) -> dict[str, CausalNet]:
+    plan = parse_network_manifests(root).by_name()
     nets: dict[str, CausalNet] = {}
-    for key, (manifest_rel, causal_rel, subject_id, mode) in SUBJECTS.items():
-        manifest = root / manifest_rel
-        causal = root / causal_rel
-        require(manifest.is_file(), f"manifest missing: {manifest_rel}")
-        require(causal.is_file(), f"causal source missing: {causal_rel}")
-        model, bindings = _manifest_causal_bindings(manifest)
-        require(model == causal_rel.as_posix(), f"causal model binding mismatch: {key}")
+    for key, (_, _, subject_id, mode) in SUBJECTS.items():
+        subject = plan[key]
+        causal = root / subject.causal_model
+        require(causal.is_file(), f"causal source missing: {subject.causal_model}")
         net = parse_causal_net(causal, subject_id, mode)
         actual = {item.component_id: item.symbol for item in net.transitions}
+        bindings = {item.component_id: item.causal_transition for item in subject.causal_bindings}
         require(actual == bindings, f"causal component binding mismatch: {key}")
         validate_causal_contract(key, net)
         nets[key] = net
@@ -426,7 +443,7 @@ def _bool(value: str) -> bool:
 def causal_admit(
     imports: list[dict[str, Any]], observation: dict[str, Any], net: CausalNet
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
-    if not exact_observation(observation):
+    if not causal_exact_observation(observation):
         return deepcopy(imports), {
             "accepted": False,
             "code": "INVALID_IMPORT",

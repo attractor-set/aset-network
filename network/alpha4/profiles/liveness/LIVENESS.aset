@@ -41,5 +41,6 @@ CAUSAL-BIND ASET-NETWORK-LIVENESS-OBSERVATION-CLAIM EVENTUALLY-OBSERVED-CLAIM
 CAUSAL-BIND ASET-NETWORK-LIVENESS-RESOLUTION-CLAIM EVENTUALLY-RESOLVED-CLAIM
 CAUSAL-BIND ASET-NETWORK-LIVENESS-TERMINAL-RESULT RESOLVED-RESULT-PERMITTED
 RELATION OPERATIONAL_CAUSAL_INTERFACE EXACT_STACK_CLOSED_WORLD_CAUSAL_CONTRACT
-PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/liveness/formal/LivenessOperationalRelationalPairingProofs.tla LivenessOperationalRelationalPairing
-PROOF BOUNDARY network/alpha4/profiles/liveness/formal/LivenessBoundaryProofs.tla LivenessPreservesOwnershipBoundary
+RELATION RELATIONAL_SOURCE BOUND_TLA_OPERATOR_DERIVATION
+PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/liveness/formal/LivenessOperationalRelationalPairingProofs.tla LivenessOperationalRelationalPairing 9
+PROOF BOUNDARY network/alpha4/profiles/liveness/formal/LivenessBoundaryProofs.tla LivenessPreservesOwnershipBoundary 7

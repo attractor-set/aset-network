@@ -13,19 +13,28 @@ from tools.alpha4_network_causal_expression import (
     CausalExpressionError,
     CausalNet,
     causal_admit,
+    causal_exact_observation,
     load_causal_nets,
     predicate_value,
 )
+from tools.alpha4_network_manifest import parse_network_manifests
 from tools.alpha4_network_paired_expression import (
     EXPECTED_STACK_EFFECTS as CORE_EXPECTED_STACK_EFFECTS,
 )
 from tools.alpha4_network_paired_expression import (
     bounded_pairing_check,
+    exact_observation,
+    field_sensitivity_check,
     operational_admit,
     relational_admit,
 )
 from tools.alpha4_network_paired_expression import (
     parse_operational_words as parse_core_operational_words,
+)
+from tools.alpha4_network_relational_expression import (
+    federation_relational_edges_from_source,
+    validate_all_relational_sources,
+    validate_federation_identity_guards,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -162,46 +171,43 @@ def _parse_forth(path: Path) -> dict[str, tuple[str, ...]]:
     return words
 
 
-def _validate_representation_sources() -> None:
-    manifests = (
-        ROOT / "network/alpha4/NETWORK.aset",
-        PROFILES / "dynamic/DYNAMIC.aset",
-        PROFILES / "federation/FEDERATION.aset",
-        PROFILES / "liveness/LIVENESS.aset",
-        PROFILES / "composition/federation-liveness/FEDERATION_LIVENESS.aset",
-    )
-    for manifest in manifests:
-        lines = [
-            line.strip()
-            for line in manifest.read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        require("SEMANTIC-PRECEDENCE NONE" in lines, f"semantic precedence drift: {manifest}")
+def _validate_representation_sources() -> int:
+    plan = parse_network_manifests(ROOT)
+    for subject in plan.subjects:
+        sources = (subject.operational, subject.relational, subject.causal_model)
         require(
-            ("RELATION OPERATIONAL_CAUSAL_INTERFACE EXACT_STACK_CLOSED_WORLD_CAUSAL_CONTRACT")
-            in lines,
-            f"operational/causal interface relation missing: {manifest}",
+            len(set(sources)) == 3,
+            f"representation sources are not independent paths: {subject.name}",
         )
-        if manifest == PROFILES / "federation/FEDERATION.aset":
-            require(
-                "RELATION OPERATIONAL_CAUSAL_RESULT OBSERVABLE_RESULT_CODE_CONGRUENCE" in lines,
-                "federation operational/causal result relation missing",
-            )
-        sources: dict[str, str] = {}
-        for line in lines:
-            tokens = line.split()
-            if tokens[0] in {"OPERATIONAL", "RELATIONAL", "CAUSAL-MODEL"}:
-                sources[tokens[0]] = tokens[1]
-        require(
-            set(sources) == {"OPERATIONAL", "RELATIONAL", "CAUSAL-MODEL"},
-            f"three-way source binding incomplete: {manifest}",
-        )
-        require(
-            len(set(sources.values())) == 3,
-            f"representation sources are not independent paths: {manifest}",
-        )
-        for source in sources.values():
+        for source in sources:
             require((ROOT / source).is_file(), f"bound representation source missing: {source}")
+    return validate_all_relational_sources(ROOT)
+
+
+def _interface_validator_independence() -> int:
+    valid = {
+        "import_id": "i0",
+        "source_context": "s0",
+        "target_context": "t0",
+        "evidence_digest": "sha256:" + "0" * 64,
+    }
+    invalid = [
+        {**valid, "evidence_digest": "NOT-A-SHA256"},
+        {key: value for key, value in valid.items() if key != "source_context"},
+        {**valid, "extra": "x"},
+    ]
+    require(
+        exact_observation(valid) and causal_exact_observation(valid),
+        "valid interface record rejected",
+    )
+    checks = 1
+    for value in invalid:
+        require(
+            exact_observation(value) == causal_exact_observation(value) is False,
+            "operational/causal interface validators disagree",
+        )
+        checks += 1
+    return checks
 
 
 def _core_triangulation(net: CausalNet) -> tuple[int, int]:
@@ -422,69 +428,8 @@ def _operational_federation_edges(state: FederationState) -> set[FederationEdge]
     return out
 
 
-def _validate_federation_relational_source() -> None:
-    text = FEDERATION_TLA.read_text(encoding="utf-8")
-    for operator in (
-        "FederationGenesis",
-        "MemberJoin",
-        "RouteGrant",
-        "ExportArtifact",
-        "SuspendRoute",
-        "MemberWithdraw",
-    ):
-        require(
-            re.search(rf"(?m)^{operator}\(", text) is not None,
-            f"federation relational operator missing: {operator}",
-        )
-    require(
-        text.count("networkAfter = networkBefore") == 6,
-        "federation relational Network-stutter surface drift",
-    )
-
-
 def _relational_federation_edges(state: FederationState) -> set[FederationEdge]:
-    _validate_federation_relational_source()
-    created, member_a, member_b, route_state, has_export = state
-    edges: set[FederationEdge] = set()
-    if created is False:
-        edges.add(
-            (
-                FEDERATION_COMPONENTS["genesis"],
-                "-",
-                (True, member_a, member_b, route_state, has_export),
-            )
-        )
-    for actor, index, value in (("A", 1, member_a), ("B", 2, member_b)):
-        if created and value == 0:
-            target = list(state)
-            target[index] = 1
-            edges.add((FEDERATION_COMPONENTS["join"], actor, tuple(target)))
-    if created and member_a == 1 and member_b == 1 and route_state == 0:
-        edges.add(
-            (FEDERATION_COMPONENTS["grant"], "A-B", (created, member_a, member_b, 1, has_export))
-        )
-    if route_state == 1 and has_export is False:
-        edges.add(
-            (
-                FEDERATION_COMPONENTS["export"],
-                "A-B",
-                (created, member_a, member_b, route_state, True),
-            )
-        )
-    if route_state == 1:
-        edges.add(
-            (
-                FEDERATION_COMPONENTS["suspend"],
-                "A-B",
-                (created, member_a, member_b, 2, has_export),
-            )
-        )
-    for actor, index, value in (("A", 1, member_a), ("B", 2, member_b)):
-        if value == 1 and route_state != 1:
-            target = list(state)
-            target[index] = 2
-            edges.add((FEDERATION_COMPONENTS["withdraw"], actor, tuple(target)))
-    return edges
+    return federation_relational_edges_from_source(state)
 
 
 def _causal_federation_apply(
@@ -626,12 +571,17 @@ def _validate_operational_causal_contracts(nets: dict[str, CausalNet]) -> tuple[
 
 def check_triangulated_assurance(root: Path = ROOT) -> dict[str, Any]:
     require(root.resolve() == ROOT.resolve(), "alternate root is not supported by this checker")
-    _validate_representation_sources()
+    relational_derivations = _validate_representation_sources()
+    federation_identity_guards = validate_federation_identity_guards(ROOT)
+    interface_validator_cases = _interface_validator_independence()
     nets = load_causal_nets(root)
     stack_contracts, causal_contracts, result_bindings = _validate_operational_causal_contracts(
         nets
     )
     core_cases, accepted = _core_triangulation(nets["network"])
+    core_field_sensitivity = field_sensitivity_check()
+    dynamic_binding_sensitivity = profile_pair.bounded_dynamic_binding_field_sensitivity_check()
+    composition_identity_sensitivity = profile_pair.bounded_composition_identity_sensitivity_check()
     dynamic_cases = _dynamic_triangulation(nets["dynamic"])
     federation_states, federation_edges = _federation_triangulation(nets["federation"])
     liveness_cases = _liveness_triangulation(nets["liveness"])
@@ -651,6 +601,12 @@ def check_triangulated_assurance(root: Path = ROOT) -> dict[str, Any]:
         "operational_stack_contracts": stack_contracts,
         "causal_closed_world_contracts": causal_contracts,
         "federation_result_code_bindings": result_bindings,
+        "relational_source_derivations": relational_derivations,
+        "federation_identity_guard_derivations": federation_identity_guards,
+        "interface_validator_cases": interface_validator_cases,
+        "core_field_sensitivity": core_field_sensitivity,
+        "dynamic_binding_sensitivity": dynamic_binding_sensitivity,
+        "composition_identity_sensitivity": composition_identity_sensitivity,
         "core_cases": core_cases,
         "core_accepted": accepted,
         "dynamic_cases": dynamic_cases,
@@ -674,6 +630,12 @@ def print_evidence(evidence: dict[str, Any]) -> None:
     stacks = evidence["operational_stack_contracts"]
     causal_contracts = evidence["causal_closed_world_contracts"]
     result_bindings = evidence["federation_result_code_bindings"]
+    relational_derivations = evidence["relational_source_derivations"]
+    federation_identity_guards = evidence["federation_identity_guard_derivations"]
+    interface_validator_cases = evidence["interface_validator_cases"]
+    core_field_sensitivity = evidence["core_field_sensitivity"]
+    dynamic_binding_sensitivity = evidence["dynamic_binding_sensitivity"]
+    composition_identity_sensitivity = evidence["composition_identity_sensitivity"]
     print("ALPHA4_NETWORK_ASSURANCE_REPRESENTATIONS=OPERATIONAL,RELATIONAL,CAUSAL")
     print("ALPHA4_NETWORK_SEMANTIC_PRECEDENCE=NONE")
     print(f"ALPHA4_NETWORK_OPERATIONAL_RELATIONAL_CONGRUENCE={core}/{core} PASS")
@@ -692,6 +654,30 @@ def print_evidence(evidence: dict[str, Any]) -> None:
     print(
         "ALPHA4_FEDERATION_OPERATIONAL_CAUSAL_RESULT_CODES="
         f"{result_bindings}/{result_bindings} PASS"
+    )
+    print(
+        "ALPHA4_NETWORK_RELATIONAL_SOURCE_DERIVATIONS="
+        f"{relational_derivations}/{relational_derivations} PASS"
+    )
+    print(
+        "ALPHA4_FEDERATION_IDENTITY_GUARD_DERIVATIONS="
+        f"{federation_identity_guards}/{federation_identity_guards} PASS"
+    )
+    print(
+        "ALPHA4_NETWORK_INTERFACE_VALIDATOR_INDEPENDENCE="
+        f"{interface_validator_cases}/{interface_validator_cases} PASS"
+    )
+    print(
+        "ALPHA4_NETWORK_CORE_FIELD_SENSITIVITY="
+        f"{core_field_sensitivity}/{core_field_sensitivity} PASS"
+    )
+    print(
+        "ALPHA4_DYNAMIC_BINDING_FIELD_SENSITIVITY="
+        f"{dynamic_binding_sensitivity}/{dynamic_binding_sensitivity} PASS"
+    )
+    print(
+        "ALPHA4_FEDERATION_LIVENESS_IDENTITY_SENSITIVITY="
+        f"{composition_identity_sensitivity}/{composition_identity_sensitivity} PASS"
     )
     print("ALPHA4_NETWORK_REPRESENTATION_SOURCE_INDEPENDENCE=PASS")
     print("ALPHA4_NETWORK_TRIANGULATED_EXPRESSION=PASS")

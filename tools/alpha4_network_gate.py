@@ -8,6 +8,8 @@ ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = [
     [sys.executable, "-m", "tools.validate_repository_minimal"],
     [sys.executable, "-m", "tools.validate_alpha4_network"],
+    [sys.executable, "-m", "tools.alpha4_network_manifest"],
+    [sys.executable, "-m", "tools.alpha4_network_relational_expression"],
     [sys.executable, "-m", "tools.alpha4_network_profiles_gate"],
     [sys.executable, "-m", "tools.alpha4_network_assurance"],
 ]
@@ -19,6 +21,7 @@ def main() -> int:
         if result.returncode:
             print("ALPHA4_NETWORK_GATE=FAIL")
             return result.returncode
+    print("ALPHA4_NETWORK_GATE_SCOPE=LOCAL_SEMANTIC_NO_TLAPS_NO_PYTEST")
     print("ALPHA4_NETWORK_GATE=PASS")
     return 0
 
