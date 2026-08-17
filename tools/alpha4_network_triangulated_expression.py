@@ -22,6 +22,9 @@ from tools.alpha4_network_paired_expression import (
     EXPECTED_STACK_EFFECTS as CORE_EXPECTED_STACK_EFFECTS,
 )
 from tools.alpha4_network_paired_expression import (
+    EXPECTED_STACK_EFFECTS as CORE_EXPECTED_STACK_EFFECTS,
+)
+from tools.alpha4_network_paired_expression import (
     bounded_pairing_check,
     exact_observation,
     field_sensitivity_check,
