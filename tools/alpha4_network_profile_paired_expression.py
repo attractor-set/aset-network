@@ -4,6 +4,18 @@ import itertools
 import re
 from pathlib import Path
 
+from tools.alpha4_network_relational_expression import (
+    composition_relational_boundary_from_source,
+    composition_relational_capabilities_from_source,
+    composition_relational_progress_from_source,
+    composition_relational_witness_from_source,
+    derive_dynamic_contract,
+    dynamic_relational_applicable_from_source,
+    dynamic_relational_stutter_from_source,
+    liveness_relational_claim_from_source,
+    liveness_relational_result_from_source,
+)
+
 ROOT = Path(__file__).resolve().parents[1]
 PROFILES = ROOT / "network/alpha4/profiles"
 
@@ -163,7 +175,8 @@ def dynamic_operational_applicable(exact_binding: bool, recognition: str) -> boo
 
 
 def dynamic_relational_applicable(exact_binding: bool, recognition: str) -> bool:
-    return exact_binding and recognition == "ALLOW"
+    contract = derive_dynamic_contract()
+    return exact_binding and recognition == contract.recognition
 
 
 def dynamic_operational_stutter(before: str, after: str) -> bool:
@@ -171,7 +184,58 @@ def dynamic_operational_stutter(before: str, after: str) -> bool:
 
 
 def dynamic_relational_stutter(before: str, after: str) -> bool:
-    return after == before
+    return dynamic_relational_stutter_from_source(before, after)
+
+
+def bounded_dynamic_binding_field_sensitivity_check() -> int:
+    binding = {
+        "profile": "p0",
+        "target_context": "c0",
+        "target_state_root": "r0",
+        "target_policy_epoch": "e0",
+        "seed_scope": "s0",
+    }
+    seed = {
+        "context": "c0",
+        "state_root": "r0",
+        "question": "p0",
+        "policy_epoch": "e0",
+        "scope": "s0",
+    }
+    require_words(DYNAMIC_FORTH, EXPECTED_DYNAMIC_WORDS)
+    checks = 0
+    if not dynamic_relational_applicable_from_source(binding, seed, "ALLOW"):
+        raise RuntimeError("dynamic exact concrete binding unexpectedly rejected")
+    checks += 1
+    variants = {
+        "context": "c1",
+        "state_root": "r1",
+        "question": "p1",
+        "policy_epoch": "e1",
+        "scope": "s1",
+    }
+    for field, value in variants.items():
+        changed = dict(seed)
+        changed[field] = value
+        operational = changed == seed
+        relational = dynamic_relational_applicable_from_source(binding, changed, "ALLOW")
+        if operational != relational:
+            raise RuntimeError(f"dynamic binding field sensitivity mismatch: {field}")
+        checks += 1
+    return checks
+
+
+def bounded_composition_identity_sensitivity_check() -> int:
+    export = "e0"
+    sets = (set(), {"e0"}, {"e1"}, {"e0", "e1"})
+    checks = 0
+    for exported, delivered in itertools.product(sets, repeat=2):
+        operational = composition_operational_delivery_witness(exported, delivered, export)
+        relational = composition_relational_delivery_witness(exported, delivered, export)
+        if operational != relational:
+            raise RuntimeError("composition foreign-export identity sensitivity mismatch")
+        checks += 1
+    return checks
 
 
 def bounded_dynamic_pairing_check() -> int:
@@ -200,10 +264,7 @@ def liveness_operational_delivered(assumptions: set[str]) -> bool:
 
 
 def liveness_relational_delivered(assumptions: set[str]) -> bool:
-    return {
-        "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
-        "NO_PERMANENT_TARGET_UNAVAILABILITY",
-    } <= assumptions
+    return liveness_relational_claim_from_source("EventuallyDeliveredClaim", assumptions)
 
 
 def liveness_operational_observed(assumptions: set[str]) -> bool:
@@ -215,11 +276,7 @@ def liveness_operational_observed(assumptions: set[str]) -> bool:
 
 
 def liveness_relational_observed(assumptions: set[str]) -> bool:
-    return {
-        "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
-        "EVENTUAL_TARGET_OBSERVATION",
-        "NO_PERMANENT_TARGET_UNAVAILABILITY",
-    } <= assumptions
+    return liveness_relational_claim_from_source("EventuallyObservedClaim", assumptions)
 
 
 def liveness_operational_resolved(assumptions: set[str]) -> bool:
@@ -227,7 +284,9 @@ def liveness_operational_resolved(assumptions: set[str]) -> bool:
 
 
 def liveness_relational_resolved(assumptions: set[str]) -> bool:
-    return LIVENESS_ASSUMPTIONS <= assumptions
+    return liveness_relational_claim_from_source(
+        "EventuallyTargetLocalSeedResolvedClaim", assumptions
+    )
 
 
 def liveness_operational_result_permitted(result: str) -> bool:
@@ -235,7 +294,7 @@ def liveness_operational_result_permitted(result: str) -> bool:
 
 
 def liveness_relational_result_permitted(result: str) -> bool:
-    return result in SEED_TERMINAL_RESULTS
+    return liveness_relational_result_from_source(result)
 
 
 def bounded_liveness_pairing_check() -> int:
@@ -265,7 +324,7 @@ def composition_operational_capabilities(provided: set[str]) -> bool:
 
 
 def composition_relational_capabilities(provided: set[str]) -> bool:
-    return REQUIRED_CAPABILITIES <= provided
+    return composition_relational_capabilities_from_source(provided)
 
 
 def composition_operational_boundary(
@@ -283,11 +342,8 @@ def composition_relational_boundary(
     transition_transfer: bool,
     authority_transfer: bool,
 ) -> bool:
-    return (
-        parent_relation is False
-        and state_transfer is False
-        and transition_transfer is False
-        and authority_transfer is False
+    return composition_relational_boundary_from_source(
+        parent_relation, state_transfer, transition_transfer, authority_transfer
     )
 
 
@@ -300,7 +356,9 @@ def composition_operational_delivery_witness(
 def composition_relational_delivery_witness(
     exported: set[str], delivered: set[str], export: str
 ) -> bool:
-    return export in exported and export in delivered
+    return composition_relational_witness_from_source(
+        "DeliveryWitness", {"exported": exported, "delivered": delivered}, export
+    )
 
 
 def composition_operational_observation_witness(
@@ -312,7 +370,9 @@ def composition_operational_observation_witness(
 def composition_relational_observation_witness(
     delivered: set[str], observed: set[str], export: str
 ) -> bool:
-    return export in delivered and export in observed
+    return composition_relational_witness_from_source(
+        "ObservationWitness", {"delivered": delivered, "observed": observed}, export
+    )
 
 
 def composition_operational_resolution_witness(
@@ -324,7 +384,9 @@ def composition_operational_resolution_witness(
 def composition_relational_resolution_witness(
     observed: set[str], resolved: set[str], export: str
 ) -> bool:
-    return export in observed and export in resolved
+    return composition_relational_witness_from_source(
+        "ResolutionWitness", {"observed": observed, "resolved": resolved}, export
+    )
 
 
 def composition_operational_progress_witness(
@@ -348,10 +410,8 @@ def composition_relational_progress_witness(
     resolved: set[str],
     export: str,
 ) -> bool:
-    return (
-        composition_relational_delivery_witness(exported, delivered, export)
-        and composition_relational_observation_witness(delivered, observed, export)
-        and composition_relational_resolution_witness(observed, resolved, export)
+    return composition_relational_progress_from_source(
+        exported, delivered, observed, resolved, export
     )
 
 
@@ -406,15 +466,22 @@ def bounded_composition_pairing_check() -> int:
 
 def main() -> int:
     dynamic = bounded_dynamic_pairing_check()
+    dynamic_fields = bounded_dynamic_binding_field_sensitivity_check()
     liveness = bounded_liveness_pairing_check()
     composition = bounded_composition_pairing_check()
+    composition_identity = bounded_composition_identity_sensitivity_check()
     total = dynamic + liveness + composition
     print("ALPHA4_DYNAMIC_OPERATIONAL_WORDS=2/2 PASS")
     print(f"ALPHA4_DYNAMIC_PAIRED_CASES={dynamic}/{dynamic} PASS")
+    print(f"ALPHA4_DYNAMIC_BINDING_FIELD_SENSITIVITY={dynamic_fields}/{dynamic_fields} PASS")
     print("ALPHA4_LIVENESS_OPERATIONAL_WORDS=4/4 PASS")
     print(f"ALPHA4_LIVENESS_PAIRED_CASES={liveness}/{liveness} PASS")
     print("ALPHA4_FEDERATION_LIVENESS_OPERATIONAL_WORDS=6/6 PASS")
     print(f"ALPHA4_FEDERATION_LIVENESS_PAIRED_CASES={composition}/{composition} PASS")
+    print(
+        "ALPHA4_FEDERATION_LIVENESS_IDENTITY_SENSITIVITY="
+        f"{composition_identity}/{composition_identity} PASS"
+    )
     print(f"ALPHA4_PROFILE_OPERATIONAL_RELATIONAL_PAIRED_CASES={total}/{total} PASS")
     print("ALPHA4_NETWORK_PROFILE_PAIRED_EXPRESSION=PASS")
     return 0

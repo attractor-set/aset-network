@@ -5,6 +5,7 @@ import hashlib
 import re
 from pathlib import Path
 
+from tools.alpha4_network_manifest import parse_network_manifests
 from tools.validate_repository_minimal import repository_paths
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -226,8 +227,11 @@ def main() -> int:
     validate_network_surface()
     validate_history_boundary()
     validate_project_identity()
+    plan = parse_network_manifests(ROOT)
     sources = parse_binding()
 
+    print(f"ALPHA4_NETWORK_MANIFEST_SUBJECTS={len(plan.subjects)}/{len(plan.subjects)} PASS")
+    print("ALPHA4_NETWORK_BINDING_PLAN=PASS")
     print("ASET_NETWORK_CURRENT_REPRESENTATION=ASET-NETWORK-ALPHA4")
     print("ASET_NETWORK_CURRENT_PROJECT_VERSION=0.1.0-alpha.4")
     print("ASET_NETWORK_CURRENT_SELECTION=UNIQUE_ACTIVE_NETWORK_LINE")

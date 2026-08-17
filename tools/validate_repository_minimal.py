@@ -108,6 +108,8 @@ ALLOWED_ACTIVE_PATHS = {
     "tools/alpha4_network_release_profiles.py",
     "tools/alpha4_network_seed_extension.py",
     "tools/alpha4_network_causal_expression.py",
+    "tools/alpha4_network_manifest.py",
+    "tools/alpha4_network_relational_expression.py",
     "tools/alpha4_network_gate.py",
     "tools/alpha4_network_paired_expression.py",
     "tools/alpha4_network_profile_paired_expression.py",

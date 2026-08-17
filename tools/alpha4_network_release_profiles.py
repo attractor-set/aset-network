@@ -6,6 +6,7 @@ import shutil
 from pathlib import Path
 from typing import Any
 
+from tools.alpha4_network_manifest import parse_network_manifests
 from tools.alpha4_network_seed_extension import (
     check_seed_companion_bases,
     parse_seed_binding,
@@ -36,34 +37,23 @@ def require(condition: bool, message: str) -> None:
 
 
 def _manifest_records(root: Path = ROOT) -> list[dict[str, str]]:
+    plan = parse_network_manifests(root)
     records: list[dict[str, str]] = []
-    for subject, relative in SUBJECT_MANIFESTS:
-        lines = [
-            line.strip()
-            for line in (root / relative).read_text(encoding="utf-8").splitlines()
-            if line.strip()
-        ]
-        causal = {}
-        for line in lines:
-            if line.startswith("CAUSAL-BIND "):
-                _, component_id, causal_transition = line.split()
-                causal[component_id] = causal_transition
-        for line in lines:
-            if not line.startswith("PAIR "):
-                continue
-            parts = line.split()
-            require(len(parts) == 6, f"bad PAIR declaration in {relative}: {line}")
-            _, component_id, transition_binding, relational, _reflection, pairing = parts
-            require(component_id in causal, f"causal binding missing for {component_id}")
-            operational = transition_binding
-            if subject == "NETWORK":
+    for subject_plan in plan.subjects:
+        subject = subject_plan.name.upper()
+        causal = {
+            item.component_id: item.causal_transition for item in subject_plan.causal_bindings
+        }
+        for pair in subject_plan.pairs:
+            operational = pair.transition
+            if subject_plan.name == "network":
                 operational = {
                     "ASET-NETWORK-COMPONENT-ADMIT-FRESH": "ADMIT-FRESH",
                     "ASET-NETWORK-COMPONENT-ADMIT-REPLAY": "ADMIT-REPLAY",
                     "ASET-NETWORK-COMPONENT-REJECT-CONFLICT": "REJECT-CONFLICT",
-                }[component_id]
+                }[pair.component_id]
             seed_extension = "NONE"
-            if subject == "NETWORK" and component_id in {
+            if subject_plan.name == "network" and pair.component_id in {
                 "ASET-NETWORK-COMPONENT-ADMIT-FRESH",
                 "ASET-NETWORK-COMPONENT-ADMIT-REPLAY",
             }:
@@ -71,12 +61,12 @@ def _manifest_records(root: Path = ROOT) -> list[dict[str, str]]:
             records.append(
                 {
                     "subject": subject,
-                    "component_id": component_id,
-                    "transition_binding": transition_binding,
+                    "component_id": pair.component_id,
+                    "transition_binding": pair.transition,
                     "operational": operational,
-                    "relational": relational,
-                    "causal": causal[component_id],
-                    "pairing": pairing,
+                    "relational": pair.formal_operator,
+                    "causal": causal[pair.component_id],
+                    "pairing": pair.pairing_theorem,
                     "seed_extension": seed_extension,
                 }
             )

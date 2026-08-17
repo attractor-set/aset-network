@@ -6,6 +6,8 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from tools.alpha4_network_relational_expression import relational_admit_from_source
+
 ROOT = Path(__file__).resolve().parents[1]
 FORTH = ROOT / "network/alpha4/operational/components.forth"
 
@@ -97,13 +99,48 @@ def relational_admit(
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not exact_observation(observation):
         return deepcopy(imports), _result(False, "INVALID_IMPORT", False)
-    identical = observation in imports
-    identifier_exists = any(item["import_id"] == observation["import_id"] for item in imports)
-    if identical:
-        return deepcopy(imports), _result(True, "IDEMPOTENT_REPLAY", False)
-    if identifier_exists:
-        return deepcopy(imports), _result(False, "IDENTIFIER_CONFLICT", False)
-    return [*deepcopy(imports), deepcopy(observation)], _result(True, "IMPORT_ADMITTED", True)
+    return relational_admit_from_source(imports, observation)
+
+
+def field_sensitivity_check() -> int:
+    digests = ["sha256:" + (ch * 64) for ch in ("0", "1")]
+    base = {
+        "import_id": "i0",
+        "source_context": "s0",
+        "target_context": "t0",
+        "evidence_digest": digests[0],
+    }
+    variants = []
+    replacements = {
+        "import_id": "i1",
+        "source_context": "s1",
+        "target_context": "t1",
+        "evidence_digest": digests[1],
+    }
+    for field, replacement in replacements.items():
+        value = dict(base)
+        value[field] = replacement
+        variants.append((field, value))
+
+    checks = 0
+    for field, variant in variants:
+        state = [deepcopy(base)]
+        operational = operational_admit(state, variant)
+        relational = relational_admit(state, variant)
+        if operational != relational:
+            raise RuntimeError(f"field sensitivity mismatch: {field}")
+        checks += 1
+
+    first = {**base, "import_id": "i1"}
+    second = deepcopy(base)
+    candidate = deepcopy(second)
+    state = [first, second]
+    operational = operational_admit(state, candidate)
+    relational = relational_admit(state, candidate)
+    if operational != relational or operational[1]["code"] != "IDEMPOTENT_REPLAY":
+        raise RuntimeError("multi-record second-position identity sensitivity mismatch")
+    checks += 1
+    return checks
 
 
 def _result(accepted: bool, code: str, changed: bool) -> dict[str, Any]:
@@ -161,9 +198,11 @@ def bounded_pairing_check() -> tuple[int, int]:
 def main() -> int:
     parse_operational_words()
     checks, accepted = bounded_pairing_check()
+    sensitivity = field_sensitivity_check()
     print("ALPHA4_NETWORK_OPERATIONAL_WORDS=3/3 PASS")
     print(f"ALPHA4_NETWORK_PAIRED_CASES={checks}/{checks} PASS")
     print(f"ALPHA4_NETWORK_ACCEPTED_PROJECTIONS={accepted} UNKNOWN/EFFECT_FALSE")
+    print(f"ALPHA4_NETWORK_FIELD_SENSITIVITY={sensitivity}/{sensitivity} PASS")
     print("ALPHA4_NETWORK_PAIRED_EXPRESSION=PASS")
     return 0
 
