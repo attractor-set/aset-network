@@ -134,7 +134,7 @@ def test_relational_source_derivation_and_sensitivity_are_first_class() -> None:
     evidence = check_triangulated_assurance()
     assert evidence["relational_source_derivations"] == 21
     assert evidence["federation_identity_guard_derivations"] == 12
-    assert evidence["interface_validator_cases"] == 4
+    assert evidence["interface_validator_cases"] == 12
     assert evidence["core_field_sensitivity"] == 5
     assert evidence["dynamic_binding_sensitivity"] == 6
     assert evidence["composition_identity_sensitivity"] == 16
@@ -186,7 +186,7 @@ def test_bound_federation_tla_guard_mutation_breaks_gate(tmp_path: Path) -> None
     path.write_text(text.replace(old, 'fs.members[context] = "ACTIVE"', 1), encoding="utf-8")
     status, output = _run_gate(repo)
     assert status != 0
-    assert "three-way" in output.lower() or "mismatch" in output.lower()
+    assert "relational canonical scope drift" in output.lower()
 
 
 def test_manifest_duplicate_precedence_breaks_gate(tmp_path: Path) -> None:
@@ -250,7 +250,7 @@ def test_federation_artifact_identity_guard_mutation_breaks_gate(tmp_path: Path)
     path.write_text(text.replace(old, "/\\ TRUE", 1), encoding="utf-8")
     status, output = _run_gate(repo)
     assert status != 0
-    assert "artifact domain guard missing" in output or "identity/domain guard" in output
+    assert "relational canonical scope drift" in output.lower()
 
 
 def test_network_tlaps_runner_rejects_reduced_proof_scope(tmp_path: Path) -> None:
@@ -289,3 +289,136 @@ def test_network_profile_tlaps_runner_rejects_reduced_proof_scope(tmp_path: Path
     )
     assert result.returncode != 0
     assert "SCOPE_DRIFT" in result.stdout
+
+
+def test_relational_and_proof_tla_scopes_are_closed_world(tmp_path: Path) -> None:
+    from tools.alpha4_network_manifest import ManifestError, parse_network_manifests
+
+    repo = _copy_repo(tmp_path / "relational")
+    relational = repo / "network/alpha4/formal/NetworkRelations.tla"
+    text = relational.read_text(encoding="utf-8")
+    marker = "/\\ o \\in ObservationUniverse"
+    assert marker in text
+    relational.write_text(text.replace(marker, marker + "\n    /\\ FALSE", 1), encoding="utf-8")
+    with pytest.raises(ManifestError, match="relational canonical scope drift"):
+        parse_network_manifests(repo)
+
+    repo = _copy_repo(tmp_path / "proof")
+    proof = repo / "network/alpha4/formal/OperationalRelationalPairingProofs.tla"
+    text = proof.read_text(encoding="utf-8")
+    theorem = "THEOREM AdmitFreshPairing =="
+    assert theorem in text
+    proof.write_text(text.replace(theorem, theorem + "\n  /\\ TRUE", 1), encoding="utf-8")
+    with pytest.raises(ManifestError, match="proof canonical scope drift"):
+        parse_network_manifests(repo)
+
+
+def test_network_airgap_rejects_repository_semantic_import() -> None:
+    from tools.alpha4_network_expression_airgap import (
+        NetworkExpressionAirgapError,
+        _validate_companion_ast,
+    )
+
+    source = "from tools.alpha4_network_relational_expression import derive_core_contract\n"
+    with pytest.raises(NetworkExpressionAirgapError, match="import forbidden"):
+        _validate_companion_ast(
+            source,
+            allowed_imports=frozenset({"hashlib", "pathlib", "typing"}),
+            allow_seed_loader=True,
+        )
+
+
+def test_network_airgap_rejects_import_smuggling_and_object_traversal() -> None:
+    from tools.alpha4_network_expression_airgap import (
+        NetworkExpressionAirgapError,
+        _validate_companion_ast,
+    )
+
+    with pytest.raises(NetworkExpressionAirgapError, match="import forbidden"):
+        _validate_companion_ast(
+            "from pathlib import os\n",
+            allowed_imports=frozenset({"hashlib", "pathlib", "typing"}),
+            allow_seed_loader=True,
+        )
+
+    with pytest.raises(NetworkExpressionAirgapError, match="private attribute forbidden"):
+        _validate_companion_ast(
+            "value = ().__class__\n",
+            allowed_imports=frozenset({"hashlib", "pathlib", "typing"}),
+            allow_seed_loader=True,
+        )
+
+
+def test_network_release_sensitivity_rejects_known_bug_classes() -> None:
+    from tools.alpha4_network_expression_airgap import (
+        NetworkExpressionAirgapError,
+        _check_composition_identity_sensitivity,
+        _check_core_identity_sensitivity,
+    )
+
+    def state(subject: str, authority: str) -> dict[str, object]:
+        return {
+            "subject": subject,
+            "authority": authority,
+            "recognition": "UNKNOWN",
+            "evidence": (),
+        }
+
+    def first_only_admit(imports, observation, seed_state):
+        same_id = [item for item in imports[:1] if item["import_id"] == observation["import_id"]]
+        if observation in same_id:
+            code = "IDEMPOTENT_REPLAY"
+            next_imports = list(imports)
+        elif same_id:
+            code = "IDENTIFIER_CONFLICT"
+            next_imports = list(imports)
+        else:
+            code = "IMPORT_ADMITTED"
+            next_imports = [*imports, dict(observation)]
+        return (
+            next_imports,
+            dict(seed_state),
+            {
+                "accepted": code != "IDENTIFIER_CONFLICT",
+                "code": code,
+                "state_changed": code == "IMPORT_ADMITTED",
+            },
+        )
+
+    with pytest.raises(NetworkExpressionAirgapError, match="second-position replay"):
+        _check_core_identity_sensitivity({"admit_import": first_only_admit}, {"state": state})
+
+    buggy = {
+        "delivery_witness": (lambda exported, delivered, export: bool(exported) and bool(delivered))
+    }
+    with pytest.raises(NetworkExpressionAirgapError, match="foreign-export identity"):
+        _check_composition_identity_sensitivity(buggy)
+
+
+def test_network_formal_reflection_scope_is_closed_world(tmp_path: Path) -> None:
+    from tools.alpha4_network_manifest import ManifestError, parse_network_manifests
+
+    repo = _copy_repo(tmp_path)
+    reflection = repo / "network/alpha4/formal/RestrictedOperationalSemantics.tla"
+    text = reflection.read_text(encoding="utf-8")
+    marker = "OperationalAdmitFresh(s, t, o, result) =="
+    assert marker in text
+    reflection.write_text(text.replace(marker, marker + "\n  /\\ TRUE", 1), encoding="utf-8")
+    with pytest.raises(ManifestError, match="formal reflection canonical scope drift"):
+        parse_network_manifests(repo)
+
+
+def test_network_tla_scope_preserves_comment_tokens_inside_strings(tmp_path: Path) -> None:
+    from tools.alpha4_network_manifest import ManifestError, parse_network_manifests
+
+    repo = _copy_repo(tmp_path)
+    relational = repo / "network/alpha4/formal/NetworkRelations.tla"
+    text = relational.read_text(encoding="utf-8")
+    marker = 'result = "IMPORT_ADMITTED"'
+    assert marker in text
+    relational.write_text(
+        text.replace(marker, 'result = "IMPORT_ADMITTED(*scope-drift*)"', 1),
+        encoding="utf-8",
+    )
+    with pytest.raises(ManifestError, match="relational canonical scope drift"):
+        parse_network_manifests(repo)

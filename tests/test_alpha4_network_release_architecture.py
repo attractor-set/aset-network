@@ -202,3 +202,51 @@ def test_post_build_verifier_is_isolated_and_bound_to_exact_seed_relation(
     assert tree_digest(release) == before
     assert not (release / ".tlacache").exists()
     assert not (seed / ".tlacache").exists()
+
+
+def test_network_airgap_executes_generated_companion_under_restricted_runtime(
+    tmp_path: Path, monkeypatch
+) -> None:
+    from tools import alpha4_network_expression_airgap as airgap
+
+    profiles = tmp_path / "profiles"
+    base = profiles / "base/seed/python/aset_seed_alpha4.py"
+    target = profiles / "python/aset_network_alpha4.py"
+    base.parent.mkdir(parents=True)
+    target.parent.mkdir(parents=True)
+    base.write_text(
+        "def state(subject, authority, recognition='UNKNOWN', evidence=()):\n"
+        "    return {'subject': subject, 'authority': authority, "
+        "'recognition': recognition, 'evidence': tuple(evidence)}\n"
+        "def apply_component(current, component_id, *, evidence=None, "
+        "authority_recognition=frozenset()):\n"
+        "    if component_id != 'ASET-COMPONENT-OBSERVE-UNKNOWN': "
+        "raise ValueError('component')\n"
+        "    if current['recognition'] != 'UNKNOWN': raise ValueError('recognition')\n"
+        "    result = dict(current); result['evidence'] = "
+        "tuple(sorted(set(current['evidence']) | {evidence})); return result\n",
+        encoding="utf-8",
+    )
+    digest = "sha256:" + hashlib.sha256(base.read_bytes()).hexdigest()
+    write_python(target, digest, _manifest_records())
+    binding = SeedBinding(
+        release_tag="seed-test",
+        release_tree="sha256:" + "0" * 64,
+        release_archive="sha256:" + "0" * 64,
+        profile_tree="sha256:" + "0" * 64,
+        profile_archive="sha256:" + "0" * 64,
+        sources={},
+        assurance_bases={},
+        companions={"PYTHON": ("base/seed/python/aset_seed_alpha4.py", digest)},
+    )
+    monkeypatch.setattr(airgap, "parse_seed_binding", lambda: binding)
+    evidence = airgap.check_airgap(profiles)
+    assert evidence["coverage"]["total_cases"] == 446
+    assert evidence["coverage"]["sensitivity_cases"] == 26
+    assert evidence["coverage"]["grand_total_cases"] == 472
+    assert evidence["assurance_dependencies"]["companion_import_surface"] == "RESTRICTED"
+    assert (
+        evidence["assurance_dependencies"]["companion_file_access"]
+        == "MATERIALIZED_PROFILE_TREE_READ_ONLY"
+    )
+    assert evidence["status"] == "PASS"

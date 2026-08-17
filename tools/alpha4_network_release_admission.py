@@ -200,9 +200,18 @@ def check_admission(
         "Network Python extension is not based on exact Seed Python companion",
     )
     coverage = airgap.get("coverage")
+    require(isinstance(coverage, dict), "Network Python air-gap coverage missing")
     require(
-        isinstance(coverage, dict) and coverage.get("total_cases") == 446,
-        "Network Python air-gap coverage mismatch",
+        coverage.get("total_cases") == 446,
+        "Network Python air-gap structural coverage mismatch",
+    )
+    require(
+        coverage.get("core_identity_sensitivity_cases") == 5
+        and coverage.get("composition_identity_sensitivity_cases") == 16
+        and coverage.get("federation_identity_sensitivity_cases") == 5
+        and coverage.get("sensitivity_cases") == 26
+        and coverage.get("grand_total_cases") == 472,
+        "Network Python air-gap identity sensitivity coverage mismatch",
     )
     require(airgap.get("status") == "PASS", "Network Python air-gap is not PASS")
     dependencies = airgap.get("assurance_dependencies")
@@ -210,7 +219,9 @@ def check_admission(
         isinstance(dependencies, dict)
         and dependencies.get("network_semantic_source") == "NONE"
         and dependencies.get("release_profile_generator") == "NONE"
-        and dependencies.get("triangulated_expression_checker") == "NONE",
+        and dependencies.get("triangulated_expression_checker") == "NONE"
+        and dependencies.get("companion_import_surface") == "RESTRICTED"
+        and dependencies.get("companion_file_access") == "MATERIALIZED_PROFILE_TREE_READ_ONLY",
         "Network Python air-gap independence boundary drift",
     )
 
@@ -301,7 +312,13 @@ def check_admission(
             "obligations_proved": proof_subject["obligations_proved"],
             "status": "PASS",
         },
-        "python_airgap": {"cases": coverage["total_cases"], "status": "PASS"},
+        "python_airgap": {
+            "structural_cases": coverage["total_cases"],
+            "identity_sensitivity_cases": coverage["sensitivity_cases"],
+            "grand_total_cases": coverage["grand_total_cases"],
+            "runtime_isolation": "PASS",
+            "status": "PASS",
+        },
         "public_assurance": {
             "identity": "ASET_NETWORK",
             "representation": "0.1.0-alpha.4",
@@ -345,6 +362,9 @@ def main() -> int:
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_ENGLISH_SEED_BASE=EXACT")
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_SEED_BASE=EXACT")
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_AIRGAP=446/446 PASS")
+        print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_AIRGAP_IDENTITY_SENSITIVITY=26/26 PASS")
+        print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_AIRGAP_GRAND_TOTAL=472/472 PASS")
+        print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_RUNTIME_ISOLATION=PASS")
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_ARCHIVE_BINDING=EXACT")
         print("ALPHA4_NETWORK_PUBLIC_ASSURANCE_REPRESENTATIONS=OPERATIONAL,RELATIONAL,CAUSAL")
         print("ALPHA4_NETWORK_PUBLIC_POST_BUILD_FORMAL_ASSURANCE=PASS")

@@ -157,13 +157,27 @@ def _result(accepted: bool, code: str, changed: bool) -> dict[str, Any]:
     }
 
 
+def relational_exact_observation_from_source(value: dict[str, Any], root: Path = ROOT) -> bool:
+    contract = derive_core_contract(root)
+    fields = set(contract.observation_fields)
+    if set(value) != fields:
+        return False
+    if not all(isinstance(value[field], str) and value[field] for field in fields):
+        return False
+    digest_fields = [field for field in contract.observation_fields if field.endswith("_digest")]
+    if len(digest_fields) != 1:
+        raise RelationalExpressionError("relational observation digest field is not singular")
+    digest = value[digest_fields[0]]
+    return bool(re.fullmatch(r"sha256:[0-9a-f]{64}", digest))
+
+
 def relational_admit_from_source(
     imports: list[dict[str, Any]], observation: dict[str, Any], root: Path = ROOT
 ) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     contract = derive_core_contract(root)
     require(
-        set(observation) == set(contract.observation_fields),
-        "relational observation field surface mismatch",
+        relational_exact_observation_from_source(observation, root),
+        "relational observation field/type surface mismatch",
     )
     identifier_exists = any(
         item[contract.identifier_field] == observation[contract.identifier_field]
