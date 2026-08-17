@@ -50,6 +50,43 @@ _FILESYSTEM_INSPECTION_METHODS = frozenset(
     }
 )
 
+_FILESYSTEM_MUTATION_METHODS = frozenset(
+    {
+        "write_text",
+        "write_bytes",
+        "unlink",
+        "rename",
+        "replace",
+        "mkdir",
+        "touch",
+        "chmod",
+        "symlink_to",
+        "hardlink_to",
+    }
+)
+
+_DENIED_RUNTIME_BUILTINS = frozenset(
+    {
+        "breakpoint",
+        "copyright",
+        "credits",
+        "delattr",
+        "dir",
+        "eval",
+        "exit",
+        "getattr",
+        "globals",
+        "help",
+        "input",
+        "license",
+        "locals",
+        "quit",
+        "setattr",
+        "type",
+        "vars",
+    }
+)
+
 
 class NetworkExpressionAirgapError(RuntimeError):
     pass
@@ -106,9 +143,18 @@ def _validate_companion_ast(
                 )
         elif isinstance(node, ast.Name) and node.id == "__builtins__":
             raise NetworkExpressionAirgapError("air-gap companion accesses __builtins__")
-        elif isinstance(node, ast.Attribute) and node.attr.startswith("_"):
-            raise NetworkExpressionAirgapError(
-                f"air-gap companion private attribute forbidden: {node.attr}"
+        elif isinstance(node, ast.Attribute):
+            if node.attr.startswith("_"):
+                raise NetworkExpressionAirgapError(
+                    f"air-gap companion private attribute forbidden: {node.attr}"
+                )
+            require(
+                node.attr not in _FILESYSTEM_INSPECTION_METHODS,
+                f"air-gap companion filesystem inspection forbidden: {node.attr}",
+            )
+            require(
+                node.attr not in _FILESYSTEM_MUTATION_METHODS,
+                f"air-gap companion filesystem mutation forbidden: {node.attr}",
             )
         elif isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
             if node.func.id in {
@@ -223,18 +269,78 @@ def execute(
             raise ImportError(f"air-gap companion import forbidden: {name}")
         return original_import(name, globals, locals, fromlist, level)
 
+    original_compile = builtins.compile
+    original_exec = builtins.exec
+    approved_exec_codes: dict[int, object] = {}
+    expected_seed_base = (
+        allowed_root / "base" / "seed" / "python" / "aset_seed_alpha4.py"
+    ).resolve()
+
+    def denied(*args: object, **kwargs: object) -> object:
+        raise NetworkExpressionAirgapError(
+            "air-gap companion attempted forbidden runtime capability"
+        )
+
+    def guarded_compile(
+        source_value: object,
+        filename: object,
+        mode: object,
+        *args: object,
+        **kwargs: object,
+    ) -> object:
+        require(
+            allow_seed_loader,
+            "air-gap companion compile forbidden outside exact Seed base loader",
+        )
+        require(
+            isinstance(source_value, (str, bytes)) and isinstance(filename, str) and mode == "exec",
+            "air-gap companion compile permitted only for exact Seed base loader",
+        )
+        candidate = Path(filename).resolve()
+        require(
+            candidate == expected_seed_base,
+            "air-gap companion compile path is not exact Seed base",
+        )
+        with original_io_open(candidate, "rb") as stream:
+            expected_bytes = stream.read()
+        actual_bytes = (
+            source_value.encode("utf-8") if isinstance(source_value, str) else source_value
+        )
+        require(
+            actual_bytes == expected_bytes,
+            "air-gap companion compiled Seed source bytes mismatch",
+        )
+        code = original_compile(
+            source_value,
+            filename,
+            mode,
+            *args,
+            **kwargs,
+        )
+        approved_exec_codes[id(code)] = code
+        return code
+
     safe_builtins = dict(vars(builtins))
+    for name in _DENIED_RUNTIME_BUILTINS:
+        if name in safe_builtins:
+            safe_builtins[name] = denied
     safe_builtins["__import__"] = guarded_import
     safe_builtins["open"] = guarded_open
+    safe_builtins["compile"] = guarded_compile
 
     def guarded_exec(
         code: object,
         globals_dict: dict[str, Any] | None = None,
         locals_dict: dict[str, Any] | None = None,
     ) -> None:
+        require(
+            allow_seed_loader and approved_exec_codes.get(id(code)) is code,
+            "air-gap companion exec permitted only for exact Seed base code",
+        )
+        approved_exec_codes.pop(id(code), None)
         target_globals = {} if globals_dict is None else globals_dict
-        target_globals.setdefault("__builtins__", safe_builtins)
-        exec(code, target_globals, locals_dict)
+        target_globals["__builtins__"] = safe_builtins
+        original_exec(code, target_globals, locals_dict)
 
     safe_builtins["exec"] = guarded_exec
     namespace: dict[str, Any] = {
@@ -689,6 +795,11 @@ def check_airgap(profiles_root: Path) -> dict[str, Any]:
             "triangulated_expression_checker": "NONE",
             "companion_import_surface": "RESTRICTED",
             "companion_file_access": "MATERIALIZED_PROFILE_TREE_READ_ONLY",
+            "companion_dynamic_builtins": "DENIED",
+            "companion_filesystem_method_aliasing": "DENIED",
+            "companion_seed_loader_exec": "EXACT_SEED_BASE_BYTES_ONLY",
+            "runtime_capability_isolation": "PASS",
+            "process_isolation": "NOT_CLAIMED",
         },
         "profile_tree_digest": before,
         "inputs": {
@@ -750,7 +861,8 @@ def main() -> int:
             f"{coverage['sensitivity_cases']}/26 PASS"
         )
         print(f"ALPHA4_NETWORK_PYTHON_AIRGAP_GRAND_TOTAL={coverage['grand_total_cases']}/472 PASS")
-        print("ALPHA4_NETWORK_PYTHON_COMPANION_RUNTIME_ISOLATION=PASS")
+        print("ALPHA4_NETWORK_PYTHON_COMPANION_RUNTIME_CAPABILITY_ISOLATION=PASS")
+        print("ALPHA4_NETWORK_PYTHON_COMPANION_PROCESS_ISOLATION=NOT_CLAIMED")
         print("ALPHA4_NETWORK_PYTHON_SEED_BASE=EXACT")
         print("ALPHA4_NETWORK_PYTHON_SEMANTIC_SOURCE_DEPENDENCY=NONE")
         print("ALPHA4_NETWORK_PYTHON_GENERATOR_DEPENDENCY=NONE")
