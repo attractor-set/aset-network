@@ -26,5 +26,6 @@ PAIR ASET-NETWORK-DYNAMIC-APPLICABILITY PROFILE-APPLICABLE? ProfileApplicable Op
 PAIR ASET-NETWORK-DYNAMIC-NETWORK-STUTTER PROFILE-NETWORK-STUTTER? DynamicProfileNetworkProjection OperationalDynamicProfileNetworkProjection DynamicProfileNetworkProjectionPairing
 CAUSAL-BIND ASET-NETWORK-DYNAMIC-APPLICABILITY PROFILE-APPLICABLE
 CAUSAL-BIND ASET-NETWORK-DYNAMIC-NETWORK-STUTTER PROFILE-NETWORK-STUTTER
+RELATION OPERATIONAL_CAUSAL_INTERFACE EXACT_STACK_CLOSED_WORLD_CAUSAL_CONTRACT
 PROOF OPERATIONAL_RELATIONAL_PAIRING network/alpha4/profiles/dynamic/formal/DynamicOperationalRelationalPairingProofs.tla DynamicOperationalRelationalPairing
 PROOF BOUNDARY network/alpha4/profiles/dynamic/formal/DynamicProfileBoundaryProofs.tla DynamicProfilesPreserveNetworkAndLocalAuthority

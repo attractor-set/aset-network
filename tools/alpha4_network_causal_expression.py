@@ -77,6 +77,216 @@ SUBJECTS = {
 }
 
 
+EXPECTED_CAUSAL_CONTRACTS: dict[
+    str, dict[str, tuple[str, frozenset[str], frozenset[str], dict[str, str]]]
+] = {
+    "network": {
+        "ADMIT-FRESH": (
+            "ASET-NETWORK-COMPONENT-ADMIT-FRESH",
+            frozenset({"EXACT_IMPORT", "FRESH_ID"}),
+            frozenset({"ADD_IMPORT"}),
+            {
+                "ACCEPTED": "TRUE",
+                "CODE": "IMPORT_ADMITTED",
+                "STATE_CHANGED": "TRUE",
+                "SEED_RECOGNITION": "UNKNOWN",
+                "SEED_EFFECT": "FALSE",
+            },
+        ),
+        "ADMIT-REPLAY": (
+            "ASET-NETWORK-COMPONENT-ADMIT-REPLAY",
+            frozenset({"EXACT_IMPORT", "EXACT_REPLAY"}),
+            frozenset({"PRESERVE_IMPORTS"}),
+            {
+                "ACCEPTED": "TRUE",
+                "CODE": "IDEMPOTENT_REPLAY",
+                "STATE_CHANGED": "FALSE",
+                "SEED_RECOGNITION": "UNKNOWN",
+                "SEED_EFFECT": "FALSE",
+            },
+        ),
+        "REJECT-CONFLICT": (
+            "ASET-NETWORK-COMPONENT-REJECT-CONFLICT",
+            frozenset({"EXACT_IMPORT", "CONFLICTING_ID"}),
+            frozenset({"PRESERVE_IMPORTS"}),
+            {
+                "ACCEPTED": "FALSE",
+                "CODE": "IDENTIFIER_CONFLICT",
+                "STATE_CHANGED": "FALSE",
+                "SEED_RECOGNITION": "NOT_APPLICABLE",
+                "SEED_EFFECT": "FALSE",
+            },
+        ),
+    },
+    "dynamic": {
+        "PROFILE-APPLICABLE": (
+            "ASET-NETWORK-DYNAMIC-APPLICABILITY",
+            frozenset({"EXACT_PROFILE_BINDING", "TARGET_LOCAL_ALLOW"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "PROFILE-NETWORK-STUTTER": (
+            "ASET-NETWORK-DYNAMIC-NETWORK-STUTTER",
+            frozenset({"SAME_NETWORK"}),
+            frozenset({"PRESERVE_NETWORK"}),
+            {"VALUE": "TRUE"},
+        ),
+    },
+    "federation": {
+        "FEDERATION-GENESIS": (
+            "ASET-NETWORK-FEDERATION-GENESIS",
+            frozenset({"EMPTY_FEDERATION"}),
+            frozenset({"CREATE_FEDERATION", "PRESERVE_NETWORK"}),
+            {"CODE": "FEDERATION_CREATED"},
+        ),
+        "MEMBER-JOIN": (
+            "ASET-NETWORK-MEMBER-JOIN",
+            frozenset({"FEDERATION_EXISTS", "MEMBER_ABSENT"}),
+            frozenset({"ADD_MEMBER", "PRESERVE_NETWORK"}),
+            {"CODE": "MEMBER_JOINED"},
+        ),
+        "ROUTE-GRANT": (
+            "ASET-NETWORK-ROUTE-GRANT",
+            frozenset({"ACTIVE_MEMBERS", "DISTINCT_ENDPOINTS", "ROUTE_ABSENT"}),
+            frozenset({"ADD_ACTIVE_ROUTE", "PRESERVE_NETWORK"}),
+            {"CODE": "ROUTE_GRANTED"},
+        ),
+        "EXPORT-ARTIFACT": (
+            "ASET-NETWORK-EXPORT-ARTIFACT",
+            frozenset({"ACTIVE_ROUTE", "EXPORT_ABSENT"}),
+            frozenset({"ADD_EXPORT", "PRESERVE_NETWORK"}),
+            {"CODE": "ARTIFACT_EXPORTED"},
+        ),
+        "SUSPEND-ROUTE": (
+            "ASET-NETWORK-SUSPEND-ROUTE",
+            frozenset({"ACTIVE_ROUTE"}),
+            frozenset({"SUSPEND_ACTIVE_ROUTE", "PRESERVE_NETWORK"}),
+            {"CODE": "ROUTE_SUSPENDED"},
+        ),
+        "MEMBER-WITHDRAW": (
+            "ASET-NETWORK-MEMBER-WITHDRAW",
+            frozenset({"ACTIVE_MEMBER", "NO_ACTIVE_ROUTE"}),
+            frozenset({"WITHDRAW_MEMBER", "PRESERVE_NETWORK"}),
+            {"CODE": "MEMBER_WITHDRAWN"},
+        ),
+    },
+    "liveness": {
+        "EVENTUALLY-DELIVERED-CLAIM": (
+            "ASET-NETWORK-LIVENESS-DELIVERY-CLAIM",
+            frozenset(
+                {
+                    "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
+                    "NO_PERMANENT_TARGET_UNAVAILABILITY",
+                }
+            ),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "EVENTUALLY-OBSERVED-CLAIM": (
+            "ASET-NETWORK-LIVENESS-OBSERVATION-CLAIM",
+            frozenset(
+                {
+                    "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
+                    "EVENTUAL_TARGET_OBSERVATION",
+                    "NO_PERMANENT_TARGET_UNAVAILABILITY",
+                }
+            ),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "EVENTUALLY-RESOLVED-CLAIM": (
+            "ASET-NETWORK-LIVENESS-RESOLUTION-CLAIM",
+            frozenset(
+                {
+                    "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
+                    "EVENTUAL_TARGET_OBSERVATION",
+                    "TARGET_LOCAL_SEED_EVENTUAL_RESOLUTION",
+                    "NO_PERMANENT_TARGET_UNAVAILABILITY",
+                }
+            ),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "RESOLVED-RESULT-PERMITTED": (
+            "ASET-NETWORK-LIVENESS-TERMINAL-RESULT",
+            frozenset({"SEED_TERMINAL_RESULT"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+    },
+    "federation-liveness": {
+        "REQUIRED-CAPABILITIES-SATISFIED": (
+            "ASET-NETWORK-FEDERATION-LIVENESS-CAPABILITIES",
+            frozenset({"REQUIRED_CAPABILITIES_PRESENT"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "COMPOSITION-BOUNDARY-PRESERVED": (
+            "ASET-NETWORK-FEDERATION-LIVENESS-BOUNDARY",
+            frozenset(
+                {
+                    "NO_PROFILE_PARENT",
+                    "NO_STATE_TRANSFER",
+                    "NO_TRANSITION_TRANSFER",
+                    "NO_AUTHORITY_TRANSFER",
+                }
+            ),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "DELIVERY-WITNESS": (
+            "ASET-NETWORK-FEDERATION-LIVENESS-DELIVERY-WITNESS",
+            frozenset({"EXPORTED", "DELIVERED"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "OBSERVATION-WITNESS": (
+            "ASET-NETWORK-FEDERATION-LIVENESS-OBSERVATION-WITNESS",
+            frozenset({"DELIVERED", "OBSERVED"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "RESOLUTION-WITNESS": (
+            "ASET-NETWORK-FEDERATION-LIVENESS-RESOLUTION-WITNESS",
+            frozenset({"OBSERVED", "RESOLVED"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+        "PROGRESS-WITNESS": (
+            "ASET-NETWORK-FEDERATION-LIVENESS-PROGRESS-WITNESS",
+            frozenset({"EXPORTED", "DELIVERED", "OBSERVED", "RESOLVED"}),
+            frozenset(),
+            {"VALUE": "TRUE"},
+        ),
+    },
+}
+
+
+def validate_causal_contract(subject_key: str, net: CausalNet) -> int:
+    expected = EXPECTED_CAUSAL_CONTRACTS[subject_key]
+    actual = {item.symbol: item for item in net.transitions}
+    require(set(actual) == set(expected), f"{subject_key}: causal transition surface drift")
+    for symbol, (component_id, requirements, effects, outputs) in expected.items():
+        transition = actual[symbol]
+        require(
+            transition.component_id == component_id,
+            f"{subject_key}/{symbol}: causal component identity drift",
+        )
+        require(
+            frozenset(transition.requirements) == requirements,
+            f"{subject_key}/{symbol}: causal requirement contract drift",
+        )
+        require(
+            frozenset(transition.effects) == effects,
+            f"{subject_key}/{symbol}: causal effect contract drift",
+        )
+        require(
+            transition.output_map() == outputs,
+            f"{subject_key}/{symbol}: causal output contract drift",
+        )
+    return len(expected)
+
+
 def _lines(path: Path) -> list[str]:
     return [line.strip() for line in path.read_text(encoding="utf-8").splitlines() if line.strip()]
 
@@ -193,6 +403,7 @@ def load_causal_nets(root: Path = ROOT) -> dict[str, CausalNet]:
         net = parse_causal_net(causal, subject_id, mode)
         actual = {item.component_id: item.symbol for item in net.transitions}
         require(actual == bindings, f"causal component binding mismatch: {key}")
+        validate_causal_contract(key, net)
         nets[key] = net
     return nets
 
@@ -202,7 +413,9 @@ def predicate_value(net: CausalNet, component_id: str, facts: set[str]) -> bool:
         transition = net.by_component()[component_id]
     except KeyError as error:
         raise CausalExpressionError(f"unknown causal component: {component_id}") from error
-    return set(transition.requirements) <= facts
+    outputs = transition.output_map()
+    require(set(outputs) == {"VALUE"}, f"{transition.symbol}: predicate output contract drift")
+    return set(transition.requirements) <= facts and _bool(outputs["VALUE"])
 
 
 def _bool(value: str) -> bool:

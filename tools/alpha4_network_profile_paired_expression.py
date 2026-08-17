@@ -65,6 +65,37 @@ EXPECTED_COMPOSITION_WORDS = {
     ),
 }
 
+EXPECTED_DYNAMIC_STACK_EFFECTS = {
+    "PROFILE-APPLICABLE?": (("binding", "seed-binding", "recognition"), ("flag",)),
+    "PROFILE-NETWORK-STUTTER?": (("network-before", "network-after"), ("flag",)),
+}
+EXPECTED_LIVENESS_STACK_EFFECTS = {
+    "EVENTUALLY-DELIVERED-CLAIM?": (("assumptions",), ("flag",)),
+    "EVENTUALLY-OBSERVED-CLAIM?": (("assumptions",), ("flag",)),
+    "EVENTUALLY-RESOLVED-CLAIM?": (("assumptions",), ("flag",)),
+    "RESOLVED-RESULT-PERMITTED?": (("result",), ("flag",)),
+}
+EXPECTED_COMPOSITION_STACK_EFFECTS = {
+    "REQUIRED-CAPABILITIES-SATISFIED?": (("provided",), ("flag",)),
+    "COMPOSITION-BOUNDARY-PRESERVED?": (
+        ("parent", "state-xfer", "transition-xfer", "authority-xfer"),
+        ("flag",),
+    ),
+    "DELIVERY-WITNESS?": (("exported", "delivered", "export"), ("flag",)),
+    "OBSERVATION-WITNESS?": (("delivered", "observed", "export"), ("flag",)),
+    "RESOLUTION-WITNESS?": (("observed", "resolved", "export"), ("flag",)),
+    "PROGRESS-WITNESS?": (
+        ("exported", "delivered", "observed", "resolved", "export"),
+        ("flag",),
+    ),
+}
+
+STACK_EFFECTS_BY_SOURCE = {
+    DYNAMIC_FORTH: EXPECTED_DYNAMIC_STACK_EFFECTS,
+    LIVENESS_FORTH: EXPECTED_LIVENESS_STACK_EFFECTS,
+    COMPOSITION_FORTH: EXPECTED_COMPOSITION_STACK_EFFECTS,
+}
+
 LIVENESS_ASSUMPTIONS = {
     "EVENTUAL_DELIVERY_FOR_RETAINED_EXPORT",
     "EVENTUAL_TARGET_OBSERVATION",
@@ -75,18 +106,48 @@ REQUIRED_CAPABILITIES = {"RETAINED_EXPORT", "DELIVERY", "TARGET_OBSERVATION"}
 SEED_TERMINAL_RESULTS = {"ALLOW", "BLOCK"}
 
 
-def parse_operational_words(path: Path) -> dict[str, tuple[str, ...]]:
+def _parse_operational_surface(
+    path: Path,
+) -> tuple[dict[str, tuple[str, ...]], dict[str, tuple[tuple[str, ...], tuple[str, ...]]]]:
     text = path.read_text(encoding="utf-8")
-    pattern = re.compile(r":\s+(?P<word>[A-Z0-9?-]+)\s+\([^)]*--[^)]*\)\s+(?P<body>.*?)\s*;")
-    return {
-        match.group("word"): tuple(match.group("body").split()) for match in pattern.finditer(text)
+    pattern = re.compile(
+        r":\s+(?P<word>[A-Z0-9?-]+)\s+"
+        r"\(\s*(?P<inputs>.*?)\s*--\s*(?P<outputs>.*?)\s*\)\s+"
+        r"(?P<body>.*?)\s*;"
+    )
+    matches = list(pattern.finditer(text))
+    words = {match.group("word"): tuple(match.group("body").split()) for match in matches}
+    stacks = {
+        match.group("word"): (
+            tuple(match.group("inputs").split()),
+            tuple(match.group("outputs").split()),
+        )
+        for match in matches
     }
+    return words, stacks
 
 
-def require_words(path: Path, expected: dict[str, tuple[str, ...]]) -> None:
-    words = parse_operational_words(path)
+def parse_operational_words(path: Path) -> dict[str, tuple[str, ...]]:
+    words, stacks = _parse_operational_surface(path)
+    expected_stacks = STACK_EFFECTS_BY_SOURCE.get(path)
+    if expected_stacks is not None and stacks != expected_stacks:
+        raise RuntimeError(f"restricted operational stack contract mismatch for {path}: {stacks!r}")
+    return words
+
+
+def require_words(
+    path: Path,
+    expected: dict[str, tuple[str, ...]],
+    expected_stacks: dict[str, tuple[tuple[str, ...], tuple[str, ...]]] | None = None,
+) -> None:
+    words, stacks = _parse_operational_surface(path)
     if words != expected:
         raise RuntimeError(f"restricted operational vocabulary mismatch for {path}: {words!r}")
+    stack_contract = expected_stacks or STACK_EFFECTS_BY_SOURCE.get(path)
+    if stack_contract is None:
+        raise RuntimeError(f"operational stack contract is not declared for {path}")
+    if stacks != stack_contract:
+        raise RuntimeError(f"restricted operational stack contract mismatch for {path}: {stacks!r}")
 
 
 def _powerset(values: set[str]) -> list[set[str]]:
