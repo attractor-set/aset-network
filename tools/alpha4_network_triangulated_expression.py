@@ -9,6 +9,7 @@ from typing import Any
 
 from tools import alpha4_network_profile_paired_expression as profile_pair
 from tools.alpha4_network_causal_expression import (
+    EXPECTED_CAUSAL_CONTRACTS,
     CausalExpressionError,
     CausalNet,
     causal_admit,
@@ -16,9 +17,15 @@ from tools.alpha4_network_causal_expression import (
     predicate_value,
 )
 from tools.alpha4_network_paired_expression import (
+    EXPECTED_STACK_EFFECTS as CORE_EXPECTED_STACK_EFFECTS,
+)
+from tools.alpha4_network_paired_expression import (
     bounded_pairing_check,
     operational_admit,
     relational_admit,
+)
+from tools.alpha4_network_paired_expression import (
+    parse_operational_words as parse_core_operational_words,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -110,13 +117,49 @@ FEDERATION_EXPECTED_WORDS = {
     ),
 }
 
+FEDERATION_EXPECTED_STACK_EFFECTS = {
+    "FEDERATION-GENESIS": (
+        ("profile", "federation-id", "epoch", "network"),
+        ("profile", "network", "result"),
+    ),
+    "MEMBER-JOIN": (("profile", "context", "network"), ("profile", "network", "result")),
+    "ROUTE-GRANT": (
+        ("profile", "source", "target", "network"),
+        ("profile", "network", "result"),
+    ),
+    "EXPORT-ARTIFACT": (
+        ("profile", "source", "target", "artifact", "network"),
+        ("profile", "network", "result"),
+    ),
+    "SUSPEND-ROUTE": (
+        ("profile", "source", "target", "network"),
+        ("profile", "network", "result"),
+    ),
+    "MEMBER-WITHDRAW": (
+        ("profile", "context", "network"),
+        ("profile", "network", "result"),
+    ),
+}
+
 
 def _parse_forth(path: Path) -> dict[str, tuple[str, ...]]:
     text = path.read_text(encoding="utf-8")
-    pattern = re.compile(r":\s+(?P<word>[A-Z0-9?-]+)\s+\([^)]*--[^)]*\)\s+(?P<body>.*?)\s*;")
-    return {
-        match.group("word"): tuple(match.group("body").split()) for match in pattern.finditer(text)
+    pattern = re.compile(
+        r":\s+(?P<word>[A-Z0-9?-]+)\s+"
+        r"\(\s*(?P<inputs>.*?)\s*--\s*(?P<outputs>.*?)\s*\)\s+"
+        r"(?P<body>.*?)\s*;"
+    )
+    matches = list(pattern.finditer(text))
+    words = {match.group("word"): tuple(match.group("body").split()) for match in matches}
+    stacks = {
+        match.group("word"): (
+            tuple(match.group("inputs").split()),
+            tuple(match.group("outputs").split()),
+        )
+        for match in matches
     }
+    require(stacks == FEDERATION_EXPECTED_STACK_EFFECTS, "federation stack contract drift")
+    return words
 
 
 def _validate_representation_sources() -> None:
@@ -134,6 +177,16 @@ def _validate_representation_sources() -> None:
             if line.strip()
         ]
         require("SEMANTIC-PRECEDENCE NONE" in lines, f"semantic precedence drift: {manifest}")
+        require(
+            ("RELATION OPERATIONAL_CAUSAL_INTERFACE EXACT_STACK_CLOSED_WORLD_CAUSAL_CONTRACT")
+            in lines,
+            f"operational/causal interface relation missing: {manifest}",
+        )
+        if manifest == PROFILES / "federation/FEDERATION.aset":
+            require(
+                "RELATION OPERATIONAL_CAUSAL_RESULT OBSERVABLE_RESULT_CODE_CONGRUENCE" in lines,
+                "federation operational/causal result relation missing",
+            )
         sources: dict[str, str] = {}
         for line in lines:
             tokens = line.split()
@@ -529,10 +582,55 @@ def _federation_triangulation(net: CausalNet) -> tuple[int, int]:
     return len(seen), edges
 
 
+def _validate_operational_causal_contracts(nets: dict[str, CausalNet]) -> tuple[int, int, int]:
+    parse_core_operational_words()
+    profile_pair.require_words(
+        profile_pair.DYNAMIC_FORTH,
+        profile_pair.EXPECTED_DYNAMIC_WORDS,
+        profile_pair.EXPECTED_DYNAMIC_STACK_EFFECTS,
+    )
+    profile_pair.require_words(
+        profile_pair.LIVENESS_FORTH,
+        profile_pair.EXPECTED_LIVENESS_WORDS,
+        profile_pair.EXPECTED_LIVENESS_STACK_EFFECTS,
+    )
+    profile_pair.require_words(
+        profile_pair.COMPOSITION_FORTH,
+        profile_pair.EXPECTED_COMPOSITION_WORDS,
+        profile_pair.EXPECTED_COMPOSITION_STACK_EFFECTS,
+    )
+    federation_words = _parse_forth(FEDERATION_FORTH)
+    require(federation_words == FEDERATION_EXPECTED_WORDS, "federation operational source drift")
+
+    stack_contract_count = (
+        len(CORE_EXPECTED_STACK_EFFECTS)
+        + len(profile_pair.EXPECTED_DYNAMIC_STACK_EFFECTS)
+        + len(FEDERATION_EXPECTED_STACK_EFFECTS)
+        + len(profile_pair.EXPECTED_LIVENESS_STACK_EFFECTS)
+        + len(profile_pair.EXPECTED_COMPOSITION_STACK_EFFECTS)
+    )
+    causal_contract_count = sum(len(items) for items in EXPECTED_CAUSAL_CONTRACTS.values())
+
+    federation_by_symbol = {item.symbol: item for item in nets["federation"].transitions}
+    result_bindings = 0
+    for symbol, body in federation_words.items():
+        operational_code = body[-1].replace("-", "_")
+        causal_code = federation_by_symbol[symbol].output_map()["CODE"]
+        require(
+            operational_code == causal_code,
+            f"{symbol}: operational/causal result-code mismatch",
+        )
+        result_bindings += 1
+    return stack_contract_count, causal_contract_count, result_bindings
+
+
 def check_triangulated_assurance(root: Path = ROOT) -> dict[str, Any]:
     require(root.resolve() == ROOT.resolve(), "alternate root is not supported by this checker")
     _validate_representation_sources()
     nets = load_causal_nets(root)
+    stack_contracts, causal_contracts, result_bindings = _validate_operational_causal_contracts(
+        nets
+    )
     core_cases, accepted = _core_triangulation(nets["network"])
     dynamic_cases = _dynamic_triangulation(nets["dynamic"])
     federation_states, federation_edges = _federation_triangulation(nets["federation"])
@@ -550,6 +648,9 @@ def check_triangulated_assurance(root: Path = ROOT) -> dict[str, Any]:
             "operational_causal": "PASS",
             "relational_causal": "PASS",
         },
+        "operational_stack_contracts": stack_contracts,
+        "causal_closed_world_contracts": causal_contracts,
+        "federation_result_code_bindings": result_bindings,
         "core_cases": core_cases,
         "core_accepted": accepted,
         "dynamic_cases": dynamic_cases,
@@ -570,6 +671,9 @@ def print_evidence(evidence: dict[str, Any]) -> None:
     liveness = evidence["liveness_cases"]
     composition = evidence["composition_cases"]
     total = evidence["total_cases"]
+    stacks = evidence["operational_stack_contracts"]
+    causal_contracts = evidence["causal_closed_world_contracts"]
+    result_bindings = evidence["federation_result_code_bindings"]
     print("ALPHA4_NETWORK_ASSURANCE_REPRESENTATIONS=OPERATIONAL,RELATIONAL,CAUSAL")
     print("ALPHA4_NETWORK_SEMANTIC_PRECEDENCE=NONE")
     print(f"ALPHA4_NETWORK_OPERATIONAL_RELATIONAL_CONGRUENCE={core}/{core} PASS")
@@ -581,6 +685,14 @@ def print_evidence(evidence: dict[str, Any]) -> None:
     print(f"ALPHA4_LIVENESS_THREE_WAY_CONGRUENCE={liveness}/{liveness} PASS")
     print(f"ALPHA4_FEDERATION_LIVENESS_THREE_WAY_CONGRUENCE={composition}/{composition} PASS")
     print(f"ALPHA4_NETWORK_ALL_SUBJECTS_TRIANGULATED_CASES={total}/{total} PASS")
+    print(f"ALPHA4_NETWORK_OPERATIONAL_STACK_CONTRACTS={stacks}/{stacks} PASS")
+    print(
+        f"ALPHA4_NETWORK_CAUSAL_CLOSED_WORLD_CONTRACTS={causal_contracts}/{causal_contracts} PASS"
+    )
+    print(
+        "ALPHA4_FEDERATION_OPERATIONAL_CAUSAL_RESULT_CODES="
+        f"{result_bindings}/{result_bindings} PASS"
+    )
     print("ALPHA4_NETWORK_REPRESENTATION_SOURCE_INDEPENDENCE=PASS")
     print("ALPHA4_NETWORK_TRIANGULATED_EXPRESSION=PASS")
 

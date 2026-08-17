@@ -25,6 +25,13 @@ EXPECTED_WORDS = {
     ),
 }
 
+
+EXPECTED_STACK_EFFECTS = {
+    "ADMIT-FRESH": (("imports", "observation"), ("imports", "result")),
+    "ADMIT-REPLAY": (("imports", "observation"), ("imports", "result")),
+    "REJECT-CONFLICT": (("imports", "observation"), ("imports", "result")),
+}
+
 OBSERVATION_FIELDS = {
     "import_id",
     "source_context",
@@ -33,14 +40,26 @@ OBSERVATION_FIELDS = {
 }
 
 
-def parse_operational_words() -> dict[str, tuple[str, ...]]:
-    text = FORTH.read_text(encoding="utf-8")
-    pattern = re.compile(r":\s+(?P<word>[A-Z0-9-]+)\s+\([^)]*--[^)]*\)\s+(?P<body>.*?)\s*;")
-    words = {
-        match.group("word"): tuple(match.group("body").split()) for match in pattern.finditer(text)
+def parse_operational_words(path: Path = FORTH) -> dict[str, tuple[str, ...]]:
+    text = path.read_text(encoding="utf-8")
+    pattern = re.compile(
+        r":\s+(?P<word>[A-Z0-9-]+)\s+"
+        r"\(\s*(?P<inputs>.*?)\s*--\s*(?P<outputs>.*?)\s*\)\s+"
+        r"(?P<body>.*?)\s*;"
+    )
+    matches = list(pattern.finditer(text))
+    words = {match.group("word"): tuple(match.group("body").split()) for match in matches}
+    stacks = {
+        match.group("word"): (
+            tuple(match.group("inputs").split()),
+            tuple(match.group("outputs").split()),
+        )
+        for match in matches
     }
     if words != EXPECTED_WORDS:
         raise RuntimeError(f"restricted operational vocabulary mismatch: {words!r}")
+    if stacks != EXPECTED_STACK_EFFECTS:
+        raise RuntimeError(f"restricted operational stack contract mismatch: {stacks!r}")
     return words
 
 
