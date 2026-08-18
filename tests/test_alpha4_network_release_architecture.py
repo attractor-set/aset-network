@@ -249,4 +249,91 @@ def test_network_airgap_executes_generated_companion_under_restricted_runtime(
         evidence["assurance_dependencies"]["companion_file_access"]
         == "MATERIALIZED_PROFILE_TREE_READ_ONLY"
     )
+    assert evidence["assurance_dependencies"]["companion_dynamic_builtins"] == "DENIED"
+    assert evidence["assurance_dependencies"]["companion_filesystem_method_aliasing"] == "DENIED"
+    assert (
+        evidence["assurance_dependencies"]["companion_seed_loader_exec"]
+        == "EXACT_SEED_BASE_BYTES_ONLY"
+    )
+    assert evidence["assurance_dependencies"]["runtime_capability_isolation"] == "PASS"
+    assert evidence["assurance_dependencies"]["process_isolation"] == "NOT_CLAIMED"
     assert evidence["status"] == "PASS"
+
+
+def test_network_airgap_rejects_bound_filesystem_capability_alias() -> None:
+    import pytest
+
+    from tools.alpha4_network_expression_airgap import (
+        NetworkExpressionAirgapError,
+        _validate_companion_ast,
+    )
+
+    source = "from pathlib import Path\nprobe = Path('.').iterdir\n"
+    with pytest.raises(
+        NetworkExpressionAirgapError,
+        match="filesystem inspection forbidden",
+    ):
+        _validate_companion_ast(
+            source,
+            allowed_imports=frozenset({"pathlib"}),
+            allow_seed_loader=False,
+        )
+
+
+def test_network_airgap_denies_aliased_dynamic_builtin_at_runtime(
+    tmp_path,
+) -> None:
+    import pytest
+
+    from tools.alpha4_network_expression_airgap import (
+        NetworkExpressionAirgapError,
+        execute,
+    )
+
+    subject = tmp_path / "network-subject.py"
+    subject.write_text(
+        "capability = getattr\ncapability((), 'missing')\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        NetworkExpressionAirgapError,
+        match="forbidden runtime capability",
+    ):
+        execute(
+            subject,
+            tmp_path,
+            allowed_imports=frozenset(),
+            allow_seed_loader=False,
+        )
+
+
+def test_network_airgap_denies_arbitrary_compile_exec_alias(
+    tmp_path,
+) -> None:
+    import pytest
+
+    from tools.alpha4_network_expression_airgap import (
+        NetworkExpressionAirgapError,
+        execute,
+    )
+
+    subject = tmp_path / "network-compile-subject.py"
+    subject.write_text(
+        "compiler = compile\n"
+        "executor = exec\n"
+        "code = compiler('VALUE = 1\\n', 'not-seed.py', 'exec')\n"
+        "executor(code)\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(
+        NetworkExpressionAirgapError,
+        match="compile path is not exact Seed base",
+    ):
+        execute(
+            subject,
+            tmp_path,
+            allowed_imports=frozenset(),
+            allow_seed_loader=True,
+        )

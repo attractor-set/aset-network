@@ -221,7 +221,12 @@ def check_admission(
         and dependencies.get("release_profile_generator") == "NONE"
         and dependencies.get("triangulated_expression_checker") == "NONE"
         and dependencies.get("companion_import_surface") == "RESTRICTED"
-        and dependencies.get("companion_file_access") == "MATERIALIZED_PROFILE_TREE_READ_ONLY",
+        and dependencies.get("companion_file_access") == "MATERIALIZED_PROFILE_TREE_READ_ONLY"
+        and dependencies.get("companion_dynamic_builtins") == "DENIED"
+        and dependencies.get("companion_filesystem_method_aliasing") == "DENIED"
+        and dependencies.get("companion_seed_loader_exec") == "EXACT_SEED_BASE_BYTES_ONLY"
+        and dependencies.get("runtime_capability_isolation") == "PASS"
+        and dependencies.get("process_isolation") == "NOT_CLAIMED",
         "Network Python air-gap independence boundary drift",
     )
 
@@ -316,7 +321,11 @@ def check_admission(
             "structural_cases": coverage["total_cases"],
             "identity_sensitivity_cases": coverage["sensitivity_cases"],
             "grand_total_cases": coverage["grand_total_cases"],
-            "runtime_isolation": "PASS",
+            "runtime_capability_isolation": "PASS",
+            "process_isolation": "NOT_CLAIMED",
+            "dynamic_builtins": "DENIED",
+            "filesystem_method_aliasing": "DENIED",
+            "seed_loader_exec": "EXACT_SEED_BASE_BYTES_ONLY",
             "status": "PASS",
         },
         "public_assurance": {
@@ -364,7 +373,8 @@ def main() -> int:
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_AIRGAP=446/446 PASS")
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_AIRGAP_IDENTITY_SENSITIVITY=26/26 PASS")
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_AIRGAP_GRAND_TOTAL=472/472 PASS")
-        print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_RUNTIME_ISOLATION=PASS")
+        print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_RUNTIME_CAPABILITY_ISOLATION=PASS")
+        print("ALPHA4_NETWORK_RELEASE_ADMISSION_PYTHON_PROCESS_ISOLATION=NOT_CLAIMED")
         print("ALPHA4_NETWORK_RELEASE_ADMISSION_ARCHIVE_BINDING=EXACT")
         print("ALPHA4_NETWORK_PUBLIC_ASSURANCE_REPRESENTATIONS=OPERATIONAL,RELATIONAL,CAUSAL")
         print("ALPHA4_NETWORK_PUBLIC_POST_BUILD_FORMAL_ASSURANCE=PASS")

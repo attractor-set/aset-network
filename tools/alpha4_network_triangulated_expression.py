@@ -671,7 +671,7 @@ def print_evidence(evidence: dict[str, Any]) -> None:
         f"{federation_identity_guards}/{federation_identity_guards} PASS"
     )
     print(
-        "ALPHA4_NETWORK_INTERFACE_VALIDATOR_INDEPENDENCE="
+        "ALPHA4_NETWORK_INTERFACE_VALIDATOR_CROSSCHECK="
         f"{interface_validator_cases}/{interface_validator_cases} PASS"
     )
     print(
