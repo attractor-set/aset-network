@@ -108,8 +108,8 @@ source Forth / TLA / Petri
 
 Verify the active source surface with `python -m tools.alpha4_network_gate`.
 The complete release gate is `tools.alpha4_network_release_gate.py`; CI supplies
-the exact immutable Seed source, release tree, companion tree, and pinned TLAPM.
-The Seed release bytes remain those published under `seed-0.4alpha-3way`.
+the exact content-addressed Seed source, release tree, companion tree, and pinned TLAPM.
+The Seed release bytes are pinned to `seed-0.4alpha-assurance-anchor-1`.
 
 Historical identities remain in `history/REFERENCES.aset`; historical
 executable theory, generated oracles, and predecessor-specific assurance tools
