@@ -105,7 +105,7 @@ def test_alpha4_seed_binding_is_content_addressed_not_commit_authority() -> None
     }
     binding = (ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset").read_text(encoding="utf-8")
     assert "CONTENT-ADDRESSED" in binding
-    assert "RELEASE-TAG seed-0.4alpha-3way" in binding
+    assert "RELEASE-TAG seed-0.4alpha-assurance-anchor-1" in binding
     assert "REQUIRED-SEED-CAUSAL-BIND ASET-COMPONENT-OBSERVE-UNKNOWN OBSERVE-UNKNOWN" in binding
     assert (
         "ASSURANCE-BASE OPERATIONAL seed/alpha4/operational/components.forth OBSERVE-UNKNOWN"

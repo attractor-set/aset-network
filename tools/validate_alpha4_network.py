@@ -15,8 +15,8 @@ BINDING = ROOT / "upstream/ASET_SEED_ALPHA4_BINDING.aset"
 HISTORY = ROOT / "history/REFERENCES.aset"
 CITATION = ROOT / "CITATION.cff"
 
-EXPECTED_ALPHA4_BINDING_SHA256 = "21fedbba98b1c36d96dba2072ccaf2e088348be13a1c9ea8d5e3bdf7616d27a4"
-EXPECTED_SEED_ALPHA4_RELEASE_TAG = "seed-0.4alpha-3way"
+EXPECTED_ALPHA4_BINDING_SHA256 = "f8bc3c73285130ad9d0529a3e8d2940c9941f0f7ea24199fd580a88ed3d0331f"
+EXPECTED_SEED_ALPHA4_RELEASE_TAG = "seed-0.4alpha-assurance-anchor-1"
 EXPECTED_ALPHA3_PACKAGE_DIGEST = (
     "sha256:82976c30880ed2a6c810b8f0aa5585dee5ab73fa12684a9d17784bac0a1bbbc7"
 )
@@ -163,8 +163,8 @@ def parse_binding() -> dict[str, str]:
         "Seed Alpha4 release locator mismatch",
     )
     for declaration in (
-        "RELEASE-TREE sha256:136e174a987ee961877472eecac3903e4f1e54a68059815e9b84e8fb966e00cc",
-        "PROFILE-TREE sha256:fb75339485027ad1529714e1793669c4850390fe54a586864772a13ab90c094e",
+        "RELEASE-TREE sha256:bc4f8409c6b28f6c31bcdeedbf6f98bea9a02e361157984a892eff9ddf03cfdf",
+        "PROFILE-TREE sha256:e8c750acbb7bf2b249a714253f75bd6025eb9fd6c84a9d3516d3b1e72ace988f",
         (
             "COMPANION ENGLISH en/Seed.md "
             "sha256:8d44ddd7d244b385de5e37bd9429f9509680775593330a258f97ff178c5fb7b9"
